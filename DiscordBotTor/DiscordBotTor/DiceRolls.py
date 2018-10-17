@@ -1,5 +1,7 @@
 import random
 
+#rolls dice
+#accepts input in the form of !roll #dTYPE ex: !roll 1d20
 class Roller():
     def roll(self, input):
         outMsg = ""
@@ -24,7 +26,8 @@ class Roller():
                 outMsg = outMsg + f"[{roll}] "
 
             outMsg += f"\n**Total: {total}**"
-          
+         
+        #invalid input
         except:
             outMsg = "*I'm sorry. There was something that I did not understand in your command. Please contact <@112041042894655488> so we can resolve this issue.*"
              

@@ -1,0 +1,6 @@
+***Dwarf Resilience***
+*(UA: Feats for Races)	Prerequisite: Dwarf*
+
+**You inherited the might and majesty of your dragon ancestors. You gain the following benefits:**
+• Increase your Constitution score by 1, up to a maximum of 20.
+• Whenever you take the Dodge action in combat, you can spend one Hit Die to heal yourself. Roll the die, add your Constitution modifier, and regain a number of hit points equal to the total (minimum of 1).
