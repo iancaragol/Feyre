@@ -10,6 +10,7 @@ import DiceRolls
 import MonsterManual
 import Feats
 import time
+import math
 
 from discord.voice_client import VoiceClient
 
@@ -23,6 +24,7 @@ class MyClient(discord.Client):
     async def on_message(self, message):
         ts = time.gmtime()
         t = time.strftime("%Y-%m-%d %H:%M:%S", ts)
+
         # don't respond to ourselves
         if message.author == self.user:
             return
@@ -82,36 +84,45 @@ Please message <@112041042894655488> if you have any questions/issues.''')
         if message.content.lower().startswith('!mm'):
             print(f"Received command: {message.content.lower()} from {message.author} at {t}")   
             
+            #search the monster manual
             retArr = mm.search(message.content.lower())
             if(len(retArr[1]) < 2048):
-                embed = discord.Embed(title = retArr[0], description = retArr[1], color=discord.Color.from_rgb(141, 158, 186))
+                embed = discord.Embed(title = retArr[0], description = retArr[1], color=discord.Color.from_rgb(87,228,249))
                 await message.channel.send(embed = embed)
-            #discord has a 2048 character limit. this may need to be adjusted for descriptions greater than 4096
-            #breaks on "!mm sea"
+
+            #discord has a 2048 character limit so this is needed to split the message into chunks
             else:
-                string = retArr[1]
-                firstpart, secondpart = string[:len(string)//2], string[len(string)//2 if len(string)%2 == 0 else ((len(string)//2)+1):]
-                embed1 = discord.Embed(title = retArr[0], description = firstpart, color=discord.Color.from_rgb(141, 158, 186))
-                embed2 = discord.Embed(title = retArr[0] + " *- Continued*", description = secondpart, color=discord.Color.from_rgb(141, 158, 186))
-                await message.channel.send(embed = embed1)
-                await message.channel.send(embed = embed2)
+                s = retArr[1]
+                mod = math.ceil(len(s) / 2048)
+                parts = [s[i:i+2048] for i in range(0, len(s), 2048)]
+                    
+                for i in range(0, len(parts)):
+                    if(i == 0):
+                        embed = discord.Embed(title = retArr[0], description = parts[i], color=discord.Color.from_rgb(87,228,249))
+                    else:
+                        embed = discord.Embed(title = retArr[0] + " *- Continued*", description = parts[i], color=discord.Color.from_rgb(87,228,249))
+                    await message.channel.send(embed = embed)    
 
         if message.content.lower().startswith('!randmonster'):
             print(f"Received command: {message.content.lower()} from {message.author} at {t}")   
             
             retArr = mm.randMonster()
             if(len(retArr[1]) < 2048):
-                embed = discord.Embed(title = f"<@{message.author.id}>   " + retArr[0], description = retArr[1], color=discord.Color.from_rgb(141, 158, 186))
+                embed = discord.Embed(title = retArr[0], description = retArr[1], color=discord.Color.from_rgb(141, 158, 186))
                 await message.channel.send(embed = embed)
 
-            #discord has a 2048 character limit. this may need to be adjusted for descriptions greater than 4096
+            #discord has a 2048 character limit so this is needed to split the message into chunks
             else:
-                string = retArr[1]
-                firstpart, secondpart = string[:len(string)//2], string[len(string)//2 if len(string)%2 == 0 else ((len(string)//2)+1):]
-                embed1 = discord.Embed(title = retArr[0], description = firstpart, color=discord.Color.from_rgb(141, 158, 186))
-                embed2 = discord.Embed(title = retArr[0] + " *- Continued*", description = secondpart, color=discord.Color.from_rgb(141, 158, 186))
-                await message.channel.send(embed = embed1)
-                await message.channel.send(embed = embed2)
+                s = retArr[1]
+                mod = math.ceil(len(s) / 2048)
+                parts = [s[i:i+2048] for i in range(0, len(s), 2048)]
+                    
+                for i in range(0, len(parts)):
+                    if(i == 0):
+                        embed = discord.Embed(title = retArr[0], description = parts[i], color=discord.Color.from_rgb(87,228,249))
+                    else:
+                        embed = discord.Embed(title = retArr[0] + " *- Continued*", description = parts[i], color=discord.Color.from_rgb(87,228,249))
+                    await message.channel.send(embed = embed)  
 
         if message.content.lower().startswith('!feat'):
             print(f"Received command: {message.content.lower()} from {message.author} at {t}")   
@@ -120,15 +131,19 @@ Please message <@112041042894655488> if you have any questions/issues.''')
             if(len(retArr[1]) < 2048):
                 embed = discord.Embed(title = retArr[0], description = retArr[1], color=discord.Color.from_rgb(141, 158, 186))
                 await message.channel.send(embed = embed)
-            #discord has a 2048 character limit. this may need to be adjusted for descriptions greater than 4096
-            #breaks on "!mm sea"
+
+            #discord has a 2048 character limit so this is needed to split the message into chunks
             else:
-                string = retArr[1]
-                firstpart, secondpart = string[:len(string)//2], string[len(string)//2 if len(string)%2 == 0 else ((len(string)//2)+1):]
-                embed1 = discord.Embed(title = retArr[0], description = firstpart, color=discord.Color.from_rgb(141, 158, 186))
-                embed2 = discord.Embed(title = retArr[0] + " *- Continued*", description = secondpart, color=discord.Color.from_rgb(141, 158, 186))
-                await message.channel.send(embed = embed1)
-                await message.channel.send(embed = embed2)
+                s = retArr[1]
+                mod = math.ceil(len(s) / 2048)
+                parts = [s[i:i+2048] for i in range(0, len(s), 2048)]
+                    
+                for i in range(0, len(parts)):
+                    if(i == 0):
+                        embed = discord.Embed(title = retArr[0], description = parts[i], color=discord.Color.from_rgb(87,228,249))
+                    else:
+                        embed = discord.Embed(title = retArr[0] + " *- Continued*", description = parts[i], color=discord.Color.from_rgb(87,228,249))
+                    await message.channel.send(embed = embed)  
             
 
 global bt 

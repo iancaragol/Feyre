@@ -15,7 +15,7 @@ class Feats():
         absRelPath = os.path.join(pyDir, relPath)
 
         for file in os.listdir(absRelPath):
-                self.featDictionary[file.replace(".txt", "")] = file
+                self.featDictionary[file.replace(".txt", "")] = self.readForDict(file)
 
     def search(self, message):
         #!feat Name
@@ -28,13 +28,36 @@ class Feats():
             retArr.append("*I'm sorry, I was unable to find the monster you are looking for.*")
             return retArr
 
-        return self.readAndFormat(closeMatches)
+        return self.featDictionary[closeMatches[0]]
+        #return self.readAndFormat(closeMatches)
     
+    def readForDict(self, filename):
+         pyDir = os.path.dirname(__file__)
+         relPath = "_data\\_feats"
+         absRelPath = os.path.join(pyDir, relPath)
+         file = open(os.path.join(absRelPath, filename), 'r')
+
+         retArr = []
+         retStr = ""
+
+         i = 0
+         for line in file:
+             if (i == 0):
+                 retArr.append(line)
+                 i = 1
+             else:
+                 retStr += line
+
+         #print(retStr)
+         retArr.append(retStr)
+         return retArr
+
+
+
     def readAndFormat(self, matches):
          pyDir = os.path.dirname(__file__)
          relPath = "_data\\_feats"
          absRelPath = os.path.join(pyDir, relPath)
-
 
          filename = self.featDictionary[matches[0]]
          file = open(os.path.join(absRelPath, filename), 'r')
@@ -50,6 +73,6 @@ class Feats():
              else:
                  retStr += line
 
-         print(retStr)
+         #print(retStr)
          retArr.append(retStr)
          return retArr
