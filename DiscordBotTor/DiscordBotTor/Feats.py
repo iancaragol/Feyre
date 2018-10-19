@@ -7,6 +7,7 @@ class Feats():
         #maps feat names to file names
         #skipped all non PH feats from Dwarven Fortitude down
         self.featDictionary = {}
+        self.featList = []
         self.setup()
 
     def setup(self):
@@ -16,8 +17,9 @@ class Feats():
 
         for file in os.listdir(absRelPath):
                 self.featDictionary[file.replace(".txt", "")] = self.readForDict(file)
+        self.featList = list(self.featDictionary)
 
-    def search(self, message):
+    async def search(self, message):
         #!feat Name
         feat = message[6:]
         closeMatches = difflib.get_close_matches(feat, list(self.featDictionary.keys()))
@@ -31,6 +33,12 @@ class Feats():
         return self.featDictionary[closeMatches[0]]
         #return self.readAndFormat(closeMatches)
     
+    async def randFeat(self):     
+        roll = random.randint(0, len(self.featList) - 1)
+        feat = self.featList[roll]
+
+        return self.featDictionary[feat]
+
     def readForDict(self, filename):
          pyDir = os.path.dirname(__file__)
          relPath = "_data\\_feats"

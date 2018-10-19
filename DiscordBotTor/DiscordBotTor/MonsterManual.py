@@ -1,13 +1,15 @@
 import os
 import difflib
 import random
+import asyncio
 
 #Gets a monster from the D&D monster manual
 class MonsterManual():
     def __init__(self):
-        #maps monster names to file names
+        #maps monster names to monster manual arrays
         self.monsterDictionary = {}
         self.setup()
+        self.mmList = []
 
     def setup(self):
         pyDir = os.path.dirname(__file__)
@@ -15,9 +17,12 @@ class MonsterManual():
         absRelPath = os.path.join(pyDir, relPath)
 
         for file in os.listdir(absRelPath):
-                self.monsterDictionary[file.replace(' ', '-').replace(".markdown", "")] = file
+                self.monsterDictionary[file.replace(' ', '-').replace(".markdown", "")] = self.readForDict(file)
 
-    def search(self, message):
+        self.mmList = list(self.monsterDictionary)
+
+    #searches for the monster that matches the search message most closely
+    async def search(self, message):
         monster = message[4:]
         monster.replace(' ', '-')
         closeMatches = difflib.get_close_matches(monster, list(self.monsterDictionary.keys()))
@@ -28,15 +33,21 @@ class MonsterManual():
             retArr.append("*I'm sorry, I was unable to find the monster you are looking for.*")
             return retArr
 
-        return self.readAndFormat(closeMatches)
+        return self.monsterDictionary[closeMatches[0]]
 
-    def readAndFormat(self, matches):
+    #gives a random monster
+    async def randMonster(self):      
+        roll = random.randint(0, len(self.mmList) - 1)
+        monster = self.mmList[roll]
+
+        return self.monsterDictionary[monster]
+
+    #helper for setup
+    def readForDict(self, filename):
          pyDir = os.path.dirname(__file__)
          relPath = "_data\\_monsters"
          absRelPath = os.path.join(pyDir, relPath)
 
-
-         filename = self.monsterDictionary[matches[0]]
          file = open(os.path.join(absRelPath, filename), 'r')
 
          retArr = []
@@ -54,17 +65,8 @@ class MonsterManual():
 
          retArr.append(retStr)
          return retArr
-
-    def randMonster(self):
-        mmList = list(self.monsterDictionary)
-        roll = random.randint(0, len(mmList) - 1)
-
-        mHelp = []
-        monster = mmList[roll]
-        mHelp.append(monster)
-
-        return self.readAndFormat(mHelp)
-
+ 
+    #helper to fix markdown files
     def fixFileNames(self):
             pyDir = os.path.dirname(__file__)
             relPath = "_data\\"

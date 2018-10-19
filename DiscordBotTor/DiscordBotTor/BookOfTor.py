@@ -1,4 +1,5 @@
 import random
+import asyncio
 
 class BookOfTor():
     def __init__(self):
@@ -175,22 +176,22 @@ class BookOfTor():
            20:"Tryptan", 21:"Nazkin", 22:"Gunthian", 23:"Galovian", 24:"Fleman"
                 }
     #gives a horoscope from the book of tor 
-    def horo(self):
+    async def horo(self):
         roll = random.randint(1, 10)
         return str(self.horoscopeDict[roll])
 
     #gives a zodiac from the book of tor
-    def zodiac(self):
+    async def zodiac(self):
         roll = random.randint(1, 12)
         return str(self.zodiacDict[roll])
 
     #creates a random race, class combination from the book of tor
-    def ranchar(self):
+    async def ranchar(self):
         cclass = self.classDict[random.randint(1, 20)]
         race = self.raceDict[random.randint(1, 24)]
         return str(f"You should play a {race} {cclass}!")
 
-    def styles(self):
+    async def styles(self):
         styleString = '''**Minimalist**
 Simple, clean, effective. There is no need for excessive displays.
  
