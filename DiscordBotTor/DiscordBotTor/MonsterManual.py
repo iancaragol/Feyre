@@ -58,7 +58,7 @@ class MonsterManual():
          relPath = "_data//_monsters"
          absRelPath = os.path.join(pyDir, relPath)
 
-         file = open(os.path.join(absRelPath, filename), 'r', encoding='utf-8')
+         file = open(os.path.join(absRelPath, filename), 'r', encoding = 'latin-1')
 
          retArr = []
          retStr = ""

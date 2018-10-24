@@ -43,7 +43,7 @@ class Feats():
          pyDir = os.path.dirname(__file__)
          relPath = "_data//_feats"
          absRelPath = os.path.join(pyDir, relPath)
-         file = open(os.path.join(absRelPath, filename), 'r')
+         file = open(os.path.join(absRelPath, filename), 'r', encoding = 'latin-1')
 
          retArr = []
          retStr = ""
@@ -68,7 +68,7 @@ class Feats():
          absRelPath = os.path.join(pyDir, relPath)
 
          filename = self.featDictionary[matches[0]]
-         file = open(os.path.join(absRelPath, filename), 'r', encoding='utf-8')
+         file = open(os.path.join(absRelPath, filename), 'r', encoding = 'latin-1')
 
          retArr = []
          retStr = ""
