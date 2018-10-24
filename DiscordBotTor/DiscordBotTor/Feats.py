@@ -27,7 +27,7 @@ class Feats():
         if(len(closeMatches) == 0):
             retArr = []
             retArr.append("An error occurred.")
-            retArr.append("*I'm sorry, I was unable to find the monster you are looking for.*")
+            retArr.append("*I'm sorry, I was unable to find the feat you are looking for.*")
             return retArr
 
         return self.featDictionary[closeMatches[0]]

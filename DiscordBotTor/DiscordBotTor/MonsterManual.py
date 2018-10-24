@@ -8,8 +8,9 @@ class MonsterManual():
     def __init__(self):
         #maps monster names to monster manual arrays
         self.monsterDictionary = {}
-        self.setup()
         self.mmList = []
+        self.setup()
+        
 
     def setup(self):
         pyDir = os.path.dirname(__file__)
@@ -18,7 +19,6 @@ class MonsterManual():
 
         for file in os.listdir(absRelPath):
                 self.monsterDictionary[file.replace(' ', '-').replace(".markdown", "")] = self.readForDict(file)
-
         self.mmList = list(self.monsterDictionary)
 
     #searches for the monster that matches the search message most closely
@@ -26,6 +26,7 @@ class MonsterManual():
         monster = message[4:]
         monster.replace(' ', '-')
         closeMatches = difflib.get_close_matches(monster, list(self.monsterDictionary.keys()))
+        otherMatches = ""
 
         if(len(closeMatches) == 0):
             retArr = []
@@ -33,7 +34,16 @@ class MonsterManual():
             retArr.append("*I'm sorry, I was unable to find the monster you are looking for.*")
             return retArr
 
-        return self.monsterDictionary[closeMatches[0]]
+        elif(len(closeMatches) == 3):
+            otherMatches = "\n *Did you mean these? " + closeMatches[1] + " or " + closeMatches[2] + "*"
+
+        elif(len(closeMatches) == 2):
+            otherMatches = "\n *Did you mean this? " + closeMatches[1] +"*"
+
+        retArr = self.monsterDictionary[closeMatches[0]]
+        retArr[1] += otherMatches
+
+        return retArr
 
     #gives a random monster
     async def randMonster(self):      
