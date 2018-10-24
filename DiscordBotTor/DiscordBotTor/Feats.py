@@ -12,7 +12,7 @@ class Feats():
 
     def setup(self):
         pyDir = os.path.dirname(__file__)
-        relPath = "_data\\_feats"
+        relPath = "_data//_feats"
         absRelPath = os.path.join(pyDir, relPath)
 
         for file in os.listdir(absRelPath):
@@ -41,7 +41,7 @@ class Feats():
 
     def readForDict(self, filename):
          pyDir = os.path.dirname(__file__)
-         relPath = "_data\\_feats"
+         relPath = "_data//_feats"
          absRelPath = os.path.join(pyDir, relPath)
          file = open(os.path.join(absRelPath, filename), 'r')
 
@@ -64,7 +64,7 @@ class Feats():
 
     def readAndFormat(self, matches):
          pyDir = os.path.dirname(__file__)
-         relPath = "_data\\_feats"
+         relPath = "_data//_feats"
          absRelPath = os.path.join(pyDir, relPath)
 
          filename = self.featDictionary[matches[0]]

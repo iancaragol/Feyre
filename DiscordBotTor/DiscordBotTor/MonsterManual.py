@@ -14,7 +14,7 @@ class MonsterManual():
 
     def setup(self):
         pyDir = os.path.dirname(__file__)
-        relPath = "_data\\_monsters"
+        relPath = "_data//_monsters"
         absRelPath = os.path.join(pyDir, relPath)
 
         for file in os.listdir(absRelPath):
@@ -55,7 +55,7 @@ class MonsterManual():
     #helper for setup
     def readForDict(self, filename):
          pyDir = os.path.dirname(__file__)
-         relPath = "_data\\_monsters"
+         relPath = "_data//_monsters"
          absRelPath = os.path.join(pyDir, relPath)
 
          file = open(os.path.join(absRelPath, filename), 'r')
@@ -79,7 +79,7 @@ class MonsterManual():
     #helper to fix markdown files
     def fixFileNames(self):
             pyDir = os.path.dirname(__file__)
-            relPath = "_data\\"
+            relPath = "_data//"
             absRelPath = os.path.join(pyDir, relPath)
 
             for filename in os.listdir(absRelPath):
