@@ -50,7 +50,7 @@ class MyClient(discord.Client):
             await message.channel.send(f"<@{message.author.id}>" + "\n" + await bt.ranchar())
 
         if message.content.lower().startswith('!roll'):         
-            await message.channel.send(f"<@{message.author.id}>" + "\n" + await dr.roll(message.content))
+            await message.channel.send(f"<@{message.author.id}>" + "\n" + await dr.parse(message.content))
 
         if message.content.lower().startswith('!uok'):
             await message.channel.send(f"<@{244286371181625344}>" + "\n" + "You okay?")
@@ -61,7 +61,8 @@ class MyClient(discord.Client):
 **Commands:**
    > !help: Displays all commands.
    > !hello: Hi!   
-   > !roll #dSize: Rolls any number of one size and any modifiers. Ex: !roll 1d20 + 5 - 1 
+   > !roll #dSize: Rolls any number and types and dice. Supports complicated expressions
+        Ex: !roll 1d20 + (5 - 1)/2 + 1d6
 
    *D&D 5E Specific Commands:*
    > !feat name: Search D&D 5E offical books for a feat (currently only PH). Ex: !feat Keen Mind

@@ -1,9 +1,63 @@
 import random
 import asyncio
+import re
+import copy
 
 #rolls dice
 #accepts input in the form of !roll #dTYPE ex: !roll 1d20 + 5
 class Roller():
+
+    async def parse(self, input):
+        input = input.lower()
+        diceExpression = input.replace(' ', '')[5:]
+        m = re.match(r"^((\d*)d(\d*)([-+*/]?\d*))*", diceExpression)
+
+        ms = re.split(r"([-+*/])", m.string)
+        rollExp = copy.deepcopy(ms)
+
+        for i in range(0, len(ms)):
+            if (re.match(r"^((\d*)d(\d*))", ms[i])):
+                split = ms[i].split('d')
+                numDice = int(split[0])
+                typeDice = int(split[1])
+                ms[i] = self.rollDice(numDice, typeDice)
+       
+        unEval = copy.deepcopy(ms)
+        evalled = ms
+
+        for i in range(0, len(ms)):
+            try:
+                evalled[i] = sum(ms[i])
+            except:
+                continue
+
+        unEvalStr = ''.join(str(e) for e in unEval)
+        evalStr = ''.join(str(e) for e in evalled)
+        rollExpStr = ''.join(str(e) for e in rollExp)
+        total = eval(evalStr)
+
+        print(unEval)
+        print(eval)
+        print(evalStr)
+        print(total)
+
+        return self.constructReturnString(rollExpStr, unEvalStr, total)
+
+    def constructReturnString(self, rES, uES, t):
+        outMsg = f'''*I interperted your input as {rES}.*
+Rolls: {uES}
+**Total:** {t}'''
+        return outMsg
+
+
+    def rollDice(self, numDice, typeDice):
+        rolls = [0]*numDice           
+        for i in range(0, numDice):
+            roll = random.randint(1, typeDice)
+            rolls[i] = roll
+         
+        return rolls
+
     async def roll(self, input):
         outMsg = ""
         try:   
