@@ -8,40 +8,42 @@ import copy
 class Roller():
 
     async def parse(self, input):
-        input = input.lower()
-        diceExpression = input.replace(' ', '')[5:]
-        m = re.match(r"^((\d*)d(\d*)([-+*/]?\d*))*", diceExpression)
+        try:
+            input = input.lower()
+            diceExpression = input.replace(' ', '')[5:]
+            m = re.match(r"^((\d*)d(\d*)([-+*/]?\d*))*", diceExpression)
 
-        ms = re.split(r"([-+*/])", m.string)
-        rollExp = copy.deepcopy(ms)
+            if(m == None):
+                return "*I'm sorry, there was something I didnt understand about your input."
 
-        for i in range(0, len(ms)):
-            if (re.match(r"^((\d*)d(\d*))", ms[i])):
-                split = ms[i].split('d')
-                numDice = int(split[0])
-                typeDice = int(split[1])
-                ms[i] = self.rollDice(numDice, typeDice)
+            ms = re.split(r"([-+*/])", m.string)
+            rollExp = copy.deepcopy(ms)
+
+            for i in range(0, len(ms)):
+                if (re.match(r"^((\d*)d(\d*))", ms[i])):
+                    split = ms[i].split('d')
+                    numDice = int(split[0])
+                    typeDice = int(split[1])
+                    ms[i] = self.rollDice(numDice, typeDice)
        
-        unEval = copy.deepcopy(ms)
-        evalled = ms
+            unEval = copy.deepcopy(ms)
+            evalled = ms
 
-        for i in range(0, len(ms)):
-            try:
-                evalled[i] = sum(ms[i])
-            except:
-                continue
+            for i in range(0, len(ms)):
+                try:
+                    evalled[i] = sum(ms[i])
+                except:
+                    continue
 
-        unEvalStr = ''.join(str(e) for e in unEval)
-        evalStr = ''.join(str(e) for e in evalled)
-        rollExpStr = ''.join(str(e) for e in rollExp)
-        total = eval(evalStr)
+            unEvalStr = ''.join(str(e) for e in unEval)
+            evalStr = ''.join(str(e) for e in evalled)
+            rollExpStr = ''.join(str(e) for e in rollExp)
+            total = eval(evalStr)
 
-        print(unEval)
-        print(eval)
-        print(evalStr)
-        print(total)
+            return self.constructReturnString(rollExpStr, unEvalStr, total)
+        except Exception:
+            return "*I'm sorry, there was something I didnt understand about your input."
 
-        return self.constructReturnString(rollExpStr, unEvalStr, total)
 
     def constructReturnString(self, rES, uES, t):
         outMsg = f'''*I interperted your input as {rES}.*
