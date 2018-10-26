@@ -3,16 +3,21 @@ import difflib
 import random
 import asyncio
 
-#Gets a monster from the D&D monster manual
 class MonsterManual():
+    """
+    Class for searching and getting random monsters from the monster manual. All monsters are stored as
+    markdown files in _data/_monsters
+    """
     def __init__(self):
-        #maps monster names to monster manual arrays
         self.monsterDictionary = {}
         self.mmList = []
         self.setup()
         
 
     def setup(self):
+        """
+        Constructs the monster dictionary by reading from all markdown files in _data/_monsters
+        """
         pyDir = os.path.dirname(__file__)
         relPath = "_data//_monsters"
         absRelPath = os.path.join(pyDir, relPath)
@@ -21,9 +26,11 @@ class MonsterManual():
                 self.monsterDictionary[file.replace(' ', '-').replace(".markdown", "")] = self.readForDict(file)
         self.mmList = list(self.monsterDictionary)
 
-    #searches for the monster that matches the search message most closely
     async def search(self, message):
-        monster = message[4:]
+        """
+        Searches for a monster that matches the message most closely and returns its description as a string.
+        """
+        monster = message[4:] #remove !mm
         monster.replace(' ', '-')
         closeMatches = difflib.get_close_matches(monster, list(self.monsterDictionary.keys()))
         otherMatches = ""
@@ -45,15 +52,19 @@ class MonsterManual():
 
         return retArr
 
-    #gives a random monster
-    async def randMonster(self):      
+    async def randMonster(self): 
+        """
+        Returns a random monster description
+        """
         roll = random.randint(0, len(self.mmList) - 1)
         monster = self.mmList[roll]
 
         return self.monsterDictionary[monster]
 
-    #helper for setup
     def readForDict(self, filename):
+         """
+         Reads all markdown files in _data/_monster and adds them to the monster dictionary with the proper format
+         """
          pyDir = os.path.dirname(__file__)
          relPath = "_data//_monsters"
          absRelPath = os.path.join(pyDir, relPath)
@@ -76,8 +87,10 @@ class MonsterManual():
          retArr.append(retStr)
          return retArr
  
-    #helper to fix markdown files
     def fixFileNames(self):
+            """
+            Helper to rename all of the monster markdown files
+            """
             pyDir = os.path.dirname(__file__)
             relPath = "_data//"
             absRelPath = os.path.join(pyDir, relPath)

@@ -32,6 +32,9 @@
     <Compile Include="Feats.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Initiative.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="MonsterManual.py">
       <SubType>Code</SubType>
     </Compile>
