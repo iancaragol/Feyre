@@ -304,4 +304,4 @@ f = Feats.Feats()
 
 embedcolor = discord.Color.from_rgb(165,87,249)
 client = MyClient()
-client.run(testToken)
+client.run(token)
