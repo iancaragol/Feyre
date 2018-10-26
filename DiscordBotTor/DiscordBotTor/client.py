@@ -219,6 +219,11 @@ Please message <@112041042894655488> if you have any questions/issues.''')
             else:
                 await message.channel.send(f"<@{message.author.id}>" + "\n" + "*Please start initiative with !start init before adding players*")
 
+        if message.content.lower().startswith('!quit'):
+            if(message.author.id == 112041042894655488):
+                await message.channel.send("<@112041042894655488> *Shutting down*")
+                await client.close()
+                sys.exit()
 
 global bt 
 bt = BookOfTor.BookOfTor()
