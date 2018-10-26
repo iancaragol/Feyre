@@ -239,4 +239,4 @@ f = Feats.Feats()
 
 embedcolor = discord.Color.from_rgb(165,87,249)
 client = MyClient()
-client.run("NTA1MTIwOTk3NjU4MzI5MTA4.DrO-Lg.jiyCbUD07MoplIKMq01kBSRbaPs")
+client.run("NTAwNzMzODQ1ODU2MDU5NDAy.DqPI-g.BBe4LLMfN3QFmrZXOK3mTNwSpws")
