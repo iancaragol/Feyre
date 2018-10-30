@@ -16,4 +16,4 @@ Nothing, for results that aren't especially good or bad
 
 The spell doesn't take into account any possible circumstances that might change the outcome, such as the casting of additional spells or the loss or gain of a companion.
 If you cast the spell two or more times before completing your next long rest, there is a cumulative 25 percent chance for each casting after the first that you get a random reading. The GM makes this roll in secret.
- - (specially marked sticks, bones, or similar tokens worth at least 25 gp)
+* - (specially marked sticks, bones, or similar tokens worth at least 25 gp)

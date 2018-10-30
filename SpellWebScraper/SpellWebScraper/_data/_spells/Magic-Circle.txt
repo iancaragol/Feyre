@@ -16,4 +16,4 @@ Targets within the cylinder can't be charmed, frightened, or possessed by the cr
 
 When you cast this spell, you can elect to cause its magic to operate in the reverse direction, preventing a creature of the specified type from leaving the cylinder and protecting targets outside it.
 At Higher Levels. When you cast this spell using a spell slot of 4th level or higher, the duration increases by 1 hour for each slot level above 3rd.
- - (holy water or powdered silver and iron worth at least 100 gp, which the spell consumes)
+* - (holy water or powdered silver and iron worth at least 100 gp, which the spell consumes)

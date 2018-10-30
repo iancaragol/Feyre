@@ -79,7 +79,7 @@ class DnDBeyondWebScraper():
             spell_attack_save = soup.find('div', attrs = {'class':'ddb-statblock-item ddb-statblock-item-attack-save'}).find('div', attrs = {'class':'ddb-statblock-item-value'}).text.strip()
             spell_damage_effect = soup.find('div', attrs = {'class':'ddb-statblock-item ddb-statblock-item-damage-effect'}).find('div', attrs = {'class':'ddb-statblock-item-value'}).text.strip()
 
-            spell_description = soup.find('div', attrs = {'class':'more-info-content'}).text.replace("*", "").strip()
+            spell_description = soup.find('div', attrs = {'class':'more-info-content'}).text.strip()
 
             #Clean strings
             #Some spells need duration to be cleaned

@@ -3,7 +3,9 @@ import difflib
 import random
 import asyncio
 
-class Spelbook():
+#Bestow curse required some editing because of a hyperlink
+
+class Spellbook():
     def __init__(self):
         self.spellDictionary = {}
         self.spellList = []
@@ -15,9 +17,25 @@ class Spelbook():
         absRelPath = os.path.join(pyDir, relPath)
 
         for file in os.listdir(absRelPath):
-                self.spellDictionaryDictionary[file.replace(' ', '-').replace(".txt", "")] = self.readForDict(file)
-        self.spellList = list(self.monsterDictionary)
+                self.spellDictionary[file.replace(' ', '-').replace(".txt", "")] = self.readForDict(file)
+        self.spellList = list(self.spellDictionary)
 
+    async def search(self, message):
+        """
+        Searches the feat dictionary for the closest feat and returns a string with that feats description
+        """
+
+        #!spell 
+        spell = message[7:]
+        closeMatches = difflib.get_close_matches(spell, list(self.spellDictionary.keys()))
+
+        if(len(closeMatches) == 0):
+            retArr = []
+            retArr.append("An error occurred.")
+            retArr.append("*I'm sorry, I was unable to find the feat you are looking for.*")
+            return retArr
+
+        return self.spellDictionary[closeMatches[0]]
 
     def readForDict(self, filename):
          pyDir = os.path.dirname(__file__)

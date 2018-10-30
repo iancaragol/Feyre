@@ -46,4 +46,4 @@ Sea Hag
 
 
 
- - (one holly berry per creature summoned)
+* - (one holly berry per creature summoned)

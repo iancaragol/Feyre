@@ -11,4 +11,4 @@ You choose a 5-foot-square unoccupied space on the ground that you can see withi
 As an action, you can cause the hand to crush the restrained target, who must make a Strength saving throw. It takes 2d6 bludgeoning damage on a failed save, or half as much damage on a successful one.
 To break out, the restrained target can make a Strength check against your spell save DC. On a success, the target escapes and is no longer restrained by the hand.
 As an action, you can cause the hand to reach for a different creature or to move to a different unoccupied space within range. The hand releases a restrained target if you do either.
- - (a miniature hand sculpted from clay)
+* - (a miniature hand sculpted from clay)

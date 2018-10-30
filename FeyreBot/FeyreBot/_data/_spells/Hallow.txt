@@ -20,4 +20,4 @@ Extradimensional Interference. Affected creatures can't move or travel using tel
 Fear. Affected creatures are frightened while in the area.
 Silence. No sound can emanate from within the area, and no sound can reach into it.
 Tongues. Affected creatures can communicate with any other creature in the area, even if they don't share a common language.
- - (herbs, oils, and incense worth at least 1,000 gp, which the spell consumes)
+* - (herbs, oils, and incense worth at least 1,000 gp, which the spell consumes)

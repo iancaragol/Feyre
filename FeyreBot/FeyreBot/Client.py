@@ -17,6 +17,7 @@ import DiceRolls
 import MonsterManual
 import Feats
 import Initiative
+import Spellbook
 
 import discord
 import asyncio
@@ -42,7 +43,7 @@ class MyClient(discord.Client):
 
         except Exception:
             self.statsDict = {'!tor horo':0, '!tor zodiac':0, '!hello':0, '!tor styles':0, '!tor randchar':0, '!roll':0,
-                          '!help':0, '!mm':0, '!randmonster':0, '!feat':0, '!randfeat':0, '!start init':0, '!add init':0}
+                          '!help':0, '!mm':0, '!randmonster':0, '!feat':0, '!randfeat':0, '!start init':0, '!add init':0, '!spell':0}
 
         self.userSet = set()
 
@@ -61,6 +62,7 @@ class MyClient(discord.Client):
    > !mm: {self.statsDict['!mm']}   
    > !randfeat: {self.statsDict['!randfeat']}
    > !randmonster: {self.statsDict['!randmonster']}
+   > !spell: {self.statsDict['!spell']}
 
    *Book of Tor Specific Commands:*
    > !tor horo: {self.statsDict['!tor horo']}
@@ -120,6 +122,7 @@ class MyClient(discord.Client):
         Ex: !add init Feyre 20
    > !roll #dSize: Rolls any number and types and dice. Supports complicated expressions
         Ex: !roll 1d20 + (5 - 1)/2 + 1d6
+   > !spell name: Search D&D 5E SRD for a spell. Ex: !spell fireball
    > !stats: Displays number of times each command has been used in the lifetime of the bot
 
    *D&D 5E Specific Commands:*
@@ -197,7 +200,27 @@ Please message <@112041042894655488> if you have any questions/issues.''')
                     else:
                         embed = discord.Embed(title = retArr[0] + " *- Continued*", description = parts[i], color=discord.Color.from_rgb(87,228,249))
                     await message.channel.send(embed = embed)  
-            
+
+        if message.content.lower().startswith('!spell'):
+            self.statsDict['!spell'] += 1
+            retArr = await sb.search(message.content.lower())
+            if(len(retArr[1]) < 2048):
+                embed = discord.Embed(title = retArr[0], description = retArr[1], color=embedcolor)
+                await message.channel.send(embed = embed)
+
+            #discord has a 2048 character limit so this is needed to split the message into chunks
+            else:
+                s = retArr[1]
+                mod = math.ceil(len(s) / 2048)
+                parts = [s[i:i+2048] for i in range(0, len(s), 2048)]
+                    
+                for i in range(0, len(parts)):
+                    if(i == 0):
+                        embed = discord.Embed(title = retArr[0], description = parts[i], color=discord.Color.from_rgb(87,228,249))
+                    else:
+                        embed = discord.Embed(title = retArr[0] + " *- Continued*", description = parts[i], color=discord.Color.from_rgb(87,228,249))
+                    await message.channel.send(embed = embed)    
+
         if message.content.lower().startswith('!randfeat'):
             self.statsDict['!randfeat'] += 1
             retArr = await f.randFeat()
@@ -302,6 +325,9 @@ mm = MonsterManual.MonsterManual()
 global f
 f = Feats.Feats()
 
+global sb
+sb = Spellbook.Spellbook()
+
 embedcolor = discord.Color.from_rgb(165,87,249)
 client = MyClient()
-client.run(testToken)
+client.run(token)
