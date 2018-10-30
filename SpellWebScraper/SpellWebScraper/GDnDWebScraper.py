@@ -86,13 +86,15 @@ class GDnDWebScraper():
                         i+=1
                     q = i
 
-            if(spell_higher_levels != None):
-                if(sb_c.contents[q-4] != '</br>'):
-                    spell_description = sb_c.contents[q-4]
-                else:
-                    spell_description = sb_c.contents[q-5]
-            else:
-                spell_description = sb_c.contents[q-1]
+            spell_description = max(sb_c.contents, key=len)
+
+            #if(spell_higher_levels == None):
+            #    if(sb_c.contents[q-4] != '</br>'):
+            #        spell_description = sb_c.contents[q-4]
+            #    else:
+            #        spell_description = sb_c.contents[q-5]
+            #else:
+            #    spell_description = sb_c.contents[q-1]
 
             print(spell_name)
             return  SpellClass.SpellClass(spell_name, spell_type, spell_casting_time, spell_range, spell_target, 

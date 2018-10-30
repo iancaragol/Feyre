@@ -4,7 +4,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>b4e774f7-19d4-422b-85b6-7f8e9c39777d</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <StartupFile>SpellWebScraper.py</StartupFile>
+    <StartupFile>DnDBeyondScraper.py</StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
@@ -21,10 +21,11 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="DnDBeyondScraper.py" />
     <Compile Include="SpellClass.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="SpellWebScraper.py" />
+    <Compile Include="GDnDWebScraper.py" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
   <!-- Uncomment the CoreCompile target to enable the Build command in

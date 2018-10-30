@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.28010.2003
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "FeyreBot", "DiscordBotTor\FeyreBot.pyproj", "{760788D4-DCBB-478C-B6ED-BAEE7A026B92}"
+Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "FeyreBot", "FeyreBot\FeyreBot.pyproj", "{760788D4-DCBB-478C-B6ED-BAEE7A026B92}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

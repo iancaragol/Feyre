@@ -223,7 +223,7 @@ Please message <@112041042894655488> if you have any questions/issues.''')
             key = message.guild.name + ":" + message.channel.name
             i = Initiative.Initiative()
             self.initDict[key] = i
-            embed = discord.Embed(title = "**--------Initiative--------**", description = "", color=embedcolor)
+            embed = discord.Embed(title = "|-------- **Initiative** --------|", description = "", color=embedcolor)
             msg = await message.channel.send(embed = embed)
             self.initEmbedDict[key] = msg
 
@@ -265,7 +265,7 @@ Please message <@112041042894655488> if you have any questions/issues.''')
                     
                 self.initDict[key].addPlayer(name, init)
                 desc = self.initDict[key].displayInit()
-                newEmbed = discord.Embed(title = "**--------Initiative--------**", description = self.initDict[key].displayInit(), color=embedcolor)
+                newEmbed = discord.Embed(title = "|-------- **Initiative** --------|", description = self.initDict[key].displayInit(), color=embedcolor)
 
                 #delete old message and send new one with updated values
                 self.initEmbedDict[key] = await  self.initEmbedDict[key].delete()
@@ -304,4 +304,4 @@ f = Feats.Feats()
 
 embedcolor = discord.Color.from_rgb(165,87,249)
 client = MyClient()
-client.run(token)
+client.run(testToken)
