@@ -1,0 +1,10 @@
+***Lesser Restoration***
+**Level: **2nd
+**Casting Time: **1 Action
+**Range: **Touch
+**Components: **V, S
+**Duration: **Instantaneous
+**School: **Abjuration
+**Attack/Save: **None
+
+You touch a creature and can end either one disease or one condition afflicting it. The condition can be blinded, deafened, paralyzed, or poisoned.

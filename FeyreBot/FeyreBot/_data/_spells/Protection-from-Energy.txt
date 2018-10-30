@@ -1,0 +1,10 @@
+***Protection from Energy***
+**Level: **3rd
+**Casting Time: **1 Action
+**Range: **Touch
+**Components: **V, S
+**Duration: **Concentration 1 Hour
+**School: **Abjuration
+**Attack/Save: **None
+
+For the duration, the willing creature you touch has resistance to one damage type of your choice: acid, cold, fire, lightning, or thunder.

@@ -1,0 +1,11 @@
+***Power Word Stun***
+**Level: **8th
+**Casting Time: **1 Action
+**Range: **60ft
+**Components: **V
+**Duration: **Instantaneous
+**School: **Enchantment
+**Attack/Save: **None
+
+You speak a word of power that can overwhelm the mind of one creature you can see within range, leaving it dumbfounded. If the target has 150 hit points or fewer, it is stunned. Otherwise, the spell has no effect.
+The stunned target must make a Constitution saving throw at the end of each of its turns. On a successful save, this stunning effect ends.

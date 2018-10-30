@@ -1,0 +1,10 @@
+***Forbiddance***
+**Level: **6th
+**Casting Time: **10 Minutes
+**Range: **Touch - (40,000ft2)
+**Components: **V, S, M *
+**Duration: **1 Day
+**School: **Abjuration
+**Attack/Save: **None
+
+You create a ward against magical travel that protects up to 40,000 square feet of floor space to a height of 30 feet above the floor. For the duration, creatures can't teleport into the area or use portals, such as those created by the gate

@@ -1,0 +1,10 @@
+***Remove Curse***
+**Level: **3rd
+**Casting Time: **1 Action
+**Range: **Touch
+**Components: **V, S
+**Duration: **Instantaneous
+**School: **Abjuration
+**Attack/Save: **None
+
+At your touch, all curses affecting one creature or object end. If the object is a cursed magic item, its curse remains, but the spell breaks its owner's attunement to the object so it can be removed or discarded.

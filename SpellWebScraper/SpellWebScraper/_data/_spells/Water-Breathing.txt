@@ -1,0 +1,11 @@
+***Water Breathing***
+**Level: **3rd
+**Casting Time: **1 Action
+**Range: **30ft
+**Components: **V, S, M *
+**Duration: **24 Hours
+**School: **Transmutation
+**Attack/Save: **None
+
+This spell grants up to ten willing creatures you can see within range the ability to breathe underwater until the spell ends. Affected creatures also retain their normal mode of respiration.
+ - (a short reed or piece of straw)

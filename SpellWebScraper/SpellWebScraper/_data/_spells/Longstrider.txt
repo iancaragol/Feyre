@@ -1,0 +1,12 @@
+***Longstrider***
+**Level: **1st
+**Casting Time: **1 Action
+**Range: **Touch
+**Components: **V, S, M *
+**Duration: **1 Hour
+**School: **Transmutation
+**Attack/Save: **None
+
+You touch a creature. The target's speed increases by 10 feet until the spell ends.
+At Higher Levels. When you cast this spell using a spell slot of 2nd level or higher, you can target one additional creature for each slot level above 1st.
+ - (a pinch of dirt)

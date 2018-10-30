@@ -1,0 +1,11 @@
+***Locate Animals or Plants***
+**Level: **2nd
+**Casting Time: **1 Action
+**Range: **Self
+**Components: **V, S, M *
+**Duration: **Instantaneous
+**School: **Divination
+**Attack/Save: **None
+
+Describe or name a specific kind of beast or plant. Concentrating on the voice of nature in your surroundings, you learn the direction and distance to the closest creature or plant of that kind within 5 miles, if any are present.
+ - (a bit of fur from a bloodhound)

@@ -1,0 +1,10 @@
+***Spare the Dying***
+**Level: **Cantrip
+**Casting Time: **1 Action
+**Range: **Touch
+**Components: **V, S
+**Duration: **Instantaneous
+**School: **Necromancy
+**Attack/Save: **None
+
+You touch a living creature that has 0 hit points. The creature becomes stable. This spell has no effect on undead or constructs.

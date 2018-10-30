@@ -49,7 +49,6 @@ class Roller():
         except Exception:
             return "*I'm sorry, there was something I didnt understand about your input."
 
-
     def constructReturnString(self, rES, uES, t):
         """
         Constructs the return string where rES is the original expression, uES is the expression with all rolls, and t is the total

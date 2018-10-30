@@ -1,0 +1,10 @@
+***Misty Step***
+**Level: **2nd
+**Casting Time: **1 Bonus Action
+**Range: **Self
+**Components: **V
+**Duration: **Instantaneous
+**School: **Conjuration
+**Attack/Save: **None
+
+Briefly surrounded by silvery mist, you teleport up to 30 feet to an unoccupied space that you can see.

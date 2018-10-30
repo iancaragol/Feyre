@@ -1,0 +1,10 @@
+***Arcane Lock***
+**Level: **2nd
+**Casting Time: **1 Action
+**Range: **Touch
+**Components: **V, S, M *
+**Duration: **Until Dispelled
+**School: **Abjuration
+**Attack/Save: **None
+
+You touch a closed door, window, gate, chest, or other entryway, and it becomes locked for the duration. You and the creatures you designate when you cast this spell can open the object normally. You can also set a password that, when spoken within 5 feet of the object, suppresses this spell for 1 minute. Otherwise, it is impassable until it is broken or the spell is dispelled or suppressed. Casting knock

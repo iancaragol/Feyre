@@ -1,0 +1,11 @@
+***See Invisibility***
+**Level: **2nd
+**Casting Time: **1 Action
+**Range: **Self
+**Components: **V, S, M *
+**Duration: **1 Hour
+**School: **Divination
+**Attack/Save: **None
+
+For the duration, you see invisible creatures and objects as if they were visible, and you can see into the Ethereal Plane. Ethereal creatures and objects appear ghostly and translucent.
+ - (a pinch of talc and a small sprinkling of powdered silver)

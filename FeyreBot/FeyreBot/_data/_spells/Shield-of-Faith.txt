@@ -1,0 +1,11 @@
+***Shield of Faith***
+**Level: **1st
+**Casting Time: **1 Bonus Action
+**Range: **60ft
+**Components: **V, S, M *
+**Duration: **Concentration 10 Minutes
+**School: **Abjuration
+**Attack/Save: **None
+
+A shimmering field appears and surrounds a creature of your choice within range, granting it a +2 bonus to AC for the duration.
+ - (a small parchment with a bit of holy text written on it)
