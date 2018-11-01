@@ -2,15 +2,16 @@ import os
 import difflib
 import random
 import asyncio
+import whoosh
 
 #Bestow curse required some editing because of a hyperlink
 
-class Spellbook():
+class Sb():
     def __init__(self):
         self.spellDictionary = {}
         self.spellList = []
         self.setup()
-
+      
     def setup(self):
         pyDir = os.path.dirname(__file__)
         relPath = "_data//_spells"
@@ -19,6 +20,8 @@ class Spellbook():
         for file in os.listdir(absRelPath):
                 self.spellDictionary[file.replace(' ', '-').replace(".txt", "")] = self.readForDict(file)
         self.spellList = list(self.spellDictionary)
+        #self.createIndex()
+
 
     async def search(self, message):
         """
@@ -56,3 +59,10 @@ class Spellbook():
 
          retArr.append(retStr)
          return retArr
+
+    #def createIndex(self):
+    #    schema = whoosh.fields.Schema(title=TEXT(stored=True))
+    #    ix = whoosh.index.create_in("indexdir", schema)
+
+    #    writer = ix.writer()
+

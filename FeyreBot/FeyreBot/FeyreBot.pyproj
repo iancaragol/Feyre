@@ -29,13 +29,13 @@
     <Compile Include="DiceRolls.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Feats.py">
+    <Compile Include="Feat.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Initiative.py">
+    <Compile Include="Init.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="MonsterManual.py">
+    <Compile Include="Monster.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Spellbook.py">

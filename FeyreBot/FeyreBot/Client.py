@@ -12,12 +12,12 @@ token = "NTAwNzMzODQ1ODU2MDU5NDAy.DqPI-g.BBe4LLMfN3QFmrZXOK3mTNwSpws"
 testToken = "NTA1MTIwOTk3NjU4MzI5MTA4.DrO-Lg.jiyCbUD07MoplIKMq01kBSRbaPs"
 
 
-import BookOfTor
-import DiceRolls
-import MonsterManual
-import Feats
-import Initiative
-import Spellbook
+from BookOfTor import BookOfTor
+from Monster import MonsterManual
+from Feat import Feats
+from Spellbook import Sb
+from DiceRolls import Roller
+from Init import Initiative
 
 import discord
 import asyncio
@@ -34,7 +34,13 @@ class MyClient(discord.Client):
     def __init__(self):
         self.initDict = {}
         self.initEmbedDict = {}
-        
+        self.bt = BookOfTor()
+        self.mm = MonsterManual()
+        self.sb = Sb()
+        self.f = Feats()
+        self.dr = Roller()
+        self.embedcolor = discord.Color.from_rgb(165,87,249)
+
         try:
             pyDir = os.path.dirname(__file__)
             relPath = "_data//stats.txt"
@@ -85,11 +91,11 @@ class MyClient(discord.Client):
 
         if message.content.lower().startswith('!tor horo'):
             self.statsDict['!tor horo'] += 1
-            await message.channel.send(f"<@{message.author.id}>" + "\n" + await bt.horo())
+            await message.channel.send(f"<@{message.author.id}>" + "\n" + await self.bt.horo())
 
         if message.content.lower().startswith('!tor zodiac'):
             self.statsDict['!tor zodiac'] += 1
-            await message.channel.send(f"<@{message.author.id}>" + "\n" + await bt.zodiac())
+            await message.channel.send(f"<@{message.author.id}>" + "\n" + await self.bt.zodiac())
 
         if message.content.lower().startswith('!hello'):
             self.statsDict['!hello'] += 1
@@ -100,15 +106,15 @@ class MyClient(discord.Client):
 
         if message.content.lower().startswith('!tor styles'):
             self.statsDict['!tor styles'] += 1
-            await message.channel.send(f"<@{message.author.id}>" + "\n" + await bt.styles())
+            await message.channel.send(f"<@{message.author.id}>" + "\n" + await self.bt.styles())
 
         if message.content.lower().startswith('!tor randchar'):    
             self.statsDict['!tor randchar'] += 1
-            await message.channel.send(f"<@{message.author.id}>" + "\n" + await bt.ranchar())
+            await message.channel.send(f"<@{message.author.id}>" + "\n" + await self.bt.ranchar())
 
         if message.content.lower().startswith('!roll'):
             self.statsDict['!roll'] += 1          
-            await message.channel.send(f"<@{message.author.id}>" + "\n" + await dr.parse(message.content))
+            await message.channel.send(f"<@{message.author.id}>" + "\n" + await self.dr.parse(message.content))
 
         if message.content.lower().startswith('!help'):
             self.statsDict['!help'] += 1
@@ -142,10 +148,10 @@ Please message <@112041042894655488> if you have any questions/issues.''')
         if message.content.lower().startswith('!mm'):
             self.statsDict['!mm'] += 1
             #search the monster manual
-            retArr = await mm.search(message.content.lower())
+            retArr = await self.mm.search(message.content.lower())
 
             if(len(retArr[1]) < 2048):
-                embed = discord.Embed(title = retArr[0], description = retArr[1], color=embedcolor)
+                embed = discord.Embed(title = retArr[0], description = retArr[1], color=self.embedcolor)
                 await message.channel.send(embed = embed)
 
             #discord has a 2048 character limit so this is needed to split the message into chunks
@@ -156,16 +162,16 @@ Please message <@112041042894655488> if you have any questions/issues.''')
                     
                 for i in range(0, len(parts)):
                     if(i == 0):
-                        embed = discord.Embed(title = retArr[0], description = parts[i], color=embedcolor)
+                        embed = discord.Embed(title = retArr[0], description = parts[i], color=self.embedcolor)
                     else:
-                        embed = discord.Embed(title = retArr[0] + " *- Continued*", description = parts[i], color=embedcolor)
+                        embed = discord.Embed(title = retArr[0] + " *- Continued*", description = parts[i], color=self.embedcolor)
                     await message.channel.send(embed = embed)    
 
         if message.content.lower().startswith('!randmonster'):
             self.statsDict['!randmonster'] += 1
-            retArr = await mm.randMonster()
+            retArr = await self.mm.randMonster()
             if(len(retArr[1]) < 2048):
-                embed = discord.Embed(title = retArr[0], description = retArr[1], color=embedcolor)
+                embed = discord.Embed(title = retArr[0], description = retArr[1], color=self.embedcolor)
                 await message.channel.send(embed = embed)
 
             #discord has a 2048 character limit so this is needed to split the message into chunks
@@ -176,16 +182,16 @@ Please message <@112041042894655488> if you have any questions/issues.''')
                     
                 for i in range(0, len(parts)):
                     if(i == 0):
-                        embed = discord.Embed(title = retArr[0], description = parts[i], color=embedcolor)
+                        embed = discord.Embed(title = retArr[0], description = parts[i], color=self.embedcolor)
                     else:
-                        embed = discord.Embed(title = retArr[0] + " *- Continued*", description = parts[i], color=embedcolor)
+                        embed = discord.Embed(title = retArr[0] + " *- Continued*", description = parts[i], color=self.embedcolor)
                     await message.channel.send(embed = embed)  
 
         if message.content.lower().startswith('!feat'):
             self.statsDict['!feat'] += 1
-            retArr = await f.search(message.content.lower())
+            retArr = await self.f.search(message.content.lower())
             if(len(retArr[1]) < 2048):
-                embed = discord.Embed(title = retArr[0], description = retArr[1], color=embedcolor)
+                embed = discord.Embed(title = retArr[0], description = retArr[1], color=self.embedcolor)
                 await message.channel.send(embed = embed)
 
             #discord has a 2048 character limit so this is needed to split the message into chunks
@@ -203,9 +209,9 @@ Please message <@112041042894655488> if you have any questions/issues.''')
 
         if message.content.lower().startswith('!spell'):
             self.statsDict['!spell'] += 1
-            retArr = await sb.search(message.content.lower())
+            retArr = await self.sb.search(message.content.lower())
             if(len(retArr[1]) < 2048):
-                embed = discord.Embed(title = retArr[0], description = retArr[1], color=embedcolor)
+                embed = discord.Embed(title = retArr[0], description = retArr[1], color=self.embedcolor)
                 await message.channel.send(embed = embed)
 
             #discord has a 2048 character limit so this is needed to split the message into chunks
@@ -223,9 +229,9 @@ Please message <@112041042894655488> if you have any questions/issues.''')
 
         if message.content.lower().startswith('!randfeat'):
             self.statsDict['!randfeat'] += 1
-            retArr = await f.randFeat()
+            retArr = await self.f.randFeat()
             if(len(retArr[1]) < 2048):
-                embed = discord.Embed(title = retArr[0], description = retArr[1], color=embedcolor)
+                embed = discord.Embed(title = retArr[0], description = retArr[1], color=self.embedcolor)
                 await message.channel.send(embed = embed)
 
             #discord has a 2048 character limit so this is needed to split the message into chunks
@@ -244,9 +250,9 @@ Please message <@112041042894655488> if you have any questions/issues.''')
         if message.content.lower().startswith('!start init'):
             self.statsDict['!start init'] += 1
             key = message.guild.name + ":" + message.channel.name
-            i = Initiative.Initiative()
+            i = Initiative()
             self.initDict[key] = i
-            embed = discord.Embed(title = "|-------- **Initiative** --------|", description = "", color=embedcolor)
+            embed = discord.Embed(title = "|-------- **Initiative** --------|", description = "", color=self.embedcolor)
             msg = await message.channel.send(embed = embed)
             self.initEmbedDict[key] = msg
 
@@ -288,7 +294,7 @@ Please message <@112041042894655488> if you have any questions/issues.''')
                     
                 self.initDict[key].addPlayer(name, init)
                 desc = self.initDict[key].displayInit()
-                newEmbed = discord.Embed(title = "|-------- **Initiative** --------|", description = self.initDict[key].displayInit(), color=embedcolor)
+                newEmbed = discord.Embed(title = "|-------- **Initiative** --------|", description = self.initDict[key].displayInit(), color=self.embedcolor)
 
                 #delete old message and send new one with updated values
                 self.initEmbedDict[key] = await  self.initEmbedDict[key].delete()
@@ -310,24 +316,12 @@ Please message <@112041042894655488> if you have any questions/issues.''')
 
 
                 await message.channel.send("<@112041042894655488> *Shutting down*")
-                await client.close()
+                await self.close()
                 sys.exit()
 
-global bt 
-bt = BookOfTor.BookOfTor()
+def main():
+    client = MyClient()
+    client.run(testToken)
 
-global dr
-dr = DiceRolls.Roller()
-
-global mm
-mm = MonsterManual.MonsterManual()
-
-global f
-f = Feats.Feats()
-
-global sb
-sb = Spellbook.Spellbook()
-
-embedcolor = discord.Color.from_rgb(165,87,249)
-client = MyClient()
-client.run(token)
+if __name__ == "__main__":
+    main()
