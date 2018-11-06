@@ -1,4 +1,4 @@
-# FeyreBot
+# Feyre
 ##### A Discord bot for D&amp;D and other RPG games
 
 This bot was created to help facilitate RPG games such as D&D and Pathfinder. 
@@ -122,3 +122,7 @@ All spells, feats, and monsters are taken from the D&D Standard Reference Docume
 	- Max and Min roll commands
 	- Better search functionality
 	- Inline skill checks
+
+#### Known bugs
+	- Dice rolling does not handle parenthesis correctly
+	- Skill checks are strictly > or < instead of >= or <=
