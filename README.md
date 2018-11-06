@@ -4,7 +4,8 @@
 This bot was created to help facilitate RPG games such as D&D and Pathfinder. 
 It is written in python and uses the discord.py module. 
 
-All spells, feats, and monsters are taken from the D&D Standard Reference Document.
+All spells, feats, and monsters are taken from the D&D Standard Reference Document or scraped
+from the free sections of D&D beyond.
 
 ## Features
 #### > Dice Rolling:
@@ -122,7 +123,8 @@ All spells, feats, and monsters are taken from the D&D Standard Reference Docume
 	- Max and Min roll commands
 	- Better search functionality
 	- Inline skill checks
+	- Add private rolls for GM
 
-#### Known bugs
+#### Known bugs:
 	- Dice rolling does not handle parenthesis correctly
 	- Skill checks are strictly > or < instead of >= or <=
