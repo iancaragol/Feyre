@@ -3,6 +3,7 @@
 
 #permissions 67648
 #test permissions 75776
+
 #https://discordapp.com/oauth2/authorize?client_id=500733845856059402&scope=bot&permissions=67648
 #https://discordapp.com/oauth2/authorize?client_id=505120997658329108&scope=bot&permissions=75776
 
@@ -113,32 +114,38 @@ class MyClient(discord.Client):
 
         if message.content.lower().startswith('!help'):
             self.statsDict['!help'] += 1
-            await message.channel.send('''Hello! My name is Feyre.
+            helpstr = '''Hello! My name is Feyre.
 
 **Commands:**
-   > !help: Displays all commands.
-   > !hello: Hi!  
-   > !start init: Starts initiative tracker in channel
-   > !add init (name) (roll): Adds player to initiative tracker. If left blank uses discord username and rolls 1d20.
-        Ex: !add init Feyre 20
-   > !roll #dSize: Rolls any number and types and dice. Supports complicated expressions
-        Ex: !roll 1d20 + (5 - 1)/2 + 1d6
-   > !spell name: Search D&D 5E SRD for a spell. Ex: !spell fireball
-   > !stats: Displays number of times each command has been used in the lifetime of the bot
+   > **!help**: Displays all commands.
+   > **!hello**: Hi!  
+   > **!start init**: Starts initiative tracker in channel
+   > **!add init (name) (roll)**: Adds player to initiative tracker. If left blank uses discord username and rolls 1d20.
+            Ex: !add init Feyre 20
+   > **!roll (dice) (modifiers) (check)**: Rolls any number and types and dice. Supports complicated expressions and ability checks
+            Ex: !roll 1d20 + (5 - 1)/2 + 1d6 < 25
+   > **!stats**: Displays number of times each command has been used in the lifetime of the bot
 
    *D&D 5E Specific Commands:*
-   > !feat name: Search D&D 5E offical books for a feat (currently only PH). Ex: !feat Keen Mind
-   > !mm name: Search the D&D 5E Monster Manual for a monster. Ex: !mm Goblin   
-   > !randfeat: Gives a random feat from offical 5E books.
-   > !randmonster: Gives a random monster from the D&D 5e Monster Manual.
+   > **!feat (name)**: Search D&D 5E offical books for a feat (currently only PH). 
+            Ex: !feat Keen Mind
+   > **!mm (name)**: Search the D&D 5E Monster Manual for a monster. 
+            Ex: !mm Goblin
+   > **!spell (name)**: Search D&D 5E SRD for a spell. 
+            Ex: !spell fireball
+   > **!randfeat**: Gives a random feat from offical 5E books.
+   > **!randmonster**: Gives a random monster from the D&D 5e Monster Manual.
 
    *Book of Tor Specific Commands:*
-   > !tor horo: Gives a Torian Horoscope.
-   > !tor randchar: Gives a random race and class combination from the Book of Tor.
-   > !tor styles: Lists all character styles from the Book of Tor.
-   > !tor zodiac: Gives a Primidia's Zodiac animal from the Book of Tor.
+   > **!tor horo**: Gives a Torian Horoscope.
+   > **!tor randchar**: Gives a random race and class combination from the Book of Tor.
+   > **!tor styles**: Lists all character styles from the Book of Tor.
+   > **!tor zodiac**: Gives a Primidia's Zodiac animal from the Book of Tor.
 
-Please message <@112041042894655488> if you have any questions/issues.''')
+Please message @kittysaurus#9804 if you have any questions/issues.'''
+
+            newEmbed = discord.Embed(description = helpstr, color=self.embedcolor)
+            await message.channel.send(embed = newEmbed)
 
         if message.content.lower().startswith('!mm'):
             self.statsDict['!mm'] += 1
@@ -299,7 +306,8 @@ Please message <@112041042894655488> if you have any questions/issues.''')
                 await message.channel.send(f"<@{message.author.id}>" + "\n" + "*Please start initiative with !start init before adding players*")
 
         if message.content.lower().startswith('!stats'):
-            await message.channel.send(await self.displayStats())
+            newEmbed = discord.Embed(description = await self.displayStats(), color=self.embedcolor)
+            await message.channel.send(embed = newEmbed)
 
         if message.content.lower().startswith('!quit'):
             if(message.author.id == 112041042894655488):

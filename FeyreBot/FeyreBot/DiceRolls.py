@@ -16,12 +16,13 @@ class Roller():
             input = input.lower()
             diceExpression = input.replace(' ', '')[5:] #remove !roll
             #check formatting
-            m = re.match(r"^((\d*)d(\d*)([-+*/]?\d*))*", diceExpression)
+            m = re.match(r"^((\d*)d(\d*)([-+*/><]?\d*))*", diceExpression)
 
             if(m == None):
                 return "*I'm sorry, there was something I didnt understand about your input.*"
 
-            ms = re.split(r"([-+*/])", m.string)
+            ms = re.split(r"([-+*/><])", m.string)
+
             rollExp = copy.deepcopy(ms)
 
             for i in range(0, len(ms)):
@@ -40,22 +41,35 @@ class Roller():
                 except:
                     continue
 
+            
             unEvalStr = ''.join(str(e) for e in unEval)
             evalStr = ''.join(str(e) for e in evalled)
             rollExpStr = ''.join(str(e) for e in rollExp)
             total = eval(evalStr)
 
             return self.constructReturnString(rollExpStr, unEvalStr, total)
-        except Exception:
-            return "*I'm sorry, there was something I didnt understand about your input."
+        except Exception as e:
+            return ("*I'm sorry, there was something I didnt understand about your input.*\n" + str(e))
 
-    def constructReturnString(self, rES, uES, t):
+    def constructReturnString(self,rES, uES, t):
         """
         Constructs the return string where rES is the original expression, uES is the expression with all rolls, and t is the total
         """
-        outMsg = f'''*I interperted your input as {rES}.*
+        if(type(t) is bool):
+            if(t):
+                outMsg = f'''*I interperted your input as {rES}.*
+Rolls: {uES}
+**Ability/Skill Check**: Succeeded'''
+            else:
+                outMsg = f'''*I interperted your input as {rES}.*
+Rolls: {uES}
+**Ability/Skill Check**: Failed'''
+
+        else:
+            outMsg = f'''*I interperted your input as {rES}.*
 Rolls: {uES}
 **Total:** {t}'''
+
         return outMsg
 
     def rollDice(self, numDice, typeDice):
