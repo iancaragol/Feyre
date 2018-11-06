@@ -1,16 +1,10 @@
 #id 500733845856059402
 #test id 505120997658329108
-#token NTAwNzMzODQ1ODU2MDU5NDAy.DqPI-g.BBe4LLMfN3QFmrZXOK3mTNwSpws
-#test token NTA1MTIwOTk3NjU4MzI5MTA4.DrO-Lg.jiyCbUD07MoplIKMq01kBSRbaPs
+
 #permissions 67648
 #test permissions 75776
 #https://discordapp.com/oauth2/authorize?client_id=500733845856059402&scope=bot&permissions=67648
 #https://discordapp.com/oauth2/authorize?client_id=505120997658329108&scope=bot&permissions=75776
-
-
-token = "NTAwNzMzODQ1ODU2MDU5NDAy.DqPI-g.BBe4LLMfN3QFmrZXOK3mTNwSpws"
-testToken = "NTA1MTIwOTk3NjU4MzI5MTA4.DrO-Lg.jiyCbUD07MoplIKMq01kBSRbaPs"
-
 
 from BookOfTor import BookOfTor
 from Monster import MonsterManual
@@ -27,6 +21,7 @@ import re
 import random
 import json
 import os
+import sys
 
 from discord.voice_client import VoiceClient
 
@@ -319,9 +314,24 @@ Please message <@112041042894655488> if you have any questions/issues.''')
                 await self.close()
                 sys.exit()
 
+
+                
 def main():
     client = MyClient()
-    client.run(testToken)
+
+    if(sys.argv[1] == 'test'):
+        pyDir = os.path.dirname(__file__)
+        file = open(os.path.join(pyDir, 'test_token.txt'), 'r')
+        testToken = file.readline()
+        client.run(testToken)
+        
+
+    elif (sys.argv[1] == 'release'):
+        pyDir = os.path.dirname(__file__)
+        file = open(os.path.join(pyDir, 'release_token.txt'), 'r')
+        releaseToken = file.readline()
+        client.run(releaseToken)
+
 
 if __name__ == "__main__":
     main()
