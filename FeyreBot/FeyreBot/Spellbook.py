@@ -2,7 +2,6 @@ import os
 import difflib
 import random
 import asyncio
-import whoosh
 
 #Bestow curse required some editing because of a hyperlink
 
