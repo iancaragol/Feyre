@@ -322,14 +322,14 @@ def main():
     if(sys.argv[1] == 'test'):
         pyDir = os.path.dirname(__file__)
         file = open(os.path.join(pyDir, 'test_token.txt'), 'r')
-        testToken = file.readline()
+        testToken = file.readline().strip()
         client.run(testToken)
         
 
     elif (sys.argv[1] == 'release'):
         pyDir = os.path.dirname(__file__)
         file = open(os.path.join(pyDir, 'release_token.txt'), 'r')
-        releaseToken = file.readline()
+        releaseToken = file.readline().strip()
         client.run(releaseToken)
 
 
