@@ -55,7 +55,7 @@ class Bot():
 
         #discord has a 2048 character limit so this is needed to split the message into chunks
         else:
-            s = mmArr[1]
+            s = returnedArray[1]
             mod = ceil(len(s) / 2048)
             parts = [s[i:i+2048] for i in range(0, len(s), 2048)]
                     
