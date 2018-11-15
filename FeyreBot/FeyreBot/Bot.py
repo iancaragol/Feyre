@@ -13,6 +13,7 @@ from discord.ext import commands
 import discord
 import asyncio
 import sys
+import random
 
 class Bot():
     """
