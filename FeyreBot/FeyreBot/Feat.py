@@ -28,7 +28,9 @@ class Feats():
         """
         Searches the feat dictionary for the closest feat and returns a string with that feats description
         """
-        feat = message[6:]
+        #feat = message[6:]
+        feat = message
+
         closeMatches = difflib.get_close_matches(feat, list(self.featDictionary.keys()))
 
         if(len(closeMatches) == 0):

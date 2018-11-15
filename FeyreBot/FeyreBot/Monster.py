@@ -30,7 +30,8 @@ class MonsterManual():
         """
         Searches for a monster that matches the message most closely and returns its description as a string.
         """
-        monster = message[4:] #remove !mm
+        #monster = message[4:] #remove !mm
+        monster = message
         monster.replace(' ', '-')
         closeMatches = difflib.get_close_matches(monster, list(self.monsterDictionary.keys()))
         otherMatches = ""

@@ -186,7 +186,7 @@ class BookOfTor():
         return str(self.zodiacDict[roll])
 
     #creates a random race, class combination from the book of tor
-    async def ranchar(self):
+    async def randchar(self):
         cclass = self.classDict[random.randint(1, 20)]
         race = self.raceDict[random.randint(1, 24)]
         return str(f"You should play a {race} {cclass}!")

@@ -5,7 +5,7 @@
     <ProjectGuid>760788d4-dcbb-478c-b6ed-baee7a026b92</ProjectGuid>
     <ProjectHome>
     </ProjectHome>
-    <StartupFile>Client.py</StartupFile>
+    <StartupFile>Bot.py</StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
@@ -28,7 +28,10 @@
     <Compile Include="BookOfTor.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Client.py" />
+    <Compile Include="Bot.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="legacy\Client.py" />
     <Compile Include="DiceRolls.py">
       <SubType>Code</SubType>
     </Compile>
@@ -44,6 +47,9 @@
     <Compile Include="Spellbook.py">
       <SubType>Code</SubType>
     </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="legacy\" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
   <!-- Uncomment the CoreCompile target to enable the Build command in

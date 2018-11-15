@@ -28,7 +28,8 @@ class Sb():
         """
 
         #!spell 
-        spell = message[7:]
+        #spell = message[7:]
+        spell = message
         closeMatches = difflib.get_close_matches(spell, list(self.spellDictionary.keys()))
 
         if(len(closeMatches) == 0):

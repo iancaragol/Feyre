@@ -24,6 +24,7 @@ import json
 import os
 import sys
 
+from discord.ext import commands
 from discord.voice_client import VoiceClient
 
 class MyClient(discord.Client):
@@ -50,7 +51,7 @@ class MyClient(discord.Client):
         self.userSet = set()
 
         return super().__init__()
-            
+
     async def displayStats(self):
         retStr = f'''**Lifetime Stats**
    > !help: {self.statsDict['!help']}
