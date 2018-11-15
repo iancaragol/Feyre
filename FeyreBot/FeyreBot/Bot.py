@@ -317,18 +317,17 @@ Please message @kittysaurus#9804 if you have any questions/issues.'''
         bot.run(token)
 
 def main():
+    b = Bot()
     if(sys.argv[1] == 'test'):
         pyDir = path.dirname(__file__)
         file = open(path.join(pyDir, 'test_token.txt'), 'r')
         testToken = file.readline().strip()
-        test = Bot()
-        test.start(testToken)
+        b.start(testToken)
 
     elif (sys.argv[1] == 'release'):
         pyDir = path.dirname(__file__)
         file = open(path.join(pyDir, 'release_token.txt'), 'r')
         releaseToken = file.readline().strip()
-        b = Bot()
         b.start(releaseToken)
 
 if __name__ == "__main__":
