@@ -21,8 +21,9 @@ from the free sections of D&D beyond.
               Rolls: [20]+5*2
               Total: 30
 #### > Initiative Tracking:
-##### !start init
-##### !add init (player) (initiative)
+##### !init start
+	Starts the initiative tracker.
+##### !init (player) (initiative)
 	The iniative tracker tracks iniative on a per-channel basis. Any player can add themselves to the initiative 
 	order or they can be added by the GM. 
 	If (player) is left blank the characters name will be the discord users name. 
@@ -95,8 +96,8 @@ from the free sections of D&D beyond.
 #### All Commands:
 	> !help: Displays all commands.
 	> !hello: Hi!
-	> !start init: Starts initiative tracker in channel
-	> !add init (name) (roll): Adds player to initiative tracker. If left blank uses discord username and rolls 1d20.
+	> !init start: Starts initiative tracker in channel
+	> !init (name) (roll): Adds player to initiative tracker. If left blank uses discord username and rolls 1d20.
 				Ex: !add init Feyre 20
 	> !roll (dice) (modifiers) (check): Rolls any number and types and dice. Supports complicated expressions and ability checks
 				Ex: !roll 1d20 + (5 - 1)/2 + 1d6 < 25
