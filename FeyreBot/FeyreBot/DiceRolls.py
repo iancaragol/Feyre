@@ -32,7 +32,9 @@ class Roller():
                     split = ms[i].split('d')
                     numDice = int(split[0])
                     typeDice = int(split[1])
-                    if(numDice >= 1000 and typeDice >= 10000):
+                    if(numDice >= 1000 and typeDice >= 100):
+                        return "*I'm sorry but that input is too big.*"
+                    if(numDice >= 100 and typeDice >= 10000):
                         return "*I'm sorry but that input is too big.*"
                     if(numDice >= 100000):
                         return "*I'm sorry but that input is too big.*"
