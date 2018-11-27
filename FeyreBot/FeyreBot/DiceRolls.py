@@ -79,7 +79,11 @@ class Roller():
                     typeDice = int(split[1])
                     if(numDice >= 1000 and typeDice >= 10000):
                         return "*I'm sorry but that input is too big.*"
-                    
+                    if(numDice >= 100000):
+                        return "*I'm sorry but that input is too big.*"
+                    if(typeDice >= 100000000000):
+                        return "*I'm sorry but that input is too big.*"
+
                     ms[i] = self.rollDice(numDice, typeDice)
        
             unEval = copy.deepcopy(ms)

@@ -18,8 +18,29 @@ import random
 class Bot():
     """
     Main class for bot. Adds all commands to the bot and starts it with the start(token) function.
+
+    Attributes:
+        diceRoller: instance of the Roller() class
+        spellBook: instance of the Sb() class
+        monsterManual: instance of the MonsterManual class
+        feats: instances of the Feats() class
+        bookOfTor: instance of the BookOfTor() class
+
+        initDict: dictionary mapping discord channel to Iniative()
+        initEmbedDict: dictionary mapping discord channel to most recent message
+        statsDict: iniatlized from text file, maps commands to ints
     """
     def __init__(self):
+        """
+        Initalizes the Bot() class
+
+        Raises:
+            File read error
+            JSON read error
+        """
+        self.bot = commands.Bot(command_prefix='!')
+
+
         #Main feature classes
         self.diceRoller = Roller()
         self.spellBook = Sb()
@@ -293,29 +314,38 @@ Please message @kittysaurus#9804 if you have any questions/issues.'''
                 await ctx.send("<@112041042894655488> *Shutting down*")
                 sys.exit()
 
+    @commands.command()
+    async def change_presence(self, ctx, *, args):
+        """
+        Cleanly shuts down the bot and re-writes the stats file
+        """
+        if(ctx.author.id == 112041042894655488):
+            await self.bot.change_presence(activity = discord.Game(name=args))
+
+
     def start(self, token):
         """
         Adds all of the commands and starts the bot with designated token.
         """
 
-        bot = commands.Bot(command_prefix='!')
-        bot.add_command(self.hello)
-        bot.add_command(self.roll)
-        bot.add_command(self.mm)
-        bot.add_command(self.randmonster)
-        bot.add_command(self.feat)
-        bot.add_command(self.randfeat)
-        bot.add_command(self.spell)
-        bot.add_command(self.init)
-        bot.add_command(self.tor)
-        bot.add_command(self.stats)
-        bot.add_command(self.quit)
+        self.bot.add_command(self.hello)
+        self.bot.add_command(self.roll)
+        self.bot.add_command(self.mm)
+        self.bot.add_command(self.randmonster)
+        self.bot.add_command(self.feat)
+        self.bot.add_command(self.randfeat)
+        self.bot.add_command(self.spell)
+        self.bot.add_command(self.init)
+        self.bot.add_command(self.tor)
+        self.bot.add_command(self.stats)
+        self.bot.add_command(self.quit)
 
         #the best way to override the default help command is to remove it
-        bot.remove_command("help")
-        bot.add_command(self.help)
+        self.bot.remove_command("help")
+        self.bot.add_command(self.help)
+        self.bot.add_command(self.change_presence)
 
-        bot.run(token)
+        self.bot.run(token)
 
 def main():
     b = Bot()
@@ -325,11 +355,15 @@ def main():
         testToken = file.readline().strip()
         b.start(testToken)
 
+       
+
     elif (sys.argv[1] == 'release'):
         pyDir = path.dirname(__file__)
         file = open(path.join(pyDir, 'release_token.txt'), 'r')
         releaseToken = file.readline().strip()
         b.start(releaseToken)
+        
+
 
 if __name__ == "__main__":
     main()

@@ -19,16 +19,11 @@ class Sb():
         for file in os.listdir(absRelPath):
                 self.spellDictionary[file.replace(' ', '-').replace(".txt", "")] = self.readForDict(file)
         self.spellList = list(self.spellDictionary)
-        #self.createIndex()
-
 
     async def search(self, message):
         """
         Searches the feat dictionary for the closest feat and returns a string with that feats description
         """
-
-        #!spell 
-        #spell = message[7:]
         spell = message
         closeMatches = difflib.get_close_matches(spell, list(self.spellDictionary.keys()))
 
@@ -59,10 +54,3 @@ class Sb():
 
          retArr.append(retStr)
          return retArr
-
-    #def createIndex(self):
-    #    schema = whoosh.fields.Schema(title=TEXT(stored=True))
-    #    ix = whoosh.index.create_in("indexdir", schema)
-
-    #    writer = ix.writer()
-
