@@ -261,3 +261,6 @@ __pycache__/
 *.pyc
 FeyreBot/FeyreBot/release_token.txt
 FeyreBot/FeyreBot/test_token.txt
+FeyreBot/FeyreBot/stats.txt
+FeyreBot/FeyreBot/users.txt
+FeyreBot/FeyreBot/prefixes.txt
