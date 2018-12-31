@@ -121,26 +121,27 @@ class Bot():
                 await ctx.send(embed = embed)
     
     async def displayStats(self):
-        retStr = f'''**Lifetime Stats**
-   > !help: {self.statsDict['!help']}
-   > !hello: {self.statsDict['!hello']}
-   > !init: {self.statsDict['!init']}
-   > !roll: {self.statsDict['!roll']}
+        retStr = f'''```asciidoc
+= Lifetime Stats =
+> !help: {self.statsDict['!help']}
+> !hello: {self.statsDict['!hello']}
+> !init: {self.statsDict['!init']}
+> !roll: {self.statsDict['!roll']}
 
-   *D&D 5E Specific Commands:*
-   > !feat: {self.statsDict['!feat']}
-   > !mm: {self.statsDict['!mm']}   
-   > !randfeat: {self.statsDict['!randfeat']}
-   > !randmonster: {self.statsDict['!randmonster']}
-   > !spell: {self.statsDict['!spell']}
+[D&D 5E]
+> !feat: {self.statsDict['!feat']}
+> !mm: {self.statsDict['!mm']}   
+> !randfeat: {self.statsDict['!randfeat']}
+> !randmonster: {self.statsDict['!randmonster']}
+> !spell: {self.statsDict['!spell']}
 
-   *Book of Tor Specific Commands:*
-   > !tor horo: {self.statsDict['!tor horo']}
-   > !tor randchar: {self.statsDict['!tor randchar']}
-   > !tor styles: {self.statsDict['!tor styles']}
-   > !tor zodiac: {self.statsDict['!tor zodiac']}
+[Book of Tor]
+> !tor horo: {self.statsDict['!tor horo']}
+> !tor randchar: {self.statsDict['!tor randchar']}
+> !tor styles: {self.statsDict['!tor styles']}
+> !tor zodiac: {self.statsDict['!tor zodiac']}
 
-   **Unique users: {len(self.userSet)}**
+[Unique users: {len(self.userSet)}]```
    '''
         return retStr
 
@@ -302,16 +303,21 @@ class Bot():
             self.userSet.add(ctx.author.id)
         if (args == 'styles'):
             self.statsDict['!tor styles'] += 1
-            await ctx.send(f"<@{ctx.author.id}>" + "\n" + await self.bookOfTor.styles())
+            newEmbed = discord.Embed(description = await self.bookOfTor.styles(), color=self.embedcolor)
+
         if (args == 'randchar'):
             self.statsDict['!tor randchar'] += 1
-            await ctx.send(f"<@{ctx.author.id}>" + "\n" + await self.bookOfTor.randchar())
+            newEmbed = discord.Embed(description = await self.bookOfTor.randchar(), color=self.embedcolor)
+
         if (args == 'horo'):
             self.statsDict['!tor horo'] += 1
-            await ctx.send(f"<@{ctx.author.id}>" + "\n" + await self.bookOfTor.horo())
+            newEmbed = discord.Embed(description = await self.bookOfTor.horo(), color=self.embedcolor)
+
         if (args == 'zodiac'):
             self.statsDict['!tor zodiac'] += 1
-            await ctx.send(f"<@{ctx.author.id}>" + "\n" + await self.bookOfTor.zodiac())
+            newEmbed = discord.Embed(description = await self.bookOfTor.zodiac(), color=self.embedcolor)
+
+        await ctx.send(embed=newEmbed)
 
     @commands.command()
     async def stats(self, ctx):
@@ -321,8 +327,8 @@ class Bot():
         """
         if (ctx.author.id not in self.userSet):
             self.userSet.add(ctx.author.id)
-        embed = discord.Embed(description = await self.displayStats(), color=self.embedcolor)
-        await ctx.send(embed = embed)
+        #embed = discord.Embed(description = await self.displayStats(), color=self.embedcolor)
+        await ctx.send(await self.displayStats())
      
     @commands.command()
     async def help(self, ctx):
