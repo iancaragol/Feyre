@@ -90,6 +90,5 @@ Rolls: {uES}
         """
         Rolls a number of dice (numDice) of type (typeDice) and returns the rolls as a list.
         """
-        rolls = np.random.randint(1,typeDice+1,numDice, dtype=np.int64)
-         
+        rolls = np.random.randint(1,typeDice+1,numDice, dtype=np.int64)     
         return list(rolls)

@@ -1,1 +1,1 @@
-{"!tor horo": 0, "!tor zodiac": 0, "!hello": 3, "!tor styles": 0, "!tor randchar": 0, "!roll": 1, "!help": 6, "!mm": 0, "!randmonster": 0, "!feat": 0, "!randfeat": 0, "!init": 0, "!spell": 0}
+{"!tor horo": 0, "!tor zodiac": 0, "!hello": 7, "!tor styles": 0, "!tor randchar": 0, "!roll": 1, "!help": 6, "!mm": 0, "!randmonster": 0, "!feat": 0, "!randfeat": 0, "!init": 0, "!spell": 0}

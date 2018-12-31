@@ -15,6 +15,10 @@ import asyncio
 import sys
 import random
 
+global bot
+bot = commands.Bot(command_prefix='!')
+
+
 class Bot():
     """
     Main class for bot. Adds all commands to the bot and starts it with the start(token) function.
@@ -63,11 +67,14 @@ class Bot():
 
         self.embedcolor = discord.Color.from_rgb(165,87,249)
 
+        self.userSet = set()
+
         try:
             pyDir = path.dirname(__file__)
             relPath = "_data//stats.txt"
             absRelPath = path.join(pyDir, relPath)
             self.statsDict = load(open(absRelPath))
+            print("Stats loaded")
 
         except Exception:
             self.statsDict = {'!tor horo':0, '!tor zodiac':0, '!hello':0, '!tor styles':0, '!tor randchar':0, '!roll':0,
@@ -78,12 +85,22 @@ class Bot():
             relPath = "_data//prefixes.txt"
             absRelPath = path.join(pyDir, relPath)
             self.prefixDict = load(open(absRelPath))
-            print(self.prefixDict)
+            print("Prefixes loaded")
 
-        except Exception:
-            print("Error loading prefixes")
+        except Exception as e:
+            print(f"Error loading prefixes: {e}")
 
-        self.bot = commands.Bot(command_prefix='!')
+        try:
+            pyDir = path.dirname(__file__)
+            relPath = "_data//users.txt"
+            absRelPath = path.join(pyDir, relPath)
+            self.userSet = set(load(open(absRelPath)))
+            print("Stats loaded")
+
+        except Exception as e:
+            print(f"Error loading users: {e}")
+
+
 
         return super().__init__()
 
@@ -124,6 +141,8 @@ class Bot():
    > !tor randchar: {self.statsDict['!tor randchar']}
    > !tor styles: {self.statsDict['!tor styles']}
    > !tor zodiac: {self.statsDict['!tor zodiac']}
+
+   **Unique users: {len(self.userSet)}**
    '''
         return retStr
 
@@ -132,6 +151,9 @@ class Bot():
         """
         Hi!
         """
+        if (ctx.author.id not in self.userSet):
+            self.userSet.add(ctx.author.id)
+
         self.statsDict['!hello'] += 1
         embed = discord.Embed()
         embed.set_image(url='https://cdn.discordapp.com/attachments/352281669992185866/500780935638155264/kOXnswR.gif')
@@ -143,6 +165,8 @@ class Bot():
         Rolls any number of dice in any format including skill checks
             Ex: !roll 1d20+5*6>100
         """
+        if (ctx.author.id not in self.userSet):
+            self.userSet.add(ctx.author.id)
         self.statsDict['!roll'] += 1
         await ctx.send(f"<@{ctx.author.id}>\n" + await self.diceRoller.parse(args))
 
@@ -151,6 +175,8 @@ class Bot():
         """
         Searches the Monster Manual for a monster
         """
+        if (ctx.author.id not in self.userSet):
+            self.userSet.add(ctx.author.id)
         self.statsDict['!mm'] += 1
         mmArr = await self.monsterManual.search(args)
         await self.createAndSendEmbeds(ctx, mmArr)
@@ -160,6 +186,8 @@ class Bot():
         """
         Gives a random monster from the Monster Manual
         """
+        if (ctx.author.id not in self.userSet):
+            self.userSet.add(ctx.author.id)
         self.statsDict['!randmonster'] += 1
         mmArr = await self.monsterManual.randMonster()
         await self.createAndSendEmbeds(ctx, mmArr)
@@ -169,6 +197,8 @@ class Bot():
         """
         Searches the Player's Handbook for a feat
         """
+        if (ctx.author.id not in self.userSet):
+            self.userSet.add(ctx.author.id)
         self.statsDict['!feat'] += 1
         featArr = await self.feats.search(args)
         await self.createAndSendEmbeds(ctx, featArr)
@@ -178,6 +208,8 @@ class Bot():
         """
         Gives a random feat from the Player's Handbook
         """
+        if (ctx.author.id not in self.userSet):
+            self.userSet.add(ctx.author.id)
         self.statsDict['!randfeat'] += 1
         featArr = await self.feats.randFeat()
         await self.createAndSendEmbeds(ctx, featArr)
@@ -187,6 +219,8 @@ class Bot():
         """
         Searches the Player's Handbook for a spell
         """
+        if (ctx.author.id not in self.userSet):
+            self.userSet.add(ctx.author.id)
         self.statsDict['!spell'] += 1
         spellArr = await self.spellBook.search(args)
         await self.createAndSendEmbeds(ctx, spellArr)
@@ -196,7 +230,8 @@ class Bot():
         """
         Starts or adds players to initiative
         """
-
+        if (ctx.author.id not in self.userSet):
+            self.userSet.add(ctx.author.id)
         #This command will be moved into its own class
         if (args == 'start'):
             self.statsDict['!init'] += 1
@@ -261,6 +296,8 @@ class Bot():
     
     @commands.command()
     async def tor(self, ctx, *, args):
+        if (ctx.author.id not in self.userSet):
+            self.userSet.add(ctx.author.id)
         if (args == 'styles'):
             self.statsDict['!tor styles'] += 1
             await ctx.send(f"<@{ctx.author.id}>" + "\n" + await self.bookOfTor.styles())
@@ -278,12 +315,17 @@ class Bot():
     async def stats(self, ctx):
         """
         Shows the lifetime stats of the bot
+
         """
+        if (ctx.author.id not in self.userSet):
+            self.userSet.add(ctx.author.id)
         embed = discord.Embed(description = await self.displayStats(), color=self.embedcolor)
         await ctx.send(embed = embed)
      
     @commands.command()
     async def help(self, ctx):
+        if (ctx.author.id not in self.userSet):
+            self.userSet.add(ctx.author.id)
         self.statsDict['!help'] += 1
         helpstr = '''Hello! My name is Feyre.
 
@@ -335,6 +377,11 @@ Please message @kittysaurus#9804 if you have any questions/issues.'''
                 with open(absRelPath, 'w') as file:
                     file.write(dumps(self.prefixDict))
 
+                relPath = "_data//users.txt"
+                absRelPath = path.join(pyDir, relPath)
+                with open(absRelPath, 'w') as file:
+                    file.write(dumps(list(self.userSet)))
+
                 await ctx.send("<@112041042894655488> *Shutting down*")
                 sys.exit()
 
@@ -371,9 +418,10 @@ Please message @kittysaurus#9804 if you have any questions/issues.'''
             await self.bot.change_presence(activity = discord.Game(name=args))
 
     async def get_pre(self, bot, message):
-        id = str(message.guild.id)
-        if (id in self.prefixDict):
-            return self.prefixDict[id]     
+        if(message.guild):
+            id = str(message.guild.id)
+            if (id in self.prefixDict):
+                return self.prefixDict[id]     
         else:
             return '!'
 
@@ -381,27 +429,30 @@ Please message @kittysaurus#9804 if you have any questions/issues.'''
         """
         Adds all of the commands and starts the bot with designated token.
         """
-        self.bot = commands.Bot(command_prefix = self.get_pre)
+        #bot = commands.Bot(command_prefix = self.get_pre)
+        bot = commands.Bot(command_prefix = self.get_pre)
 
-        self.bot.add_command(self.hello)
-        self.bot.add_command(self.roll)
-        self.bot.add_command(self.mm)
-        self.bot.add_command(self.randmonster)
-        self.bot.add_command(self.feat)
-        self.bot.add_command(self.randfeat)
-        self.bot.add_command(self.spell)
-        self.bot.add_command(self.init)
-        self.bot.add_command(self.tor)
-        self.bot.add_command(self.stats)
-        self.bot.add_command(self.quit)
+
+        bot.add_command(self.hello)
+        bot.add_command(self.roll)
+        bot.add_command(self.mm)
+        bot.add_command(self.randmonster)
+        bot.add_command(self.feat)
+        bot.add_command(self.randfeat)
+        bot.add_command(self.spell)
+        bot.add_command(self.init)
+        bot.add_command(self.tor)
+        bot.add_command(self.stats)
+        bot.add_command(self.quit)
 
         #the best way to override the default help command is to remove it
-        self.bot.remove_command("help")
-        self.bot.add_command(self.help)
-        self.bot.add_command(self.change_presence)
-        self.bot.add_command(self.set_prefix)
+        bot.remove_command("help")
+        bot.add_command(self.help)
+        bot.add_command(self.change_presence)
+        bot.add_command(self.set_prefix)
 
-        self.bot.run(token)
+        #self.bot.run(token)
+        bot.run(token)
 
 def main():
     b = Bot()
