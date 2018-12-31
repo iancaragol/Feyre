@@ -27,6 +27,6 @@ class Initiative():
         displayStr = ""
 
         for (nu, iq) in sortedInit:
-            displayStr += f"\n**{nu}:** {iq}"
+            displayStr += f"\n{nu}: {iq}"
 
         return displayStr

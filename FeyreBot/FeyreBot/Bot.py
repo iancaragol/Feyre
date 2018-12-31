@@ -166,7 +166,7 @@ class Bot():
         if (ctx.author.id not in self.userSet):
             self.userSet.add(ctx.author.id)
         self.statsDict['!roll'] += 1
-        await ctx.send(f"<@{ctx.author.id}>\n" + await self.diceRoller.parse(args))
+        await ctx.send(await self.diceRoller.parse(args))
 
     @commands.command()
     async def mm(self, ctx, *, args):
@@ -236,8 +236,9 @@ class Bot():
             key = ctx.guild.name + ":" + ctx.channel.name
             i = Initiative()
             self.initDict[key] = i
-            embed = discord.Embed(title = "|-------- **Initiative** --------|", description = "", color=self.embedcolor)
-            msg = await ctx.send(embed = embed)
+            codeBlock = '''```diff
+- Initiative -```'''
+            msg = await ctx.send(codeBlock)
             self.initEmbedDict[key] = msg
              
         else:
@@ -282,11 +283,14 @@ class Bot():
                     
                 self.initDict[key].addPlayer(name, init)
                 desc = self.initDict[key].displayInit()
-                newEmbed = discord.Embed(title = "|------------- **Initiative** -------------|", description = self.initDict[key].displayInit(), color=self.embedcolor)
+                #newEmbed = discord.Embed(title = "|------------- **Initiative** -------------|", description = self.initDict[key].displayInit(), color=self.embedcolor)
+
+                codeBlock = '''```diff
+- Initiative -''' + desc + '```'
 
                 #delete old message and send new one with updated values
                 self.initEmbedDict[key] = await  self.initEmbedDict[key].delete()
-                self.initEmbedDict[key] = await  ctx.send(embed = newEmbed)
+                self.initEmbedDict[key] = await  ctx.send(codeBlock)
 
             else:
                 await ctx.send(f"<@{ctx.author.id}>" + "\n" + "Please start initiative with **!init start** before adding players")
