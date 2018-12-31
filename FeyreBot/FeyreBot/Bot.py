@@ -29,6 +29,14 @@ class Bot():
         initDict: dictionary mapping discord channel to Iniative()
         initEmbedDict: dictionary mapping discord channel to most recent message
         statsDict: iniatlized from text file, maps commands to ints
+
+    TO DO:
+        Bot should DM mm lookup/etc by default
+        Bot should support DM's
+        GM/Secret rolls
+        Only admin's should be able to change the bot's prefix
+        Inline dice rolls
+        Fix dice roller (freezes on !roll 1000d20
     """
     def __init__(self):
         """
@@ -38,9 +46,7 @@ class Bot():
             File read error
             JSON read error
         """
-        self.bot = commands.Bot(command_prefix='!')
-
-
+        
         #Main feature classes
         self.diceRoller = Roller()
         self.spellBook = Sb()
@@ -53,6 +59,7 @@ class Bot():
         self.initEmbedDict = {}
 
         self.statsDict = {}
+        self.prefixDict = {}
 
         self.embedcolor = discord.Color.from_rgb(165,87,249)
 
@@ -66,6 +73,17 @@ class Bot():
             self.statsDict = {'!tor horo':0, '!tor zodiac':0, '!hello':0, '!tor styles':0, '!tor randchar':0, '!roll':0,
                           '!help':0, '!mm':0, '!randmonster':0, '!feat':0, '!randfeat':0, '!init':0, '!spell':0}
 
+        try:
+            pyDir = path.dirname(__file__)
+            relPath = "_data//prefixes.txt"
+            absRelPath = path.join(pyDir, relPath)
+            self.prefixDict = load(open(absRelPath))
+            print(self.prefixDict)
+
+        except Exception:
+            print("Error loading prefixes")
+
+        self.bot = commands.Bot(command_prefix='!')
 
         return super().__init__()
 
@@ -114,6 +132,7 @@ class Bot():
         """
         Hi!
         """
+        self.statsDict['!hello'] += 1
         embed = discord.Embed()
         embed.set_image(url='https://cdn.discordapp.com/attachments/352281669992185866/500780935638155264/kOXnswR.gif')
         await ctx.send(embed=embed)
@@ -125,7 +144,7 @@ class Bot():
             Ex: !roll 1d20+5*6>100
         """
         self.statsDict['!roll'] += 1
-        await ctx.send(f"<@{ctx.author.id}>\n" + await self.diceRoller.BotParse(args))
+        await ctx.send(f"<@{ctx.author.id}>\n" + await self.diceRoller.parse(args))
 
     @commands.command()
     async def mm(self, ctx, *, args):
@@ -311,9 +330,38 @@ Please message @kittysaurus#9804 if you have any questions/issues.'''
                 with open(absRelPath, 'w') as file:
                     file.write(dumps(self.statsDict))
 
+                relPath = "_data//prefixes.txt"
+                absRelPath = path.join(pyDir, relPath)
+                with open(absRelPath, 'w') as file:
+                    file.write(dumps(self.prefixDict))
+
                 await ctx.send("<@112041042894655488> *Shutting down*")
                 sys.exit()
 
+    
+    @commands.command()
+    async def set_prefix(self, ctx, *, args):
+        #TO DO:
+        #Support pinging bot if you do not know the prefix
+        #Removing bot from server should reset bot's prefix
+        
+
+        print(args)
+        print(ctx.message.guild.id)
+
+        possibleArgs = set(['!','~','`','#','$','%','^','&','*',','])
+
+        if(len(args) > 1):
+            await ctx.send(f"<@{ctx.author.id}>\n Prefix must be !, ~, `, #, $, %, ^, &, * or ,")
+            return
+
+        elif (args.strip() not in possibleArgs):
+            await ctx.send(f"<@{ctx.author.id}>\n Prefix must be !, ~, `, #, $, %, ^, &, * or ,")
+            return
+
+        self.prefixDict[ctx.message.guild.id] = args.strip()    
+        await ctx.send(f"<@{ctx.author.id}>\n Prefix for this server set to: {args.strip()}")
+                
     @commands.command()
     async def change_presence(self, ctx, *, args):
         """
@@ -322,11 +370,18 @@ Please message @kittysaurus#9804 if you have any questions/issues.'''
         if(ctx.author.id == 112041042894655488):
             await self.bot.change_presence(activity = discord.Game(name=args))
 
+    async def get_pre(self, bot, message):
+        id = str(message.guild.id)
+        if (id in self.prefixDict):
+            return self.prefixDict[id]     
+        else:
+            return '!'
 
     def start(self, token):
         """
         Adds all of the commands and starts the bot with designated token.
         """
+        self.bot = commands.Bot(command_prefix = self.get_pre)
 
         self.bot.add_command(self.hello)
         self.bot.add_command(self.roll)
@@ -344,6 +399,7 @@ Please message @kittysaurus#9804 if you have any questions/issues.'''
         self.bot.remove_command("help")
         self.bot.add_command(self.help)
         self.bot.add_command(self.change_presence)
+        self.bot.add_command(self.set_prefix)
 
         self.bot.run(token)
 

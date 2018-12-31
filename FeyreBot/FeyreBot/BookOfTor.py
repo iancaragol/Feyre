@@ -210,3 +210,5 @@ Cheap and far from honorable, but ensures your victory. There are no rules in wa
 **Practical**
 Killing is a means to an end, so why not do what's tried and true. It only makes sense.'''
         return styleString
+
+   
