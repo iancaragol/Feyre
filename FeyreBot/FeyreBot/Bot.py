@@ -15,7 +15,6 @@ import asyncio
 import sys
 import random
 
-global bot
 
 class Bot():
     """
@@ -48,7 +47,6 @@ class Bot():
             File read error
             JSON read error
         """
-        
         #Main feature classes
         self.diceRoller = Roller()
         self.spellBook = Sb()
@@ -410,7 +408,7 @@ Please message @kittysaurus#9804 if you have any questions/issues.'''
     @commands.command()
     async def change_presence(self, ctx, *, args):
         if(ctx.author.id == 112041042894655488):
-            await self.bot.change_presence(activity = discord.Game(name=args))
+            await bot.change_presence(activity = discord.Game(name=args))
 
     async def get_pre(self, bot, message):
         return self.prefixDict.get(message.guild, '!')
@@ -421,6 +419,7 @@ Please message @kittysaurus#9804 if you have any questions/issues.'''
         Adds all of the commands and starts the bot with designated token.
         """
         #bot = commands.Bot(command_prefix = self.get_pre)
+        global bot
         bot = commands.Bot(command_prefix = self.get_pre)
 
 
@@ -444,6 +443,7 @@ Please message @kittysaurus#9804 if you have any questions/issues.'''
 
         #self.bot.run(token)
         bot.run(token)
+        self.sBot = bot
 
 def main():
     b = Bot()
