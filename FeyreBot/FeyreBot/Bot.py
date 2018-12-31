@@ -409,9 +409,6 @@ Please message @kittysaurus#9804 if you have any questions/issues.'''
                 
     @commands.command()
     async def change_presence(self, ctx, *, args):
-        """
-        Cleanly shuts down the bot and re-writes the stats file
-        """
         if(ctx.author.id == 112041042894655488):
             await self.bot.change_presence(activity = discord.Game(name=args))
 
