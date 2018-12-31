@@ -16,8 +16,6 @@ import sys
 import random
 
 global bot
-bot = commands.Bot(command_prefix='!')
-
 
 class Bot():
     """
@@ -94,7 +92,7 @@ class Bot():
             pyDir = path.dirname(__file__)
             relPath = "_data//users.txt"
             absRelPath = path.join(pyDir, relPath)
-            self.userSet = set(load(open(absRelPath)))
+            self.userSet = setload(open(absRelPath))
             print("Stats loaded")
 
         except Exception as e:
@@ -418,12 +416,8 @@ Please message @kittysaurus#9804 if you have any questions/issues.'''
             await self.bot.change_presence(activity = discord.Game(name=args))
 
     async def get_pre(self, bot, message):
-        if(message.guild):
-            id = str(message.guild.id)
-            if (id in self.prefixDict):
-                return self.prefixDict[id]     
-        else:
-            return '!'
+        return self.prefixDict.get(message.guild, '!')
+
 
     def start(self, token):
         """
