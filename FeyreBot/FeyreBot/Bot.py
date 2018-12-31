@@ -392,6 +392,9 @@ Please message @kittysaurus#9804 if you have any questions/issues.'''
         #TO DO:
         #Support pinging bot if you do not know the prefix
         #Removing bot from server should reset bot's prefix
+        if(not hasattr(ctx.author, 'ctx.author.guild_permissions')):
+            await ctx.send(f"This command is for server use only.")
+
         if args:
            args = args.strip()
 
@@ -423,6 +426,9 @@ Please message @kittysaurus#9804 if you have any questions/issues.'''
             await bot.change_presence(activity = discord.Game(name=args))
 
     async def get_pre(self, bot, message):
+        if(message.guild == None):
+            return '!'
+
         pre = self.prefixDict.get(str(message.guild.id), '!')
         return pre
 
