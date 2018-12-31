@@ -9,6 +9,7 @@ from os import path
 from json import load, dumps
 from math import ceil
 from discord.ext import commands
+from datetime import datetime
 
 import discord
 import asyncio
@@ -82,6 +83,7 @@ class Bot():
             absRelPath = path.join(pyDir, relPath)
             self.prefixDict = load(open(absRelPath))
             print("Prefixes loaded")
+            print(self.prefixDict)
 
         except Exception as e:
             print(f"Error loading prefixes: {e}")
@@ -90,13 +92,13 @@ class Bot():
             pyDir = path.dirname(__file__)
             relPath = "_data//users.txt"
             absRelPath = path.join(pyDir, relPath)
-            self.userSet = setload(open(absRelPath))
-            print("Stats loaded")
+            self.userSet = set(load(open(absRelPath)))
+            print("Users loaded")
 
         except Exception as e:
             print(f"Error loading users: {e}")
 
-
+        print("\nTime: " + str(datetime.now()))
 
         return super().__init__()
 
@@ -323,7 +325,7 @@ class Bot():
         if (ctx.author.id not in self.userSet):
             self.userSet.add(ctx.author.id)
         self.statsDict['!help'] += 1
-        helpstr = '''Hello! My name is Feyre.
+        helpstr = '''Hello! My name is Feyre. You can use chat or DM's to summon me.
 
 **Commands:**
    > **!help**: Displays all commands.
@@ -350,6 +352,9 @@ class Bot():
    > **!tor randchar**: Gives a random race and class combination from the Book of Tor.
    > **!tor styles**: Lists all character styles from the Book of Tor.
    > **!tor zodiac**: Gives a Primidia's Zodiac animal from the Book of Tor.
+
+   *Administrator Commands:*
+   > **!set_prefix (prefix)**: Changes the command prefix for this server.
 
 Please message @kittysaurus#9804 if you have any questions/issues.'''
 
@@ -383,36 +388,43 @@ Please message @kittysaurus#9804 if you have any questions/issues.'''
 
     
     @commands.command()
-    async def set_prefix(self, ctx, *, args):
+    async def set_prefix(self, ctx, *, args = None):
         #TO DO:
         #Support pinging bot if you do not know the prefix
         #Removing bot from server should reset bot's prefix
-        
+        if args:
+           args = args.strip()
 
-        print(args)
-        print(ctx.message.guild.id)
+           if(ctx.author.guild_permissions.administrator):
+                possibleArgs = set(['!','~','`','#','$','%','^','&','*',',','.',';',':','>','<'])
 
-        possibleArgs = set(['!','~','`','#','$','%','^','&','*',','])
+                if(len(args) < 1):
+                    await ctx.send(f"<@{ctx.author.id}>\n You must include arguments! Ex: !set_prefix &")
+                    return
 
-        if(len(args) > 1):
-            await ctx.send(f"<@{ctx.author.id}>\n Prefix must be !, ~, `, #, $, %, ^, &, * or ,")
-            return
+                elif (args not in possibleArgs):
+                    await ctx.send(f"<@{ctx.author.id}>\n Prefix must be !, ~, `, #, $, %, ^, &, *, ,, ., ;, :, <, or >")
+                    return
 
-        elif (args.strip() not in possibleArgs):
-            await ctx.send(f"<@{ctx.author.id}>\n Prefix must be !, ~, `, #, $, %, ^, &, * or ,")
-            return
+                self.prefixDict[str(ctx.message.guild.id)] = args   
+                await ctx.send(f"<@{ctx.author.id}>\n Prefix for this server set to: {args.strip()}")
+           else:
+                 await ctx.send("Only server administrators have access to this command.")
+        else:
+            if(ctx.author.guild_permissions.administrator):
+                await ctx.send(f"<@{ctx.author.id}>\n You must include arguments! Ex: !set_prefix &")
+                return
+            else:
+                await ctx.send("Only server administrators have access to this command.")
 
-        self.prefixDict[ctx.message.guild.id] = args.strip()    
-        await ctx.send(f"<@{ctx.author.id}>\n Prefix for this server set to: {args.strip()}")
-                
     @commands.command()
     async def change_presence(self, ctx, *, args):
         if(ctx.author.id == 112041042894655488):
             await bot.change_presence(activity = discord.Game(name=args))
 
     async def get_pre(self, bot, message):
-        return self.prefixDict.get(message.guild, '!')
-
+        pre = self.prefixDict.get(str(message.guild.id), '!')
+        return pre
 
     def start(self, token):
         """
