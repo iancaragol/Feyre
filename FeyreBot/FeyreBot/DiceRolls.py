@@ -71,16 +71,16 @@ class Roller():
 
         if(type(t) is bool):
             if(t):
-                outMsg = f'''I interperted your input as {rES}.
+                outMsg = f'''I interpreted your input as {rES}.
 Rolls: {uES}
 **Ability/Skill Check**: Succeeded'''
             else:
-                outMsg = f'''I interperted your input as {rES}.
+                outMsg = f'''I interpreted your input as {rES}.
 Rolls: {uES}
 **Ability/Skill Check**: Failed'''
 
         else:
-            outMsg = f'''I interperted your input as {rES}.
+            outMsg = f'''I interpreted your input as {rES}.
 Rolls: {uES}
 **Total:** {t}'''
 
