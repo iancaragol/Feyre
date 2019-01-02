@@ -33,6 +33,9 @@
     <Compile Include="Bot.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="BotData.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="legacy\Client.py" />
     <Compile Include="DiceRolls.py">
       <SubType>Code</SubType>

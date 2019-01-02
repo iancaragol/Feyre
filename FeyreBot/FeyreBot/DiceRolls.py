@@ -79,7 +79,7 @@ Rolls: {uES}
                 outMsg = f'''```diff
 I interpreted your input as {rES}.
 Rolls: {uES}
-- Ability/Skill Check**: Failed -```'''
+- Ability/Skill Check: Failed -```'''
 
         else:
             outMsg = f'''```diff
