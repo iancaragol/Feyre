@@ -39,7 +39,6 @@ async def createAndSendEmbeds(ctx, returnedArray):
     
 
 
-
 #Initalize the bot:
 
 data = BotData()
@@ -390,57 +389,8 @@ Commands:
     > Sets the server wide prefix to [prefix]. Prefix must be !, ~, `, #, $, %, ^, &, *, ,, ., ;, :, <, or >
 Note: If you forget the bot's prefix you will no longer be able to summon it and reset it's prefix (as of now).```'''
 
-                if(len(args) < 1):
-                    await ctx.send(f"<@{ctx.author.id}>\n You must include arguments! Ex: !set_prefix &")
-                    return
+    await ctx.send(retstr)
 
-                elif (args not in possibleArgs):
-                    await ctx.send(f"<@{ctx.author.id}>\n Prefix must be !, ~, `, #, $, %, ^, &, *, ,, ., ;, :, <, or >")
-                    return
-
-                self.prefixDict[str(ctx.message.guild.id)] = args   
-                await ctx.send(f"<@{ctx.author.id}>\n Prefix for this server set to: {args.strip()}")
-           else:
-                 await ctx.send("Only server administrators have access to this command.")
-        else:
-            if(ctx.author.guild_permissions.administrator):
-                await ctx.send(f"<@{ctx.author.id}>\n You must include arguments! Ex: !set_prefix &")
-                return
-            else:
-                await ctx.send("Only server administrators have access to this command.")
-
-    @commands.command()
-    async def change_presence(self, ctx, *, args):
-        if(ctx.author.id == 112041042894655488):
-            await bot.change_presence(activity = discord.Game(name=args))
-
-    async def get_pre(self, bot, message):
-        if(message.guild == None):
-            return '!'
-
-        pre = self.prefixDict.get(str(message.guild.id), '!')
-        return pre
-
-    def start(self, token):
-        """
-        Adds all of the commands and starts the bot with designated token.
-        #bot = commands.Bot(command_prefix = self.get_pre)
-        global bot
-        bot = commands.Bot(command_prefix = self.get_pre)
-
-
-        bot.add_command(self.hello)
-        bot.add_command(self.roll)
-        bot.add_command(self.mm)
-        bot.add_command(self.randmonster)
-        bot.add_command(self.feat)
-        bot.add_command(self.randfeat)
-        bot.add_command(self.spell)
-        bot.add_command(self.init)
-        bot.add_command(self.tor)
-        bot.add_command(self.stats)
-        bot.add_command(self.quit)
-        bot.add_command(self.admin)
 @bot.command()
 async def quit(ctx):
     if(ctx.author.id == 112041042894655488):
@@ -448,19 +398,22 @@ async def quit(ctx):
         relPath = "_data//stats.txt"
         absRelPath = path.join(pyDir, relPath)
         with open(absRelPath, 'w') as file:
-            file.write(dumps(self.statsDict))
+            file.write(dumps(data.statsDict))
 
         relPath = "_data//prefixes.txt"
         absRelPath = path.join(pyDir, relPath)
         with open(absRelPath, 'w') as file:
-            file.write(dumps(self.prefixDict))
+            file.write(dumps(data.prefixDict))
 
         relPath = "_data//users.txt"
         absRelPath = path.join(pyDir, relPath)
         with open(absRelPath, 'w') as file:
-            file.write(dumps(list(self.userSet)))
+            file.write(dumps(list(data.userSet)))
 
-        await ctx.send("<@112041042894655488> *Shutting down*")
+        User = bot.get_user(112041042894655488)
+
+        requestStr = "Shutting down..."
+        await User.send(requestStr)
         sys.exit()
 
 @bot.command()
@@ -503,6 +456,8 @@ async def change_presence(data, ctx, *, args):
 
 
 #EVENTS:
+
+
 @bot.event
 async def on_ready():
     print()
@@ -510,6 +465,7 @@ async def on_ready():
     print ("I am running as: " + bot.user.name)
     print ("With the ID: " + str(bot.user.id))
 
+    await bot.change_presence(activity = discord.Game(name="!help (chat or DM)"))
 #Start the bot
 if(sys.argv[1] == 'test'):
     pyDir = path.dirname(__file__)
