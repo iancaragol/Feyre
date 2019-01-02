@@ -370,6 +370,7 @@ Commands:
     > mm - Monster Manual lookup
     > spell - Spell lookup
     > tor - Book of Tor
+    > request - Request new features!
     > admin - For administrators
 
 Feyre always responds in the channel or direct message from which it was summoned. ```''' 
@@ -457,10 +458,29 @@ Commands:
         > Sets the server wide prefix to [prefix]. Prefix must be !, ~, `, #, $, %, ^, &, *, ,, ., ;, :, <, or >
     Note: If you forget the bot's prefix you will no longer be able to summon it and reset it's prefix (as of now).```'''
 
+        elif (args == "request"):
+            helpstr = '''```Please help improve the bot by requesting features you would like to see!
+
+!request [feature]```'''
+
+        elif (args == "hello"):
+                   helpstr = '''```Hi?```'''
+
         else:
             helpstr = '''```I could not find that command. Try !help for a list of commands.```'''
 
         await ctx.send(helpstr)
+
+    @commands.command(pass_context = True)
+    async def request(self, ctx, *, args = None):
+        #TODO: Finish implementing the request command
+        if (args == None):
+            await ctx.send("```!request requires arguments! Try !request [feature]```")
+        else:
+            User = bot.get_user(112041042894655488)
+
+            requestStr = f"**Feature Request**\nFrom: {ctx.author}\n\n{args}"
+            await User.send(requestStr)
 
     @commands.command()
     async def admin(self, ctx):
@@ -498,6 +518,7 @@ Commands:
                 await ctx.send("<@112041042894655488> *Shutting down*")
                 sys.exit()
 
+    
     
     @commands.command()
     async def set_prefix(self, ctx, *, args = None):
@@ -565,6 +586,7 @@ Commands:
         bot.add_command(self.stats)
         bot.add_command(self.quit)
         bot.add_command(self.admin)
+        bot.add_command(self.request)
 
         #the best way to override the default help command is to remove it
         bot.remove_command("help")
