@@ -67,7 +67,7 @@ class Roller():
         Constructs the return string where rES is the original expression, uES is the expression with all rolls, and t is the total
         """
         if(len(uES) > 100):
-            uES = "```Omitted (# of dice was too large)```"
+            uES = "Omitted (# of dice was too large)"
 
         if(type(t) is bool):
             if(t):
