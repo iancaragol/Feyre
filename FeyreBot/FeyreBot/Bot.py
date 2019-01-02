@@ -178,7 +178,10 @@ class Bot():
             self.userSet.add(ctx.author.id)
         self.statsDict['!mm'] += 1
         mmArr = await self.monsterManual.search(args)
-        await self.createAndSendEmbeds(ctx, mmArr)
+        if (mmArr == False):
+            await ctx.send("```I'm sorry. I wasn't able to find the monster you are looking for.```")
+        else:
+            await self.createAndSendEmbeds(ctx, mmArr)
      
     @commands.command()
     async def randmonster(self, ctx):
@@ -191,6 +194,8 @@ class Bot():
         mmArr = await self.monsterManual.randMonster()
         await self.createAndSendEmbeds(ctx, mmArr)
 
+        
+
     @commands.command()
     async def feat(self, ctx, *, args):
         """
@@ -200,7 +205,11 @@ class Bot():
             self.userSet.add(ctx.author.id)
         self.statsDict['!feat'] += 1
         featArr = await self.feats.search(args)
-        await self.createAndSendEmbeds(ctx, featArr)
+        if (featArr == False):
+            await ctx.send("```I'm sorry. I wasn't able to find the feat you are looking for.```")
+        else:
+            await self.createAndSendEmbeds(ctx, featArr)
+            
 
     @commands.command()
     async def randfeat(self, ctx):
@@ -210,6 +219,7 @@ class Bot():
         if (ctx.author.id not in self.userSet):
             self.userSet.add(ctx.author.id)
         self.statsDict['!randfeat'] += 1
+
         featArr = await self.feats.randFeat()
         await self.createAndSendEmbeds(ctx, featArr)
 
@@ -221,8 +231,13 @@ class Bot():
         if (ctx.author.id not in self.userSet):
             self.userSet.add(ctx.author.id)
         self.statsDict['!spell'] += 1
+
         spellArr = await self.spellBook.search(args)
-        await self.createAndSendEmbeds(ctx, spellArr)
+
+        if (spellArr == False):
+            await ctx.send("```I'm sorry. I wasn't able to find the spell you are looking for.```")
+        else:
+            await self.createAndSendEmbeds(ctx, spellArr)
 
     @commands.command()
     async def init(self, ctx, *, args = ""):
@@ -294,7 +309,7 @@ class Bot():
                 self.initEmbedDict[key] = await  ctx.send(codeBlock)
 
             else:
-                await ctx.send(f"<@{ctx.author.id}>" + "\n" + "Please start initiative with **!init start** before adding players")
+                await ctx.send('''```Please start initiative with !init start before adding players```''')
     
     
     @commands.command()
@@ -331,45 +346,132 @@ class Bot():
         await ctx.send(await self.displayStats())
      
     @commands.command()
-    async def help(self, ctx):
+    async def help(self, ctx, *, args = None):
         if (ctx.author.id not in self.userSet):
             self.userSet.add(ctx.author.id)
         self.statsDict['!help'] += 1
-        helpstr = '''Hello! My name is Feyre. You can use chat or DM's to summon me.
+        helpstr = ""
 
-**Commands:**
-   > **!help**: Displays all commands.
-   > **!hello**: Hi!  
-   > **!init start**: Starts initiative tracker in channel
-   > **!init (name) (roll)**: Adds player to initiative tracker. If left blank uses discord username and rolls 1d20.
-            Ex: !add init Feyre 20
-   > **!roll (dice) (modifiers) (check)**: Rolls any number and types and dice. Supports complicated expressions and ability checks
-            Ex: !roll 1d20 + (5 - 1)/2 + 1d6 < 25
-   > **!stats**: Displays number of times each command has been used in the lifetime of the bot
+        if (args != None):
+            args = args.lower().strip()
 
-   *D&D 5E Specific Commands:*
-   > **!feat (name)**: Search D&D 5E offical books for a feat (currently only PH). 
-            Ex: !feat Keen Mind
-   > **!mm (name)**: Search the D&D 5E Monster Manual for a monster. 
-            Ex: !mm Goblin
-   > **!spell (name)**: Search D&D 5E SRD for a spell. 
-            Ex: !spell fireball
-   > **!randfeat**: Gives a random feat from offical 5E books.
-   > **!randmonster**: Gives a random monster from the D&D 5e Monster Manual.
+        if (args == None):
+            helpstr = '''```Hello! My name is Feyre. You can use chat or DM's to summon me. 
 
-   *Book of Tor Specific Commands:*
-   > **!tor horo**: Gives a Torian Horoscope.
-   > **!tor randchar**: Gives a random race and class combination from the Book of Tor.
-   > **!tor styles**: Lists all character styles from the Book of Tor.
-   > **!tor zodiac**: Gives a Primidia's Zodiac animal from the Book of Tor.
+The default prefix is !. To learn more about a command type !help [command].
+Like this: !help roll
 
-   *Administrator Commands:*
-   > **!set_prefix (prefix)**: Changes the command prefix for this server.
+Commands:
+    > hello - Hi!
+    > init - Initiative tracking
+    > roll - Dice rolling
+    > stats - Command statistics
+    > feat - Feat lookup
+    > mm - Monster Manual lookup
+    > spell - Spell lookup
+    > tor - Book of Tor
+    > admin - For administrators
 
-Please message @kittysaurus#9804 if you have any questions/issues.'''
+Feyre always responds in the channel or direct message from which it was summoned. ```''' 
 
-        embed = discord.Embed(description = helpstr, color=self.embedcolor)
-        await ctx.send(embed = embed)
+        elif (args == "init"):
+           helpstr = '''```!init is a per channel based initiative tracker. 
+
+Commands:
+    !init start
+        > Starts a new initiative tracker in the same channel
+    !init
+        > Adds the player to initiative with their discord username and rolls 1d20 for them
+    !init [player name]
+        > Adds a player with [player name] to initiative and rolls 1d20 for them
+    !init [player name] [initiative]
+        > Adds a player with [player name] and [initiative] to iniative.
+
+Ex:
+    !init start
+    !init Legolas
+    !init Gandalf 1```'''
+        elif (args == "roll"):
+           helpstr = '''```!roll can be used to roll dice of any size with complicated expressions and built in skill checks.
+
+Dice are represented with the standard [# of dice]d[size of dice] format.
+Ex: !roll 4d6
+    !roll 1d6*2
+    !roll 1d20 + 5
+    !roll 1d1000 + 2d2000 * 3 / 3 - 1
+
+Skill checks can be built into the dice expression using the < and > symbols.
+Ex: !roll 1d20 > 15
+```'''
+        elif (args == "stats"):
+           helpstr = '''```Feyre keeps track of the number of times each command has been used and the total user count.
+```'''
+        elif (args == "feat"):
+           helpstr = '''```!feat can be used to lookup feats from the Player's Handbook. 
+
+Commands:
+    !feat [feat name] 
+        > Searches for a feat
+    !randfeat
+        > Gives a random feat
+Ex:
+    !feat Keen Mind```'''
+        elif (args == "mm"):
+           helpstr = '''```!mm can be used to lookup monsters from the Monster Manual.
+
+Commands:
+    !mm [monster name]
+        > Searches for a monster
+    !randmonster
+        > Gives a random monster
+Ex:
+    !mm Young Black Dragon
+    !mm Tarrasque```'''
+        elif (args == "spell"):
+                   helpstr = '''```!spell can be used to lookup spells from the Player's Handbook.
+
+!spell [spell name]
+
+Ex: 
+    !spell Wish
+    !spell Cure Wounds```'''
+
+        elif (args == "tor"):
+                   helpstr = '''```!tor can be used to find character styles, horoscope, race/class combinations, and zodiac from the Book of Tor.
+
+Commands:
+    !tor styles
+        > Displays character styles
+    !tor horo
+        > Gives a Torian horoscope
+    !tor zodiac
+        > Gives a Torian zodiac
+    !tor randchar
+        > Gives a random Torian race/class combination.```'''
+
+        elif (args == "admin"):
+                   helpstr = '''```!admin is for server administrators. Currently the only command available to adminstrators is !set_prefix.
+
+Commands:
+    !set_prefix [prefix]
+        > Sets the server wide prefix to [prefix]. Prefix must be !, ~, `, #, $, %, ^, &, *, ,, ., ;, :, <, or >
+    Note: If you forget the bot's prefix you will no longer be able to summon it and reset it's prefix (as of now).```'''
+
+        else:
+            helpstr = '''```I could not find that command. Try !help for a list of commands.```'''
+
+        await ctx.send(helpstr)
+
+    @commands.command()
+    async def admin(self, ctx):
+        retstr = '''```!admin is for server administrators. Currently the only command available to adminstrators is !set_prefix.
+
+Commands:
+    !set_prefix [prefix]
+        > Sets the server wide prefix to [prefix]. Prefix must be !, ~, `, #, $, %, ^, &, *, ,, ., ;, :, <, or >
+    Note: If you forget the bot's prefix you will no longer be able to summon it and reset it's prefix (as of now).```'''
+
+        await ctx.send(retstr)
 
     @commands.command()
     async def quit(self, ctx):
@@ -462,6 +564,7 @@ Please message @kittysaurus#9804 if you have any questions/issues.'''
         bot.add_command(self.tor)
         bot.add_command(self.stats)
         bot.add_command(self.quit)
+        bot.add_command(self.admin)
 
         #the best way to override the default help command is to remove it
         bot.remove_command("help")

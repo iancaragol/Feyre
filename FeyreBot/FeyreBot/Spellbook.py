@@ -28,10 +28,7 @@ class Sb():
         closeMatches = difflib.get_close_matches(spell, list(self.spellDictionary.keys()))
 
         if(len(closeMatches) == 0):
-            retArr = []
-            retArr.append("An error occurred.")
-            retArr.append("*I'm sorry, I was unable to find the feat you are looking for.*")
-            return retArr
+            return False
 
         return self.spellDictionary[closeMatches[0]]
 

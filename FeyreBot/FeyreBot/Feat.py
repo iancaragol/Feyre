@@ -34,10 +34,7 @@ class Feats():
         closeMatches = difflib.get_close_matches(feat, list(self.featDictionary.keys()))
 
         if(len(closeMatches) == 0):
-            retArr = []
-            retArr.append("An error occurred.")
-            retArr.append("*I'm sorry, I was unable to find the feat you are looking for.*")
-            return retArr
+            return False
 
         return self.featDictionary[closeMatches[0]]
     
@@ -68,35 +65,8 @@ class Feats():
                  retArr.append(line)
                  i = 1
              else:
+                 #retStr.replace(u"\u25A1", '>')
                  retStr += line
 
-         retArr.append(retStr)
-         return retArr
-
-
-
-    def readAndFormat(self, matches):
-         """
-         Legacy code, replaced by readForDict()
-         """
-         pyDir = os.path.dirname(__file__)
-         relPath = "_data//_feats"
-         absRelPath = os.path.join(pyDir, relPath)
-
-         filename = self.featDictionary[matches[0]]
-         file = open(os.path.join(absRelPath, filename), 'r', encoding = 'latin-1')
-
-         retArr = []
-         retStr = ""
-
-         i = 0
-         for line in file:
-             if (i == 0):
-                 retArr.append(line)
-                 i = 1
-             else:
-                 retStr += line
-
-         #print(retStr)
          retArr.append(retStr)
          return retArr

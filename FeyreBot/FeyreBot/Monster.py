@@ -37,10 +37,7 @@ class MonsterManual():
         otherMatches = ""
 
         if(len(closeMatches) == 0):
-            retArr = []
-            retArr.append("An error occurred.")
-            retArr.append("*I'm sorry, I was unable to find the monster you are looking for.*")
-            return retArr
+            return False
 
         elif(len(closeMatches) == 3):
             otherMatches = "\n *Did you mean these? " + closeMatches[1] + " or " + closeMatches[2] + "*"
