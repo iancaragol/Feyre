@@ -503,7 +503,9 @@ Roll from = {ctx.author.name} =
 
                 await gmUser.send(gmResult)
 
-                userResult = "Rawr"
+                userResult = f'''```asciidoc
+Roll to = {ctx.author.name} =
+{result} ```'''
                 sendUser = bot.get_user(ctx.author.id)
                 await sendUser.send(userResult)
             except:
