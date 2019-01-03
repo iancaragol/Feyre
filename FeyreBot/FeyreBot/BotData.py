@@ -6,8 +6,9 @@ from Monster import MonsterManual
 from Feat import Feats
 from Spellbook import Sb
 from DiceRolls import Roller
-from Init import Initiative
 from datetime import datetime
+from Init import Initiative
+
 
 import discord
 
@@ -53,6 +54,8 @@ class BotData():
         self.initDict = {}
         self.initEmbedDict = {}
 
+        self.gmDict = {}
+
         self.statsDict = {}
         self.prefixDict = {}
 
@@ -72,6 +75,16 @@ class BotData():
             self.statsDict = {'!tor horo':0, '!tor zodiac':0, '!hello':0, '!tor styles':0, '!tor randchar':0, '!roll':0,
                           '!help':0, '!mm':0, '!randmonster':0, '!feat':0, '!randfeat':0, '!init':0, '!spell':0}
 
+        try:
+            pyDir = path.dirname(__file__)
+            relPath = "_data//gms.txt"
+            absRelPath = path.join(pyDir, relPath)
+            self.gmDict = load(open(absRelPath))
+            print("GM's loaded succesfully")
+
+        except Exception as e:
+            print(f"Error loading GM's: {e}")
+ 
         try:
             pyDir = path.dirname(__file__)
             relPath = "_data//prefixes.txt"

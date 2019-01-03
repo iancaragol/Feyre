@@ -7,7 +7,7 @@ import numpy as np
 #rolls dice
 #accepts input in the form of !roll #dTYPE ex: !roll 1d20 + 5
 class Roller():
-    async def parse(self, input):
+    async def parse(self, input, gm = False):
         """
         Parses a string of the format !roll #d# +,/,*,- #d# or # ... evaulated 
         Ex: !roll 5d20 + 1d6 * 2
@@ -56,7 +56,11 @@ class Roller():
             rollExpStr = ''.join(str(e) for e in rollExp)
             total = eval(evalStr)
 
-            return self.constructReturnString(rollExpStr, unEvalStr, total)
+            if(not gm):
+                return self.constructReturnString(rollExpStr, unEvalStr, total)
+            if(gm):
+                return self.constructReturnStringNoFormat(rollExpStr, unEvalStr, total)
+
         except Exception as e:
             return ("*I'm sorry, there was something I didnt understand about your input.*\n" + str(e))
 
@@ -86,6 +90,31 @@ Rolls: {uES}
 I interpreted your input as {rES}.
 Rolls: {uES}
 - Total: {t} -```'''
+
+        return outMsg
+
+    def constructReturnStringNoFormat(self,rES, uES, t):
+        """
+        Constructs the return string where rES is the original expression, uES is the expression with all rolls, and t is the total
+        """
+        if(len(uES) > 100):
+            uES = "Omitted (# of dice was too large)"
+
+        if(type(t) is bool):
+            if(t):
+                outMsg = f'''I interpreted the input as {rES}.
+Rolls: {uES}
+[Ability/Skill Check: Succeeded]'''
+            else:
+                outMsg = f'''I interpreted the input as {rES}.
+Rolls: {uES}
+[Ability/Skill Check: Failed]'''
+
+        else:
+            outMsg = f'''
+I interpreted the input as {rES}.
+Rolls: {uES}
+[Total: {t}]'''
 
         return outMsg
 

@@ -4,6 +4,8 @@ from os import path
 from json import load, dumps
 from math import ceil
 from discord.ext import commands
+from Init import Initiative
+
 
 import discord
 import asyncio
@@ -69,7 +71,7 @@ async def roll(ctx, *, args):
     if (ctx.author.id not in data.userSet):
         data.userSet.add(ctx.author.id)
     data.statsDict['!roll'] += 1
-    await ctx.send(await data.diceRoller.parse(args))
+    await ctx.send(await data.diceRoller.parse(args, gm = False))
 
 @bot.command()
 async def mm(dctx, *, args):
@@ -145,9 +147,10 @@ async def init(ctx, *, args = ""):
     """
     if (ctx.author.id not in data.userSet):
         data.userSet.add(ctx.author.id)
+    data.statsDict['!init'] += 1
+
     #This command will be moved into its own class
     if (args == 'start'):
-        data.statsDict['!init'] += 1
         key = ctx.guild.name + ":" + ctx.channel.name
         i = Initiative()
         data.initDict[key] = i
@@ -263,6 +266,7 @@ Commands:
 > hello - Hi!
 > init - Initiative tracking
 > roll - Dice rolling
+> gm - GM only dice rolling
 > stats - Bot usage statistics
 > feat - Feat lookup
 > mm - Monster Manual lookup
@@ -364,6 +368,20 @@ Note: If you forget the bot's prefix you will no longer be able to summon it and
     elif (args == "hello"):
                 helpstr = '''```Hi?```'''
 
+    elif (args == "gm"):
+                helpstr = '''```!gm can be used to send dice rolls to the GM without other players being able to see the result.
+GM's are set on a per channel basis.
+                
+Commands:
+!gm
+    > Sets the channels GM to the user
+!gm roll [expression]
+    > Rolls dice and sends the result to the user and the GM
+
+Ex:
+!gm
+!gm roll 1d20```'''
+
     else:
         helpstr = '''```I could not find that command. Try !help for a list of commands.```'''
 
@@ -410,6 +428,12 @@ async def quit(ctx):
         with open(absRelPath, 'w') as file:
             file.write(dumps(list(data.userSet)))
 
+        pyDir = path.dirname(__file__)
+        relPath = "_data//gms.txt"
+        absRelPath = path.join(pyDir, relPath)
+        with open(absRelPath, 'w') as file:
+            file.write(dumps(data.gmDict))
+
         User = bot.get_user(112041042894655488)
 
         requestStr = "Shutting down..."
@@ -450,10 +474,40 @@ async def set_prefix(ctx, *, args = None):
             await ctx.send("Only server administrators have access to this command.")
 
 @bot.command()
-async def change_presence(data, ctx, *, args):
+async def change_presence(ctx, *, args):
     if(ctx.author.id == 112041042894655488):
         await bot.change_presence(activity = discord.Game(name=args))
 
+@bot.command()
+async def gm(ctx, *, args = None):
+    #TODO: Fix this command, codeblocks do not disply color correctly.
+    if (ctx.guild == None):
+        await ctx.send("```GM rolls must be done in a channel with a dedicated gm.```")
+        return
+
+    elif (args == None):
+        data.gmDict[ctx.channel.id] = ctx.author.id
+        await ctx.send(f"```{ctx.author} was made GM of this channel.```")
+
+    elif (args != None):
+        args = args.strip()
+        if (args.startswith('roll')):
+            try:
+                expression = args.replace('roll', '').strip()
+                result = await data.diceRoller.parse(expression, gm = True)
+
+                gmUser = bot.get_user(data.gmDict[ctx.channel.id])
+                gmResult = f'''```asciidoc
+Roll from = {ctx.author.name} =
+{result} ```'''
+
+                await gmUser.send(gmResult)
+
+                userResult = "Rawr"
+                sendUser = bot.get_user(ctx.author.id)
+                await sendUser.send(userResult)
+            except:
+                await ctx.send("```This channel does not have a dedicated GM. Type !gm to set yourself as GM.```")
 
 #EVENTS:
 
