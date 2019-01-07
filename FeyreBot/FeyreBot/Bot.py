@@ -305,6 +305,10 @@ Ex: !roll 4d6
 
 Skill checks can be built into the dice expression using the < and > symbols.
 Ex: !roll 1d20 > 15
+
+You can roll with advantage or disadvantage using the -a and -d flags before the dice expression.
+Ex: !roll -a 1d20
+    !roll -d 1d20+5
 ```'''
     elif (args == "stats"):
         helpstr = '''```Feyre keeps track of the number of times each command has been used and the total user count.
@@ -495,6 +499,9 @@ async def gm(ctx, *, args = None):
             try:
                 expression = args.replace('roll', '').strip()
                 result = await data.diceRoller.parse(expression, gm = True)
+                #TODO: Fix this spaget
+                result = result.replace('```', '')
+                result = result.replace('diff', '')
 
                 gmUser = bot.get_user(data.gmDict[ctx.channel.id])
                 gmResult = f'''```asciidoc
