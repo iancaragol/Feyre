@@ -275,7 +275,8 @@ Commands:
 > request - Request new features!
 > admin - Change defualt command prefix
 
-Feyre always responds in the channel or direct message from which it was summoned. ```''' 
+Feyre always responds in the channel or direct message from which it was summoned.
+Use this link to add Feyre to your channel: [https://discordbots.org/bot/500733845856059402]```''' 
 
     elif (args == "init"):
         helpstr = '''```!init is a per channel based initiative tracker. 
