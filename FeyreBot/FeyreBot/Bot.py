@@ -124,6 +124,148 @@ async def randfeat(bot, ctx):
     featArr = await data.feats.randFeat()
     await data.createAndSendEmbeds(ctx, featArr)
 
+
+@bot.command()
+async def dp(ctx, *, args = None):
+    data.statsDict['!roll'] += 1
+
+    try:
+        roll = str(random.randint(1, 100))
+        if(args):
+            total = eval(roll + args.strip())
+            msg = f'''```css\n{roll}{args} = [{total}%]```'''
+
+        else:
+            total = roll
+            msg = f'''```asciidoc
+[{total}%]```'''
+
+    except:
+        msg = f'''```I didn't understand something about your input. Try !roll for more complicated expressions.```'''
+
+    await ctx.send(msg)
+
+@bot.command()
+async def d20(ctx, *, args = None):
+    data.statsDict['!roll'] += 1
+
+    try:
+        roll = str(random.randint(1, 20))
+        if(args):
+            total = eval(roll + args.strip())
+            msg = f'''```css\n{roll}{args} = [{total}]```'''
+
+        else:
+            total = roll
+            msg = f'''```asciidoc
+[{total}]```'''
+
+    except:
+        msg = f'''```I didn't understand something about your input. Try !roll for more complicated expressions.```'''
+
+    await ctx.send(msg)
+
+@bot.command()
+async def d12(ctx, *, args = None):
+    data.statsDict['!roll'] += 1
+
+    try:
+        roll = str(random.randint(1, 12))
+        if(args):
+            total = eval(roll + args.strip())
+            msg = f'''```css\n{roll}{args} = [{total}]```'''
+
+        else:
+            total = roll
+            msg = f'''```asciidoc
+[{total}]```'''
+
+    except:
+        msg = f'''```I didn't understand something about your input. Try !roll for more complicated expressions.```'''
+
+    await ctx.send(msg)
+
+@bot.command()
+async def d10(ctx, *, args = None):
+    data.statsDict['!roll'] += 1
+
+    try:
+        roll = str(random.randint(1, 10))
+        if(args):
+            total = eval(roll + args.strip())
+            msg = f'''```css\n{roll}{args} = [{total}]```'''
+
+        else:
+            total = roll
+            msg = f'''```asciidoc
+[{total}]```'''
+
+    except:
+        msg = f'''```I didn't understand something about your input. Try !roll for more complicated expressions.```'''
+
+    await ctx.send(msg)
+
+@bot.command()
+async def d8(ctx, *, args = None):
+    data.statsDict['!roll'] += 1
+
+    try:
+        roll = str(random.randint(1, 8))
+        if(args):
+            total = eval(roll + args.strip())
+            msg = f'''```css\n{roll}{args} = [{total}]```'''
+
+        else:
+            total = roll
+            msg = f'''```asciidoc
+[{total}]```'''
+
+    except:
+        msg = f'''```I didn't understand something about your input. Try !roll for more complicated expressions.```'''
+
+    await ctx.send(msg)
+
+@bot.command()
+async def d6(ctx, *, args = None):
+    data.statsDict['!roll'] += 1
+
+    try:
+        roll = str(random.randint(1, 6))
+        if(args):
+            total = eval(roll + args.strip())
+            msg = f'''```css\n{roll}{args} = [{total}]```'''
+
+        else:
+            total = roll
+            msg = f'''```asciidoc
+[{total}]```'''
+
+    except:
+        msg = f'''```I didn't understand something about your input. Try !roll for more complicated expressions.```'''
+
+    await ctx.send(msg)
+
+@bot.command()
+async def d4(ctx, *, args = None):
+    data.statsDict['!roll'] += 1
+
+    try:
+        roll = str(random.randint(1, 4))
+        if(args):
+            total = eval(roll + args.strip())
+            msg = f'''```css\n{roll}{args} = [{total}]```'''
+
+        else:
+            total = roll
+            msg = f'''```asciidoc
+[{total}]```'''
+
+    except:
+        msg = f'''```I didn't understand something about your input. Try !roll for more complicated expressions.```'''
+
+    await ctx.send(msg)
+
+
 @bot.command()
 async def spell(ctx, *, args):
     """
@@ -265,7 +407,8 @@ Like this: !help roll
 Commands:
 > hello - Hi!
 > init - Initiative tracking
-> roll - Dice rolling
+> roll - Dice rolling with complicated expressions
+> d - Simple dice rolling
 > gm - GM only dice rolling
 > stats - Bot usage statistics
 > feat - Feat lookup
@@ -276,7 +419,7 @@ Commands:
 > admin - Change defualt command prefix
 
 Feyre always responds in the channel or direct message from which it was summoned.
-Use this link to add Feyre to your channel: [https://discordbots.org/bot/500733845856059402]```''' 
+Use this link to add Feyre! to your channel: [https://discordbots.org/bot/500733845856059402]```''' 
 
     elif (args == "init"):
         helpstr = '''```!init is a per channel based initiative tracker. 
@@ -311,6 +454,19 @@ You can roll with advantage or disadvantage using the -a and -d flags before the
 Ex: !roll -a 1d20
     !roll -d 1d20+5
 ```'''
+
+    elif (args == "d"):
+        helpstr = '''```!d[size] [expression] can be used if you only want to roll one dice.
+This command supports standard dice sizes [4,6,8,10,12,20] and expressions. A space is neccessary between the dice and any modifiers.
+
+You can also use !dp to roll for percentile.
+
+Ex:
+!d20
+!d6 +2
+!dp
+```'''
+
     elif (args == "stats"):
         helpstr = '''```Feyre keeps track of the number of times each command has been used and the total user count.
 ```'''
