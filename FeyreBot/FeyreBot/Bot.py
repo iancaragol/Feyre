@@ -74,7 +74,7 @@ async def roll(ctx, *, args):
     await ctx.send(await data.diceRoller.parse(args, gm = False))
 
 @bot.command()
-async def mm(dctx, *, args):
+async def mm(ctx, *, args):
     """
     Searches the Monster Manual for a monster
     """
@@ -85,7 +85,7 @@ async def mm(dctx, *, args):
     if (mmArr == False):
         await ctx.send("```I'm sorry. I wasn't able to find the monster you are looking for.```")
     else:
-        await data.createAndSendEmbeds(ctx, mmArr)
+        await createAndSendEmbeds(ctx, mmArr)
      
 @bot.command()
 async def randmonster(ctx):
@@ -96,7 +96,7 @@ async def randmonster(ctx):
         data.userSet.add(ctx.author.id)
     data.statsDict['!randmonster'] += 1
     mmArr = await data.monsterManual.randMonster()
-    await data.createAndSendEmbeds(ctx, mmArr)
+    await createAndSendEmbeds(ctx, mmArr)
 
 @bot.command()
 async def feat(ctx, *, args):
@@ -110,10 +110,10 @@ async def feat(ctx, *, args):
     if (featArr == False):
         await ctx.send("```I'm sorry. I wasn't able to find the feat you are looking for.```")
     else:
-        await data.createAndSendEmbeds(ctx, featArr)
+        await createAndSendEmbeds(ctx, featArr)
             
 @bot.command()
-async def randfeat(bot, ctx):
+async def randfeat(ctx):
     """
     Gives a random feat from the Player's Handbook
     """
@@ -122,7 +122,7 @@ async def randfeat(bot, ctx):
     data.statsDict['!randfeat'] += 1
 
     featArr = await data.feats.randFeat()
-    await data.createAndSendEmbeds(ctx, featArr)
+    await createAndSendEmbeds(ctx, featArr)
 
 
 @bot.command()
@@ -280,7 +280,7 @@ async def spell(ctx, *, args):
     if (spellArr == False):
         await ctx.send("```I'm sorry. I wasn't able to find the spell you are looking for.```")
     else:
-        await data.createAndSendEmbeds(ctx, spellArr)
+        await createAndSendEmbeds(ctx, spellArr)
 
 @bot.command()
 async def init(ctx, *, args = ""):
