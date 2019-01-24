@@ -17,10 +17,26 @@ class Initiative():
         if(not updated):
             self.playerList.append((Name, init))
 
+    def removePlayer(self, name):
+        toremove = -1
+        for i in range(0, len(self.playerList)):
+            if(self.playerList[i][0] == name):
+                toremove = i;
+
+        if(toremove != -1):
+            del(self.playerList[toremove]);
+            return True
+        else:
+            return False
+
     def displayInit(self):
         """
         Sorts players by their iniative and returns a string for display as an embedded message
         """
+        if(len(self.playerList) == 0):
+            return ''
+
+
         sortedInit = sorted(self.playerList, key=lambda x: int(x[1]))
         sortedInit.reverse()
 

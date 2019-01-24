@@ -300,6 +300,32 @@ async def init(ctx, *, args = ""):
 - Initiative -```'''
         msg = await ctx.send(codeBlock)
         data.initEmbedDict[key] = msg
+
+    elif (args.strip().startswith('remove') or args.strip().startswith('-r')):
+        argsStr = str(args)
+        argsStr = argsStr.replace('remove', '').strip()
+        argsStr = argsStr.replace('-r', '').strip()
+
+        key = ctx.guild.name + ":" + ctx.channel.name
+
+        if(key in data.initDict):
+            name = argsStr.strip()
+            ret = data.initDict[key].removePlayer(name)
+
+            if(ret):
+                desc = data.initDict[key].displayInit()
+                #newEmbed = discord.Embed(title = "|------------- **Initiative** -------------|", description = data.initDict[key].displayInit(), color=data.embedcolor)
+
+                codeBlock = '''```diff
+- Initiative -''' + desc + '```'
+
+                #delete old message and send new one with updated values
+                data.initEmbedDict[key] = await  data.initEmbedDict[key].delete()
+                data.initEmbedDict[key] = await  ctx.send(codeBlock)
+
+            elif(not ret):
+                await ctx.send('''```I couldnt find the player you were looking for.```''')
+
              
     else:
         argsStr = str(args)
@@ -333,14 +359,18 @@ async def init(ctx, *, args = ""):
             if(len(split) == 2):
                 #!init Name Init
                 if (split[1].lstrip('+-').isdigit()):
-                    init = split[1]
+                    init = int(split[1])
                     name = split[0]
                 #!init Init Name
                 else:
-                    init = split[0]
+                    try:
+                        init = int(split[0])
+                    except:
+                        await ctx.send('''```There was something I did not understand about your input. I interperted your initiative value as non-integer.```''')
+                        return
+
                     name = split[1]
 
-                    
             data.initDict[key].addPlayer(name, init)
             desc = data.initDict[key].displayInit()
             #newEmbed = discord.Embed(title = "|------------- **Initiative** -------------|", description = data.initDict[key].displayInit(), color=data.embedcolor)
@@ -354,7 +384,7 @@ async def init(ctx, *, args = ""):
 
         else:
             await ctx.send('''```Please start initiative with !init start before adding players```''')
-    
+      
 @bot.command()
 async def tor(ctx, *, args):
     if (ctx.author.id not in data.userSet):
@@ -433,11 +463,14 @@ Commands:
     > Adds a player with [player name] to initiative and rolls 1d20 for them
 !init [player name] [initiative]
     > Adds a player with [player name] and [initiative] to iniative.
+!init remove [player name] or !init -r [player name]
+    > Removes a player from initiative. 
 
 Ex:
 !init start
 !init Legolas
-!init Gandalf 1```'''
+!init Gandalf 1
+!init -r Gandalf```'''
     elif (args == "roll"):
         helpstr = '''```!roll can be used to roll dice of any size with complicated expressions and built in skill checks.
 
