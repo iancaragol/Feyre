@@ -57,9 +57,12 @@ async def hello(ctx):
     if (ctx.author.id not in data.userSet):
         data.userSet.add(ctx.author.id)
 
+    #raise Exception
+
     data.statsDict['!hello'] += 1
     embed = discord.Embed()
-    embed.set_image(url='https://cdn.discordapp.com/attachments/352281669992185866/500780935638155264/kOXnswR.gif')
+    #https://cdn.discordapp.com/attachments/352281669992185866/500780935638155264/kOXnswR.gif
+    embed.set_image(url='https://cdn.discordapp.com/attachments/401837411291627524/538476988357148675/hello.gif')
     await ctx.send(embed=embed)
 
 @bot.command()
@@ -436,7 +439,7 @@ Like this: !help roll
 
 Commands:
 > hello - Hi!
-> init - Initiative tracking
+> init- Initiative tracking
 > roll - Dice rolling with complicated expressions
 > d - Simple dice rolling
 > gm - GM only dice rolling
@@ -449,12 +452,16 @@ Commands:
 > admin - Change defualt command prefix
 
 Feyre always responds in the channel or direct message from which it was summoned.
-Use this link to add Feyre! to your channel: [https://discordbots.org/bot/500733845856059402]```''' 
+Use this link to add Feyre! to your channel: [https://discordbots.org/bot/500733845856059402]
+
+-- UPDATES --
+> You can now use dice rolling and initative tracker with !i and !r in addition to their regular commands.
+```''' 
 
     elif (args == "init"):
         helpstr = '''```!init is a per channel based initiative tracker. 
 
-Commands:
+Commands (can be shortened to !i):
 !init start
     > Starts a new initiative tracker in the same channel
 !init
@@ -468,17 +475,19 @@ Commands:
 
 Ex:
 !init start
-!init Legolas
+!i Legolas
 !init Gandalf 1
+!init Frodo
+!init remove Frodo
 !init -r Gandalf```'''
     elif (args == "roll"):
         helpstr = '''```!roll can be used to roll dice of any size with complicated expressions and built in skill checks.
 
-Dice are represented with the standard [# of dice]d[size of dice] format.
+Dice are represented with the standard [# of dice]d[size of dice] format. You can also use !r.
 Ex: !roll 4d6
 !roll 1d6*2
-!roll 1d20 + 5
-!roll 1d1000 + 2d2000 * 3 / 3 - 1
+!r 1d20 + 5
+!r 1d1000 + 2d2000 * 3 / 3 - 1
 
 Skill checks can be built into the dice expression using the < and > symbols.
 Ex: !roll 1d20 > 15
@@ -668,6 +677,123 @@ async def set_prefix(ctx, *, args = None):
             await ctx.send("Only server administrators have access to this command.")
 
 @bot.command()
+async def r(ctx, *, args):
+    """
+    Rolls any number of dice in any format including skill checks
+        Ex: !roll 1d20+5*6>100
+    """
+
+    #This should be rewritten...
+
+    if (ctx.author.id not in data.userSet):
+        data.userSet.add(ctx.author.id)
+    data.statsDict['!roll'] += 1
+    await ctx.send(await data.diceRoller.parse(args, gm = False))
+
+@bot.command()
+async def i(ctx, *, args = ""):
+    """
+    Starts or adds players to initiative
+    """
+    if (ctx.author.id not in data.userSet):
+        data.userSet.add(ctx.author.id)
+    data.statsDict['!init'] += 1
+
+    #This command will be moved into its own class
+    if (args == 'start'):
+        key = ctx.guild.name + ":" + ctx.channel.name
+        i = Initiative()
+        data.initDict[key] = i
+        codeBlock = '''```diff
+- Initiative -```'''
+        msg = await ctx.send(codeBlock)
+        data.initEmbedDict[key] = msg
+
+    elif (args.strip().startswith('remove') or args.strip().startswith('-r')):
+        argsStr = str(args)
+        argsStr = argsStr.replace('remove', '').strip()
+        argsStr = argsStr.replace('-r', '').strip()
+
+        key = ctx.guild.name + ":" + ctx.channel.name
+
+        if(key in data.initDict):
+            name = argsStr.strip()
+            ret = data.initDict[key].removePlayer(name)
+
+            if(ret):
+                desc = data.initDict[key].displayInit()
+                #newEmbed = discord.Embed(title = "|------------- **Initiative** -------------|", description = data.initDict[key].displayInit(), color=data.embedcolor)
+
+                codeBlock = '''```diff
+- Initiative -''' + desc + '```'
+
+                #delete old message and send new one with updated values
+                data.initEmbedDict[key] = await  data.initEmbedDict[key].delete()
+                data.initEmbedDict[key] = await  ctx.send(codeBlock)
+
+            elif(not ret):
+                await ctx.send('''```I couldnt find the player you were looking for.```''')
+
+             
+    else:
+        argsStr = str(args)
+
+        data.statsDict['!init'] += 1
+        key = ctx.guild.name + ":" + ctx.channel.name
+
+        if(key in data.initDict):
+            split = argsStr.split(' ')
+            name = ""
+            init = ""
+
+            #!init something
+            if(len(split) == 1):
+                #!init
+                if(len(split[0]) == 0):
+                    name = ctx.author.name
+                    init = random.randint(1, 20)
+
+                #something = int so name = author
+                elif (split[0].lstrip('+-').isdigit()):
+                    init = split[0]
+                    name = ctx.author.name
+
+                #something = name so int = random
+                else:
+                    name = split[0]
+                    init = random.randint(1, 20)
+
+            #!init name init OR init name
+            if(len(split) == 2):
+                #!init Name Init
+                if (split[1].lstrip('+-').isdigit()):
+                    init = int(split[1])
+                    name = split[0]
+                #!init Init Name
+                else:
+                    try:
+                        init = int(split[0])
+                    except:
+                        await ctx.send('''```There was something I did not understand about your input. I interperted your initiative value as non-integer.```''')
+                        return
+
+                    name = split[1]
+
+            data.initDict[key].addPlayer(name, init)
+            desc = data.initDict[key].displayInit()
+            #newEmbed = discord.Embed(title = "|------------- **Initiative** -------------|", description = data.initDict[key].displayInit(), color=data.embedcolor)
+
+            codeBlock = '''```diff
+- Initiative -''' + desc + '```'
+
+            #delete old message and send new one with updated values
+            data.initEmbedDict[key] = await  data.initEmbedDict[key].delete()
+            data.initEmbedDict[key] = await  ctx.send(codeBlock)
+
+        else:
+            await ctx.send('''```Please start initiative with !init start before adding players```''')
+
+@bot.command()
 async def change_presence(ctx, *, args):
     if(ctx.author.id == 112041042894655488):
         await bot.change_presence(activity = discord.Game(name=args))
@@ -709,7 +835,10 @@ Roll to = {ctx.author.name} =
                 await ctx.send("```This channel does not have a dedicated GM. Type !gm to set yourself as GM.```")
 
 #EVENTS:
-
+@bot.event
+async def on_error(event, *args, **kwargs):
+    print("oof")
+    await client.send_message(client.get_channel('538068002374156289'), 'oof')
 
 @bot.event
 async def on_ready():
