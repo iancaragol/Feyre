@@ -123,6 +123,7 @@ class BotData():
 > !randfeat: {self.statsDict['!randfeat']}
 > !randmonster: {self.statsDict['!randmonster']}
 > !spell: {self.statsDict['!spell']}
+> !weapon: {self.statsDict['!weapon']}
 
 [Book of Tor]
 > !tor horo: {self.statsDict['!tor horo']}
