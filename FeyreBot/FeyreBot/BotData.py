@@ -75,7 +75,7 @@ class BotData():
         except Exception as e:
             print(f"Error loading stats: {e}")
             self.statsDict = {'!tor horo':0, '!tor zodiac':0, '!hello':0, '!tor styles':0, '!tor randchar':0, '!roll':0,
-                          '!help':0, '!mm':0, '!randmonster':0, '!feat':0, '!randfeat':0, '!init':0, '!spell':0}
+                          '!help':0, '!mm':0, '!randmonster':0, '!feat':0, '!randfeat':0, '!init':0, '!spell':0, '!weapon':0}
 
         try:
             pyDir = path.dirname(__file__)

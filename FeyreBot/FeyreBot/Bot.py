@@ -288,6 +288,10 @@ async def spell(ctx, *, args):
 
 @bot.command()
 async def weapon(ctx, *, args):
+    if (ctx.author.id not in data.userSet):
+        data.userSet.add(ctx.author.id)
+    data.statsDict['!weapon'] += 1
+
     wep = await data.weapons.search(args)
     if wep == False:
         await ctx.send("```Sorry, I couldn't find that weapon.```")
@@ -296,6 +300,10 @@ async def weapon(ctx, *, args):
 
 @bot.command()
 async def w(ctx, *, args):
+    if (ctx.author.id not in data.userSet):
+        data.userSet.add(ctx.author.id)
+    data.statsDict['!weapon'] += 1
+
     wep = await data.weapons.search(args)
 
     if wep == False:
