@@ -14,87 +14,92 @@ class Roller():
         Ex: !roll 5d20 + 1d6 * 2
         Returns an invalid input message if the input is not recongnized.
         """
-        try:
+        #try:
             #TODO: Fix this spaget
-            advantage = False
-            disadvantage = False
-            input = input.lower().strip()
-            input = input.replace('\\','')
-            if(input.startswith('-a')):
-                advantage = True
-                input = input.replace('-a', '').strip()
+        advantage = False
+        disadvantage = False
+        input = input.lower().strip()
+        input = input.replace('\\','')
+        if(input.startswith('-a')):
+            advantage = True
+            input = input.replace('-a', '').strip()
 
-            if(input.startswith('-d')):
-                disadvantage = True
-                input = input.replace('-d', '').strip()
+        if(input.startswith('-d')):
+            disadvantage = True
+            input = input.replace('-d', '').strip()
 
-            #check formatting
-            m = re.match(r"^((\d*)d(\d*)([-+*/><]?\d*))*", input)
+        #check formatting
+        m = re.match(r"^((\d*)d(\d*)([-+*/><]?\d*))*", input)
 
-            if(m == None):
-                return "*I'm sorry, there was something I didnt understand about your input.*"
+        if(m == None):
+            return "*I'm sorry, there was something I didnt understand about your input.*"
 
-            ms = re.split(r"([-+*/><])", m.string)
-            adv = ms
+        ms = re.split(r"([-+*/><])", m.string)
+        adv = ms
 
-            rollExp = copy.deepcopy(ms)
+        rollExp = copy.deepcopy(ms)
 
-            for i in range(0, len(ms)):
-                if (re.match(r"^((\d*)d(\d*))", ms[i])):
-                    split = ms[i].split('d')
-                    numDice = int(split[0])
-                    typeDice = int(split[1])
-
-                    if(numDice > 100000):
-                        return "Your input is too big! Maximum number of dice is 100,000"
-
-                    if(typeDice > 9223372036854775808):
-                        return ("Your input is too big! Maximum size is 9,223,372,036,854,775,807")
-
-
-                    ms[i] = self.rollDice(numDice, typeDice)
-                    if(advantage or disadvantage):
-                        adv = self.rollDice(numDice, typeDice)
-       
-            unEval = copy.deepcopy(ms)
-            if(advantage or disadvantage):
-                unEvalAdv = copy.deepcopy(adv)
-                evalledAdv = adv
-
-            evalled = ms
-
-            for i in range(0, len(ms)):
+        for i in range(0, len(ms)):
+            if (re.match(r"^((\d*)d(\d*))", ms[i])):
+                split = ms[i].split('d')
                 try:
-                    evalled[i] = sum(ms[i])
+                    numDice = int(split[0])
+
+                except ValueError:
+                    numDice = int(1)
+
+                typeDice = int(split[1])
+
+                if(numDice > 100000):
+                    return "Your input is too big! Maximum number of dice is 100,000"
+
+                if(typeDice > 9223372036854775808):
+                    return ("Your input is too big! Maximum size is 9,223,372,036,854,775,807")
+
+
+                ms[i] = self.rollDice(numDice, typeDice)
+                if(advantage or disadvantage):
+                    adv = self.rollDice(numDice, typeDice)
+       
+        unEval = copy.deepcopy(ms)
+        if(advantage or disadvantage):
+            unEvalAdv = copy.deepcopy(adv)
+            evalledAdv = adv
+
+        evalled = ms
+
+        for i in range(0, len(ms)):
+            try:
+                evalled[i] = sum(ms[i])
+            except:
+                continue
+
+        if(advantage or disadvantage):
+            for i in range(0, len(adv)):
+                try:
+                    evalledAdv[i] = sum(adv[i])
                 except:
                     continue
-
-            if(advantage or disadvantage):
-                for i in range(0, len(adv)):
-                    try:
-                        evalledAdv[i] = sum(adv[i])
-                    except:
-                        continue
-                unEvalStrAdv = ''.join(str(e) for e in unEvalAdv)
-                evalStrAdv = ''.join(str(e) for e in evalledAdv)
-                totalAdv = eval(evalStrAdv)
+            unEvalStrAdv = ''.join(str(e) for e in unEvalAdv)
+            evalStrAdv = ''.join(str(e) for e in evalledAdv)
+            totalAdv = eval(evalStrAdv)
             
-            unEvalStr = ''.join(str(e) for e in unEval)
-            evalStr = ''.join(str(e) for e in evalled)
-            rollExpStr = ''.join(str(e) for e in rollExp)
-            total = eval(evalStr)
+        unEvalStr = ''.join(str(e) for e in unEval)
+        evalStr = ''.join(str(e) for e in evalled)
+        rollExpStr = ''.join(str(e) for e in rollExp)
+        total = eval(evalStr)
 
-            if(advantage or disadvantage):
-                return self.constructReturnStringAdvantage(advantage, disadvantage, rollExpStr, unEvalStr, unEvalStrAdv, total, totalAdv)
+        if(advantage or disadvantage):
+            return self.constructReturnStringAdvantage(advantage, disadvantage, rollExpStr, unEvalStr, unEvalStrAdv, total, totalAdv)
 
-            if(not gm):
-                return self.constructReturnString(rollExpStr, unEvalStr, total)
-            if(gm and not advantage or not disadvantage):
-                return self.constructReturnStringNoFormat(rollExpStr, unEvalStr, total)
+        if(not gm):
+            return self.constructReturnString(rollExpStr, unEvalStr, total)
+        if(gm and not advantage or not disadvantage):
+            return self.constructReturnStringNoFormat(rollExpStr, unEvalStr, total)
         
 
-        except Exception as e:
-            return ("*I'm sorry, there was something I didnt understand about your input.*\n" + str(e))
+        #except Exception as e:
+            #return ("*I'm sorry, there was something I didnt understand about your input.*\n" + str(e))
 
     def constructReturnStringAdvantage(self, adv, disadv, rES, uES, uES2, t1, t2):
         """

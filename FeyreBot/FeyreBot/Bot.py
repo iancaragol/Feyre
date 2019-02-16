@@ -285,6 +285,24 @@ async def spell(ctx, *, args):
     else:
         await createAndSendEmbeds(ctx, spellArr)
 
+
+@bot.command()
+async def weapon(ctx, *, args):
+    wep = await data.weapons.search(args)
+    if wep == False:
+        await ctx.send("```Sorry, I couldn't find that weapon.```")
+    else:
+        await ctx.send(await wep.to_string())
+
+@bot.command()
+async def w(ctx, *, args):
+    wep = await data.weapons.search(args)
+
+    if wep == False:
+        await ctx.send("```Sorry, I couldn't find that weapon.```")
+    else:
+        await ctx.send(await wep.to_string())
+
 @bot.command()
 async def init(ctx, *, args = ""):
     """
@@ -445,6 +463,7 @@ Commands:
 > gm - GM only dice rolling
 > stats - Bot usage statistics
 > feat - Feat lookup
+> weapon - Weapon lookup
 > mm - Monster Manual lookup
 > spell - Spell lookup
 > tor - Book of Tor
@@ -584,6 +603,15 @@ Commands:
 Ex:
 !gm
 !gm roll 1d20```'''
+
+    elif (args == "weapon"):
+        helpstr = '''```!weapon or !w can be used to lookup weapons from the players handbook. 
+If you find any errors or a weapon is missing please use !request to let me know.
+
+Built in attack rolls are coming soon.
+
+Ex:
+!w Longbow```'''
 
     else:
         helpstr = '''```I could not find that command. Try !help for a list of commands.```'''
@@ -835,11 +863,14 @@ Roll to = {ctx.author.name} =
                 await ctx.send("```This channel does not have a dedicated GM. Type !gm to set yourself as GM.```")
 
 #EVENTS:
-@bot.event
-async def on_error(event, *args, **kwargs):
-    print("oof")
-    await client.send_message(client.get_channel('538068002374156289'), 'oof')
+#@bot.event
+#async def on_command_error(ctx, error):
+#    print(error)
 
+    #exceptionChannel = discord.Object(id='538068002374156289')
+
+#    await ctx.send(bot.get_channel('538068002374156289'), error)
+    
 @bot.event
 async def on_ready():
     print()

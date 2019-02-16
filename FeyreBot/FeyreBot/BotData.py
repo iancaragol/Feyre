@@ -8,6 +8,7 @@ from Spellbook import Sb
 from DiceRolls import Roller
 from datetime import datetime
 from Init import Initiative
+from Weapons import Weapons
 
 
 import discord
@@ -15,7 +16,7 @@ import discord
 class BotData():
     """
     Main class for bot. Adds all commands to the bot and starts it with the start(token) function.
-
+                                       
     Attributes:
         diceRoller: instance of the Roller() class
         spellBook: instance of the Sb() class
@@ -49,6 +50,7 @@ class BotData():
         self.monsterManual = MonsterManual()
         self.feats = Feats()
         self.bookOfTor = BookOfTor()
+        self.weapons = Weapons()
 
         #Initiative tracking dictionaries
         self.initDict = {}

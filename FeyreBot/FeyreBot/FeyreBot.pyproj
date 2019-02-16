@@ -52,6 +52,9 @@
     <Compile Include="Spellbook.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Weapons.py">
+      <SubType>Code</SubType>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="legacy\" />
