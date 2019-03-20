@@ -9,6 +9,7 @@ from DiceRolls import Roller
 from datetime import datetime
 from Init import Initiative
 from Weapons import Weapons
+from Class_Abilities import Class_Abil
 
 
 import discord
@@ -51,6 +52,7 @@ class BotData():
         self.feats = Feats()
         self.bookOfTor = BookOfTor()
         self.weapons = Weapons()
+        self.class_abilities = Class_Abil()
 
         #Initiative tracking dictionaries
         self.initDict = {}
@@ -109,27 +111,4 @@ class BotData():
 
         print("\nTime: " + str(datetime.now()))
 
-    async def displayStats(self):
-        retStr = f'''```asciidoc
-= Lifetime Stats =
-> !help: {self.statsDict['!help']}
-> !hello: {self.statsDict['!hello']}
-> !init: {self.statsDict['!init']}
-> !roll: {self.statsDict['!roll']}
-
-[D&D 5E]
-> !feat: {self.statsDict['!feat']}
-> !mm: {self.statsDict['!mm']}   
-> !randfeat: {self.statsDict['!randfeat']}
-> !randmonster: {self.statsDict['!randmonster']}
-> !spell: {self.statsDict['!spell']}
-> !weapon: {self.statsDict['!weapon']}
-
-[Book of Tor]
-> !tor horo: {self.statsDict['!tor horo']}
-> !tor randchar: {self.statsDict['!tor randchar']}
-> !tor styles: {self.statsDict['!tor styles']}
-> !tor zodiac: {self.statsDict['!tor zodiac']}
-
-[Unique users: {len(self.userSet)}]```'''
-        return retStr
+    

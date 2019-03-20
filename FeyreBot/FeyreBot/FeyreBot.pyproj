@@ -52,6 +52,7 @@
     <Compile Include="Spellbook.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Class_Abilities.py" />
     <Compile Include="Weapons.py">
       <SubType>Code</SubType>
     </Compile>

@@ -39,13 +39,23 @@ async def createAndSendEmbeds(ctx, returnedArray):
                 embed = discord.Embed(title = returnedArray[0] + " *- Continued*", description = parts[i], color=data.embedcolor)
             await ctx.send(embed = embed)
     
+async def codify(string, title = None):
+    if title:
+        s = f'''```md
+# {title}
 
+{string}```'''
+    
+    else:
+        s = '```' + string + '```'
+    return s
 
 #Initalize the bot:
 
 data = BotData()
 bot = commands.Bot(command_prefix = get_pre)
 bot.remove_command('help')
+
 
 #COMMANDS:
 
@@ -312,6 +322,17 @@ async def w(ctx, *, args):
         await ctx.send(await wep.to_string())
 
 @bot.command()
+async def ability(ctx, *, args):
+    if (ctx.author.id not in data.userSet):
+        data.userSet.add(ctx.author.id)
+    #data.statsDict['!feat'] += 1
+    abil_arr = await data.class_abilities.search(args)
+    if (abil_arr == False):
+        await ctx.send("```I'm sorry. I wasn't able to find the feat you are looking for.```")
+    else:
+        await ctx.send(await codify(abil_arr[0], abil_arr[1]))
+
+@bot.command()
 async def init(ctx, *, args = ""):
     """
     Starts or adds players to initiative
@@ -445,8 +466,35 @@ async def stats(ctx):
     if (ctx.author.id not in data.userSet):
         data.userSet.add(ctx.author.id)
     #embed = discord.Embed(description = await data.displayStats(), color=data.embedcolor)
-    await ctx.send(await data.displayStats())
-     
+    await ctx.send(await displayStats())
+   
+async def displayStats():
+    retStr = f'''```asciidoc
+= Lifetime Stats =
+> !help: {data.statsDict['!help']}
+> !hello: {data.statsDict['!hello']}
+> !init: {data.statsDict['!init']}
+> !roll: {data.statsDict['!roll']}
+
+[D&D 5E]
+> !feat: {data.statsDict['!feat']}
+> !mm: {data.statsDict['!mm']}   
+> !randfeat: {data.statsDict['!randfeat']}
+> !randmonster: {data.statsDict['!randmonster']}
+> !spell: {data.statsDict['!spell']}
+> !weapon: {data.statsDict['!weapon']}
+
+[Book of Tor]
+> !tor horo: {data.statsDict['!tor horo']}
+> !tor randchar: {data.statsDict['!tor randchar']}
+> !tor styles: {data.statsDict['!tor styles']}
+> !tor zodiac: {data.statsDict['!tor zodiac']}
+
+= Unique users: {len(data.userSet)} =
+= Server count: {len(bot.guilds)} =```'''
+    return retStr
+
+
 @bot.command()
 async def help(ctx, *, args = None):
     if (ctx.author.id not in data.userSet):
@@ -702,7 +750,10 @@ async def set_prefix(ctx, *, args = None):
                 return
 
             data.prefixDict[str(ctx.message.guild.id)] = args   
-            await ctx.send(f"<@{ctx.author.id}>\n Prefix for this server set to: {args.strip()}")
+           
+            msg = await ctx.send(f"<@{ctx.author.id}>\n Prefix for this server set to: {args.strip()}")
+            await msg.pin()
+
         else:
                 await ctx.send("Only server administrators have access to this command.")
     else:
