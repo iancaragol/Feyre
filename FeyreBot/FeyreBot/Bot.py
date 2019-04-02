@@ -383,54 +383,91 @@ async def init(ctx, *, args = ""):
         data.statsDict['!init'] += 1
         key = ctx.guild.name + ":" + ctx.channel.name
 
+       
         if(key in data.initDict):
             split = argsStr.split(' ')
             name = ""
             init = ""
-
-            #!init something
-            if(len(split) == 1):
-                #!init
-                if(len(split[0]) == 0):
-                    name = ctx.author.name
-                    init = random.randint(1, 20)
-
-                #something = int so name = author
-                elif (split[0].lstrip('+-').isdigit()):
-                    init = split[0]
-                    name = ctx.author.name
-
-                #something = name so int = random
-                else:
+        #mod = ""        
+            if len(split) == 2:
+                try:
+                    #name mod
                     name = split[0]
-                    init = random.randint(1, 20)
+                    if split[1].startswith("+") or split[1].startswith("-") or split[1].startswith("/") or split[1].startswith("*"):
+                        roll = random.randint(1, 20)
+                        init = eval(str(roll) + split[1])
 
-            #!init name init OR init name
-            if(len(split) == 2):
-                #!init Name Init
-                if (split[1].lstrip('+-').isdigit()):
-                    init = int(split[1])
-                    name = split[0]
-                #!init Init Name
-                else:
-                    try:
+                    #name roll
+                    elif split[1][0].isdigit():
+                        init = int(split[1])
+
+                    else:
+                        #mod name
+                        name = split[1]
+                        if split[0].startswith("+") or split[0].startswith("-") or split[0].startswith("/") or split[0].startswith("*"):
+                            roll = random.randint(1, 20)
+                            init = eval(str(roll) + split[0])
+
+                        #roll name
+                        elif split[0][0].isdigit():
+                            init = int(split[0])
+
+                except Exception as e:
+                    print(e)
+                    await ctx.send('''```There was something I didnt understand about your input.
+Ex: !init [name] [value OR modifier]
+
+Currently I don't support inline dice rolls such as !init Gandalf +1d6```''')
+
+            elif len(split) == 1:
+
+                try:
+                    if split[0][0].isdigit():
+                        name = ctx.author.name
                         init = int(split[0])
-                    except:
-                        await ctx.send('''```There was something I did not understand about your input. I interperted your initiative value as non-integer.```''')
-                        return
 
-                    name = split[1]
+                    elif split[0].startswith("+") or split[0].startswith("-") or split[0].startswith("/") or split[0].startswith("*"):
+                        name = ctx.author.name
+                        roll = random.randint(1, 20)
+                        init = eval(str(roll) + split[0])
 
-            data.initDict[key].addPlayer(name, init)
-            desc = data.initDict[key].displayInit()
-            #newEmbed = discord.Embed(title = "|------------- **Initiative** -------------|", description = data.initDict[key].displayInit(), color=data.embedcolor)
+                    else:
+                        name = split[0]
+                        init = random.randint(1, 20)
 
-            codeBlock = '''```diff
+                except Exception as e:
+                    print(e)
+                    await ctx.send('''```There was something I didnt understand about your input.
+Ex: !init [name] [value OR modifier]
+
+Currently I don't support inline dice rolls such as !init Gandalf +1d6```''')
+          
+            else:
+                await ctx.send('''```There was something I didnt understand about your input.
+Ex: !init [name] [value OR modifier]
+Currently I don't support inline dice rolls such as !init Gandalf +1d6```''')
+
+            try:
+                init = int(init)
+                name = str(name)
+
+                data.initDict[key].addPlayer(name, init)
+                desc = data.initDict[key].displayInit()
+                #newEmbed = discord.Embed(title = "|------------- **Initiative** -------------|", description = data.initDict[key].displayInit(), color=data.embedcolor)
+
+                codeBlock = '''```diff
 - Initiative -''' + desc + '```'
 
-            #delete old message and send new one with updated values
-            data.initEmbedDict[key] = await  data.initEmbedDict[key].delete()
-            data.initEmbedDict[key] = await  ctx.send(codeBlock)
+                #delete old message and send new one with updated values
+                data.initEmbedDict[key] = await  data.initEmbedDict[key].delete()
+                data.initEmbedDict[key] = await  ctx.send(codeBlock)
+
+            except Exception as e:
+                print(e)
+                await ctx.send('''```There was something I didnt understand about your input.
+Ex: !init [name] [value OR modifier]
+
+Currently I don't support inline dice rolls such as !init Gandalf +1d6```''')
 
         else:
             await ctx.send('''```Please start initiative with !init start before adding players```''')
@@ -456,6 +493,7 @@ async def tor(ctx, *, args):
         newEmbed = discord.Embed(description = await data.bookOfTor.zodiac(), color=data.embedcolor)
 
     await ctx.send(embed=newEmbed)
+
 
 @bot.command()
 async def stats(ctx):
@@ -506,7 +544,8 @@ async def help(ctx, *, args = None):
         args = args.lower().strip()
 
     if (args == None):
-        helpstr = '''```Hello! My name is Feyre. You can use chat or DM's to summon me. 
+        helpstr = '''```diff
+Hello! My name is Feyre. You can use chat or DM's to summon me. 
 
 The default prefix is !. To learn more about a command type !help [command].
 Like this: !help roll
@@ -527,10 +566,13 @@ Commands:
 > admin - Change defualt command prefix
 
 Feyre always responds in the channel or direct message from which it was summoned.
-Use this link to add Feyre! to your channel: [https://discordbots.org/bot/500733845856059402]
+
++ Use this link to add Feyre to your channel: [https://discordbots.org/bot/500733845856059402]
+
+- Please report bugs with the !request command
 
 -- UPDATES --
-> You can now use dice rolling and initative tracker with !i and !r in addition to their regular commands.
+> You can now add modifiers to the initiative tracker.
 ```''' 
 
     elif (args == "init"):
@@ -547,10 +589,13 @@ Commands (can be shortened to !i):
     > Adds a player with [player name] and [initiative] to iniative.
 !init remove [player name] or !init -r [player name]
     > Removes a player from initiative. 
+!init [name] [modifier] or [modifier] [name]
+    > Adds a plyer to inititative after rolling 1d20 and applying the modifier.
 
 Ex:
 !init start
 !i Legolas
+!i Sauron +5
 !init Gandalf 1
 !init Frodo
 !init remove Frodo
@@ -828,107 +873,95 @@ async def i(ctx, *, args = ""):
         data.statsDict['!init'] += 1
         key = ctx.guild.name + ":" + ctx.channel.name
 
+       
         if(key in data.initDict):
             split = argsStr.split(' ')
             name = ""
             init = ""
-
-            #!init something
-            if(len(split) == 1):
-                #!init
-                if(len(split[0]) == 0):
-                    name = ctx.author.name
-                    init = random.randint(1, 20)
-
-                #something = int so name = author
-                elif (split[0].lstrip('+-').isdigit()):
-                    init = split[0]
-                    name = ctx.author.name
-
-                #something = name so int = random
-                else:
+        #mod = ""        
+            if len(split) == 2:
+                try:
+                    #name mod
                     name = split[0]
-                    init = random.randint(1, 20)
+                    if split[1].startswith("+") or split[1].startswith("-") or split[1].startswith("/") or split[1].startswith("*"):
+                        roll = random.randint(1, 20)
+                        init = eval(str(roll) + split[1])
 
-            #!init name init OR init name
-            if(len(split) == 2):
-                #!init Name Init
-                if (split[1].lstrip('+-').isdigit()):
-                    init = int(split[1])
-                    name = split[0]
-                #!init Init Name
-                else:
-                    try:
+                    #name roll
+                    elif split[1][0].isdigit():
+                        init = int(split[1])
+
+                    else:
+                        #mod name
+                        name = split[1]
+                        if split[0].startswith("+") or split[0].startswith("-") or split[0].startswith("/") or split[0].startswith("*"):
+                            roll = random.randint(1, 20)
+                            init = eval(str(roll) + split[0])
+
+                        #roll name
+                        elif split[0][0].isdigit():
+                            init = int(split[0])
+
+                except Exception as e:
+                    print(e)
+                    await ctx.send('''```There was something I didnt understand about your input.
+Ex: !init [name] [value OR modifier]
+
+Currently I don't support inline dice rolls such as !init Gandalf +1d6```''')
+
+            elif len(split) == 1:
+
+                try:
+                    if split[0][0].isdigit():
+                        name = ctx.author.name
                         init = int(split[0])
-                    except:
-                        await ctx.send('''```There was something I did not understand about your input. I interperted your initiative value as non-integer.```''')
-                        return
 
-                    name = split[1]
+                    elif split[0].startswith("+") or split[0].startswith("-") or split[0].startswith("/") or split[0].startswith("*"):
+                        name = ctx.author.name
+                        roll = random.randint(1, 20)
+                        init = eval(str(roll) + split[0])
 
-            data.initDict[key].addPlayer(name, init)
-            desc = data.initDict[key].displayInit()
-            #newEmbed = discord.Embed(title = "|------------- **Initiative** -------------|", description = data.initDict[key].displayInit(), color=data.embedcolor)
+                    else:
+                        name = split[0]
+                        init = random.randint(1, 20)
 
-            codeBlock = '''```diff
+                except Exception as e:
+                    print(e)
+                    await ctx.send('''```There was something I didnt understand about your input.
+Ex: !init [name] [value OR modifier]
+
+Currently I don't support inline dice rolls such as !init Gandalf +1d6```''')
+          
+            else:
+                await ctx.send('''```There was something I didnt understand about your input.
+Ex: !init [name] [value OR modifier]
+Currently I don't support inline dice rolls such as !init Gandalf +1d6```''')
+
+            try:
+                init = int(init)
+                name = str(name)
+
+                data.initDict[key].addPlayer(name, init)
+                desc = data.initDict[key].displayInit()
+                #newEmbed = discord.Embed(title = "|------------- **Initiative** -------------|", description = data.initDict[key].displayInit(), color=data.embedcolor)
+
+                codeBlock = '''```diff
 - Initiative -''' + desc + '```'
 
-            #delete old message and send new one with updated values
-            data.initEmbedDict[key] = await  data.initEmbedDict[key].delete()
-            data.initEmbedDict[key] = await  ctx.send(codeBlock)
+                #delete old message and send new one with updated values
+                data.initEmbedDict[key] = await  data.initEmbedDict[key].delete()
+                data.initEmbedDict[key] = await  ctx.send(codeBlock)
+
+            except Exception as e:
+                print(e)
+                await ctx.send('''```There was something I didnt understand about your input.
+Ex: !init [name] [value OR modifier]
+
+Currently I don't support inline dice rolls such as !init Gandalf +1d6```''')
 
         else:
             await ctx.send('''```Please start initiative with !init start before adding players```''')
-
-@bot.command()
-async def change_presence(ctx, *, args):
-    if(ctx.author.id == 112041042894655488):
-        await bot.change_presence(activity = discord.Game(name=args))
-
-@bot.command()
-async def gm(ctx, *, args = None):
-    #TODO: Fix this command, codeblocks do not disply color correctly.
-    if (ctx.guild == None):
-        await ctx.send("```GM rolls must be done in a channel with a dedicated gm.```")
-        return
-
-    elif (args == None):
-        data.gmDict[ctx.channel.id] = ctx.author.id
-        await ctx.send(f"```{ctx.author} was made GM of this channel.```")
-
-    elif (args != None):
-        args = args.strip()
-        if (args.startswith('roll')):
-            try:
-                expression = args.replace('roll', '').strip()
-                result = await data.diceRoller.parse(expression, gm = True)
-                #TODO: Fix this spaget
-                result = result.replace('```', '')
-                result = result.replace('diff', '')
-
-                gmUser = bot.get_user(data.gmDict[ctx.channel.id])
-                gmResult = f'''```asciidoc
-Roll from = {ctx.author.name} =
-{result} ```'''
-
-                await gmUser.send(gmResult)
-
-                userResult = f'''```asciidoc
-Roll to = {ctx.author.name} =
-{result} ```'''
-                sendUser = bot.get_user(ctx.author.id)
-                await sendUser.send(userResult)
-            except:
-                await ctx.send("```This channel does not have a dedicated GM. Type !gm to set yourself as GM.```")
-
-#EVENTS:
-#@bot.event
-#async def on_command_error(ctx, error):
-#    print(error)
-
-    #exceptionChannel = discord.Object(id='538068002374156289')
-
-#    await ctx.send(bot.get_channel('538068002374156289'), error)
+      
     
 @bot.event
 async def on_ready():
