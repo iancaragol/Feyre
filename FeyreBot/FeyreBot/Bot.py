@@ -572,7 +572,7 @@ Feyre always responds in the channel or direct message from which it was summone
 - Please report bugs with the !request command
 
 -- UPDATES --
-> You can now add modifiers to the initiative tracker.
+> Removed "Did you mean this?" from monster lookup
 ```''' 
 
     elif (args == "init"):
