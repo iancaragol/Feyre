@@ -10,6 +10,7 @@ from datetime import datetime
 from Init import Initiative
 from Weapons import Weapons
 from Class_Abilities import Class_Abil
+from Items import ItemLookup
 
 
 import discord
@@ -53,6 +54,7 @@ class BotData():
         self.bookOfTor = BookOfTor()
         self.weapons = Weapons()
         self.class_abilities = Class_Abil()
+        self.item_lookup = ItemLookup()
 
         #Initiative tracking dictionaries
         self.initDict = {}

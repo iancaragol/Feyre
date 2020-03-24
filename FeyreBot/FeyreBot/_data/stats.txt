@@ -1,1 +1,0 @@
-{"!tor horo": 188, "!tor zodiac": 193, "!hello": 178, "!tor styles": 21, "!tor randchar": 35, "!roll": 37024, "!help": 8792, "!mm": 1334, "!randmonster": 153, "!feat": 345, "!randfeat": 101, "!init": 11801, "!spell": 2617, "!weapon": 189}
