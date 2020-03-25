@@ -259,8 +259,8 @@ paket-files/
 # Python Tools for Visual Studio (PTVS)
 __pycache__/
 *.pyc
-FeyreBot/FeyreBot/release_token.txt
-FeyreBot/FeyreBot/test_token.txt
-FeyreBot/FeyreBot/stats.txt
-FeyreBot/FeyreBot/users.txt
-FeyreBot/FeyreBot/prefixes.txt
+FeyreBot/release_token.txt
+FeyreBot/test_token.txt
+FeyreBot/stats.txt
+FeyreBot/users.txt
+FeyreBot/prefixes.txt
