@@ -76,6 +76,40 @@ async def hello(ctx):
     await ctx.send(embed=embed)
 
 @bot.command()
+async def item(ctx, *, args):
+    if (ctx.author.id not in data.userSet):
+        data.userSet.add(ctx.author.id)
+    data.statsDict['!item'] += 1
+    item = await data.item_lookup.search(args)
+
+    if len(item) >= 1997 and len(item) < 3997:
+        item1 = item[0:1990] + '```'
+        item2 = '```diff\n' + item[1991:]
+        await ctx.send(item1)
+        await ctx.send(item2)
+
+    elif len(item) >= 3997 and len(item) < 5980:
+        item1 = item[0:1990] + '```'
+        item2 = '```diff\n' + item[1990:3979] + '```'
+        item3 = '```diff\n' + item[3979:]
+        await ctx.send(item1)
+        await ctx.send(item2)
+        await ctx.send(item3)
+
+    elif len(item) >= 5980:
+        item1 = item[0:1990] + '```'
+        item2 = '```diff\n' + item[1990:3979] + '```'
+        item3 = '```diff\n' + item[3979:5979] + '```'
+        item4 = '```diff\n' + item[5979:]
+        await ctx.send(item1)
+        await ctx.send(item2)
+        await ctx.send(item3)
+        await ctx.send(item4)
+    
+    else:
+        await ctx.send(item)
+
+@bot.command()
 async def roll(ctx, *, args):
     """
     Rolls any number of dice in any format including skill checks
@@ -521,6 +555,7 @@ async def displayStats():
 > !randmonster: {data.statsDict['!randmonster']}
 > !spell: {data.statsDict['!spell']}
 > !weapon: {data.statsDict['!weapon']}
+> !item: {data.statsDict['!item']}
 
 [Book of Tor]
 > !tor horo: {data.statsDict['!tor horo']}
@@ -559,9 +594,9 @@ Commands:
 > stats - Bot usage statistics
 > feat - Feat lookup
 > weapon - Weapon lookup
+> item - Wondrous item lookup
 > mm - Monster Manual lookup
 > spell - Spell lookup
-> tor - Book of Tor
 > request - Request new features!
 > admin - Change defualt command prefix
 
@@ -569,10 +604,10 @@ Feyre always responds in the channel or direct message from which it was summone
 
 + Use this link to add Feyre to your channel: [https://discordbots.org/bot/500733845856059402]
 
-- Please report bugs with the !request command
+- Please report bugs or request additional features with the !request command
 
 -- UPDATES --
-> Removed "Did you mean this?" from monster lookup
+> Added item lookup
 ```''' 
 
     elif (args == "init"):
@@ -713,6 +748,13 @@ Built in attack rolls are coming soon.
 
 Ex:
 !w Longbow```'''
+
+    elif (args == "item"):
+        helpstr = '''```!item can be used to lookup items from the Dungeon Master's Guide. 
+If you find any errors or a item is missing please use !request to let me know. Some items have a lot of text, and may be sent in multiple message blocks.
+
+Ex:
+!item Portable Hole```'''
 
     else:
         helpstr = '''```I could not find that command. Try !help for a list of commands.```'''
