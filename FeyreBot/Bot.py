@@ -826,14 +826,14 @@ async def set_prefix(ctx, *, args = None):
         args = args.strip()
 
         if(ctx.author.guild_permissions.administrator):
-            possibleArgs = set(['!','~','`','#','$','%','^','&','*',',','.',';',':','>','<'])
+            possibleArgs = set(['/','!','~','`','#','$','%','^','&','*',',','.',';',':','>','<'])
 
             if(len(args) < 1):
                 await ctx.send(f"<@{ctx.author.id}>\n You must include arguments! Ex: !set_prefix &")
                 return
 
             elif (args not in possibleArgs):
-                await ctx.send(f"<@{ctx.author.id}>\n Prefix must be !, ~, `, #, $, %, ^, &, *, ,, ., ;, :, <, or >")
+                await ctx.send(f"<@{ctx.author.id}>\n Prefix must be /, !, ~, `, #, $, %, ^, &, *, ,, ., ;, :, <, or >")
                 return
 
             data.prefixDict[str(ctx.message.guild.id)] = args   
