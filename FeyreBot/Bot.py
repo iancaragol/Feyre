@@ -78,6 +78,41 @@ async def hello(ctx):
 
 #region Dice Rolls
 @bot.command()
+async def gm(ctx, *, args = None):
+    if (ctx.author.id not in data.userSet):
+        data.userSet.add(ctx.author.id)
+    data.statsDict['!gm'] += 1
+
+    if (ctx.guild == None):
+        await ctx.send("```GM rolls must be done in a channel with a dedicated gm.```")
+        return
+
+    elif (args == None):
+        data.gmDict[ctx.channel.id] = ctx.author.id
+        await ctx.send(f"```{ctx.author} was made GM of this channel.```")
+
+    elif (args != None):
+        args = args.strip()
+        if (args.startswith('roll')):
+            try:
+                expression = args.replace('roll', '').strip()
+                result = await data.diceRoller.parse(expression, gm = True)
+
+                gmUser = bot.get_user(data.gmDict[ctx.channel.id])
+                gmResult = f'''```asciidoc
+Roll from [{ctx.author.name}]
+{result} ```'''
+
+                await gmUser.send(gmResult)
+
+                userResult = f'''```asciidoc
+{result}```'''
+                sendUser = bot.get_user(ctx.author.id)
+                await sendUser.send(userResult)
+            except:
+                await ctx.send("```This channel does not have a dedicated GM. Type !gm to set yourself as GM.```")
+
+@bot.command()
 async def roll(ctx, *, args):
     """
     Rolls any number of dice in any format including skill checks
@@ -312,6 +347,42 @@ async def ability(ctx, *, args):
         await ctx.send("```I'm sorry. I wasn't able to find the feat you are looking for.```")
     else:
         await ctx.send(await codify(abil_arr[0], abil_arr[1]))
+#endregion
+
+#region
+@bot.command()
+async def item(ctx, *, args):
+    if (ctx.author.id not in data.userSet):
+        data.userSet.add(ctx.author.id)
+    data.statsDict['!item'] += 1
+    item = await data.item_lookup.search(args)
+
+    if len(item) >= 1997 and len(item) < 3997:
+        item1 = item[0:1990] + '```'
+        item2 = '```diff\n' + item[1991:]
+        await ctx.send(item1)
+        await ctx.send(item2)
+
+    elif len(item) >= 3997 and len(item) < 5980:
+        item1 = item[0:1990] + '```'
+        item2 = '```diff\n' + item[1990:3979] + '```'
+        item3 = '```diff\n' + item[3979:]
+        await ctx.send(item1)
+        await ctx.send(item2)
+        await ctx.send(item3)
+
+    elif len(item) >= 5980:
+        item1 = item[0:1990] + '```'
+        item2 = '```diff\n' + item[1990:3979] + '```'
+        item3 = '```diff\n' + item[3979:5979] + '```'
+        item4 = '```diff\n' + item[5979:]
+        await ctx.send(item1)
+        await ctx.send(item2)
+        await ctx.send(item3)
+        await ctx.send(item4)
+    
+    else:
+        await ctx.send(item)
 #endregion
 
 #region Spell
@@ -603,10 +674,11 @@ async def displayStats(tor):
 [D&D 5E]
 > !feat: {data.statsDict['!feat']}
 > !mm: {data.statsDict['!mm']}   
-> !randfeat: {data.statsDict['!randfeat']}
-> !randmonster: {data.statsDict['!randmonster']}
 > !spell: {data.statsDict['!spell']}
 > !weapon: {data.statsDict['!weapon']}
+> !item: {data.statsDict['!item']}
+> !randfeat: {data.statsDict['!randfeat']}
+> !randmonster: {data.statsDict['!randmonster']}
 
 [Book of Tor]
 > !tor horo: {data.statsDict['!tor horo']}
@@ -614,6 +686,13 @@ async def displayStats(tor):
 > !tor styles: {data.statsDict['!tor styles']}
 > !tor zodiac: {data.statsDict['!tor zodiac']}
 
+[Others]
+> !new: {data.statsDict['!new']}
+> !gm: {data.statsDict['!gm']}
+> !admin: {data.statsDict['!admin']}
+> !set-prefix: {data.statsDict['!set_prefix']}
+> !request: {data.statsDict['!request']}
+ 
 = Unique users: {len(data.userSet)} =
 = Server count: {len(bot.guilds)} =```'''
 
@@ -666,9 +745,9 @@ Commands:
 > stats - Bot usage statistics
 > feat - Feat lookup
 > weapon - Weapon lookup
+> item - Wondrous item lookup
 > mm - Monster Manual lookup
 > spell - Spell lookup
-> tor - Book of Tor
 > request - Request new features!
 > admin - Change defualt command prefix
 > new - New features & updates
@@ -821,6 +900,13 @@ Built in attack rolls are coming soon.
 Ex:
 !w Longbow```'''
 
+    elif (args == "item"):
+        helpstr = '''```!item can be used to lookup items from the Dungeon Master's Guide. 
+If you find any errors or a item is missing please use !request to let me know. Some items have a lot of text, and may be sent in multiple message blocks.
+
+Ex:
+!item Portable Hole```'''
+
     else:
         helpstr = '''```I could not find that command. Try !help for a list of commands.```'''
 
@@ -830,12 +916,18 @@ Ex:
 #region Admin
 @bot.command()
 async def admin(ctx):
+    if (ctx.author.id not in data.userSet):
+        data.userSet.add(ctx.author.id)
+    data.statsDict['!admin'] += 1
+
     retstr = '''```!admin is for server administrators. Currently the only command available to adminstrators is !set_prefix.
 
 Commands:
 !set_prefix [prefix]
-    > Sets the server wide prefix to [prefix]. Prefix must be !, ~, `, #, $, %, ^, &, *, ,, ., ;, :, <, or >
-Note: If you forget the bot's prefix you will no longer be able to summon it and reset it's prefix (as of now).```'''
+    > Sets the server wide prefix to [prefix]. 
+    Prefix must be /, !, ~, `, #, $, %, ^, &, *, ,, ., ;, :, <, or >
+Note: If you forget the bot's prefix you will no longer be able to summon it and reset it's prefix.
+For this reason, the prefix will be pinned in the channel from which it is changed.```'''
 
     await ctx.send(retstr)
 
@@ -844,6 +936,10 @@ async def set_prefix(ctx, *, args = None):
     #TO DO:
     #Support pinging bot if you do not know the prefix
     #Removing bot from server should reset bot's prefix
+    if (ctx.author.id not in data.userSet):
+        data.userSet.add(ctx.author.id)
+    data.statsDict['!set_prefix'] += 1
+
     if(not hasattr(ctx.author, 'ctx.author.guild_permissions')):
         await ctx.send(f"This command is for server use only.")
 
@@ -879,7 +975,10 @@ async def set_prefix(ctx, *, args = None):
 #region Developer
 @bot.command()
 async def request(ctx, *, args = None):
-    #TODO: Finish implementing the request command
+    if (ctx.author.id not in data.userSet):
+        data.userSet.add(ctx.author.id)
+    data.statsDict['!request'] += 1
+
     if (args == None):
         await ctx.send("```!request requires arguments! Try !request [feature]```")
     else:
@@ -928,6 +1027,10 @@ async def new(ctx):
     Whats new with the bot?
 
     """
+    if (ctx.author.id not in data.userSet):
+        data.userSet.add(ctx.author.id)
+    data.statsDict['!new'] += 1
+
     updateString = '''```asciidoc
 [Updates]
 
@@ -935,10 +1038,12 @@ async def new(ctx):
 + Initative can now be decimals to allow players to insert themselves anywhere in the turn order
 + Added response to !request command
 + Changed initative tracker format slightly
++ Added "all" argument to !stats to see stats for all commands
 + Added this command :)
 
 [Bugs]
-+ Fixed issue with initative where !init with no arguments would fail```'''
+> Fixed issue with initative where !init with no arguments would fail
+> Fixed gm rolls which have been broken for months```'''
     await ctx.send(updateString)
 #endregion
     

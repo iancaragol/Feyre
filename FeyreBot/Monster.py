@@ -46,7 +46,7 @@ class MonsterManual():
             otherMatches = "\n *Did you mean this? " + closeMatches[1] +"*"
 
         retArr = self.monsterDictionary[closeMatches[0]]
-        retArr[1] += otherMatches
+        retArr[1] += "" #otherMatches, removed this at user request
 
         return retArr
 
