@@ -4,6 +4,8 @@ class Initiative():
     """
     def __init__(self):
         self.playerList = []
+        self.round_count = 0
+        self.marker_count = 0
 
     def addPlayer(self, Name = None, init = 0):
         """
@@ -40,9 +42,19 @@ class Initiative():
         sortedInit = sorted(self.playerList, key=lambda x: float(x[1]))
         sortedInit.reverse()
 
-        displayStr = ""
+        if (self.marker_count >= len(sortedInit)):
+            self.marker_count = 0
 
-        for (nu, iq) in sortedInit:
-            displayStr += f"\n{nu}: {iq}"
+        displayStr = "\n"
+        for i in range(len(sortedInit)):
+            if (i == self.marker_count):
+                displayStr += "> "
+                            
+            displayStr += f"{sortedInit[i][0]}: {sortedInit[i][1]}\n"
+
+        
+
+        # for (nu, iq) in sortedInit:
+        #     displayStr += f"\n{nu}: {iq}"
 
         return displayStr
