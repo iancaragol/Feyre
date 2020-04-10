@@ -21,10 +21,10 @@ class Initiative():
         toremove = -1
         for i in range(0, len(self.playerList)):
             if(self.playerList[i][0] == name):
-                toremove = i;
+                toremove = i
 
         if(toremove != -1):
-            del(self.playerList[toremove]);
+            del(self.playerList[toremove])
             return True
         else:
             return False
@@ -37,7 +37,7 @@ class Initiative():
             return ''
 
 
-        sortedInit = sorted(self.playerList, key=lambda x: int(x[1]))
+        sortedInit = sorted(self.playerList, key=lambda x: float(x[1]))
         sortedInit.reverse()
 
         displayStr = ""

@@ -6,14 +6,12 @@ from math import ceil
 from discord.ext import commands
 from Init import Initiative
 
-
 import discord
 import asyncio
 import sys
 import random
 
-
-#Helper functions:
+#region Helper Functions
 async def get_pre(bot, message):
     if(message.guild == None):
         return '!'
@@ -29,7 +27,6 @@ async def createAndSendEmbeds(ctx, returnedArray):
     #discord has a 2048 character limit so this is needed to split the message into chunks
     else:
         s = returnedArray[1]
-        mod = ceil(len(s) / 2048)
         parts = [s[i:i+2048] for i in range(0, len(s), 2048)]
                     
         for i in range(0, len(parts)):
@@ -49,6 +46,7 @@ async def codify(string, title = None):
     else:
         s = '```' + string + '```'
     return s
+#endregion
 
 #Initalize the bot:
 
@@ -59,6 +57,7 @@ bot.remove_command('help')
 
 #COMMANDS:
 
+#region Hello
 @bot.command()
 async def hello(ctx):
     """
@@ -74,7 +73,9 @@ async def hello(ctx):
     #https://cdn.discordapp.com/attachments/352281669992185866/500780935638155264/kOXnswR.gif
     embed.set_image(url='https://cdn.discordapp.com/attachments/401837411291627524/538476988357148675/hello.gif')
     await ctx.send(embed=embed)
+#endregion
 
+#region Dice Rolls
 @bot.command()
 async def roll(ctx, *, args):
     """
@@ -86,6 +87,22 @@ async def roll(ctx, *, args):
     data.statsDict['!roll'] += 1
     await ctx.send(await data.diceRoller.parse(args, gm = False))
 
+@bot.command()
+async def r(ctx, *, args):
+    """
+    Rolls any number of dice in any format including skill checks
+        Ex: !roll 1d20+5*6>100
+    """
+
+    #This should be rewritten...
+
+    if (ctx.author.id not in data.userSet):
+        data.userSet.add(ctx.author.id)
+    data.statsDict['!roll'] += 1
+    await ctx.send(await data.diceRoller.parse(args, gm = False))
+#endregion
+
+#region Monster Manual
 @bot.command()
 async def mm(ctx, *, args):
     """
@@ -110,7 +127,9 @@ async def randmonster(ctx):
     data.statsDict['!randmonster'] += 1
     mmArr = await data.monsterManual.randMonster()
     await createAndSendEmbeds(ctx, mmArr)
+#endregion
 
+#region Feats
 @bot.command()
 async def feat(ctx, *, args):
     """
@@ -136,8 +155,9 @@ async def randfeat(ctx):
 
     featArr = await data.feats.randFeat()
     await createAndSendEmbeds(ctx, featArr)
+#endregion
 
-
+#region Shorthand dice rolls
 @bot.command()
 async def dp(ctx, *, args = None):
     data.statsDict['!roll'] += 1
@@ -278,7 +298,22 @@ async def d4(ctx, *, args = None):
 
     await ctx.send(msg)
 
+#endregion
 
+#region Ability
+@bot.command()
+async def ability(ctx, *, args):
+    if (ctx.author.id not in data.userSet):
+        data.userSet.add(ctx.author.id)
+    #data.statsDict['!feat'] += 1
+    abil_arr = await data.class_abilities.search(args)
+    if (abil_arr == False):
+        await ctx.send("```I'm sorry. I wasn't able to find the feat you are looking for.```")
+    else:
+        await ctx.send(await codify(abil_arr[0], abil_arr[1]))
+#endregion
+
+#region Spell
 @bot.command()
 async def spell(ctx, *, args):
     """
@@ -294,46 +329,37 @@ async def spell(ctx, *, args):
         await ctx.send("```I'm sorry. I wasn't able to find the spell you are looking for.```")
     else:
         await createAndSendEmbeds(ctx, spellArr)
+#endregion
 
+#region Weapon
+
+async def weapon_helper(ctx, args):
+    if (ctx.author.id not in data.userSet):
+        data.userSet.add(ctx.author.id)
+    data.statsDict['!weapon'] += 1
+
+    wep = await data.weapons.search(args)
+    if wep == False:
+        await ctx.send("```Sorry, I couldn't find that weapon.```")
+    else:
+        await ctx.send(await wep.to_string())
 
 @bot.command()
 async def weapon(ctx, *, args):
-    if (ctx.author.id not in data.userSet):
-        data.userSet.add(ctx.author.id)
-    data.statsDict['!weapon'] += 1
-
-    wep = await data.weapons.search(args)
-    if wep == False:
-        await ctx.send("```Sorry, I couldn't find that weapon.```")
-    else:
-        await ctx.send(await wep.to_string())
+    await weapon_helper(ctx, args)
 
 @bot.command()
 async def w(ctx, *, args):
-    if (ctx.author.id not in data.userSet):
-        data.userSet.add(ctx.author.id)
-    data.statsDict['!weapon'] += 1
+    await weapon_helper(ctx, args)
 
-    wep = await data.weapons.search(args)
+#endregion
 
-    if wep == False:
-        await ctx.send("```Sorry, I couldn't find that weapon.```")
-    else:
-        await ctx.send(await wep.to_string())
 
-@bot.command()
-async def ability(ctx, *, args):
-    if (ctx.author.id not in data.userSet):
-        data.userSet.add(ctx.author.id)
-    #data.statsDict['!feat'] += 1
-    abil_arr = await data.class_abilities.search(args)
-    if (abil_arr == False):
-        await ctx.send("```I'm sorry. I wasn't able to find the feat you are looking for.```")
-    else:
-        await ctx.send(await codify(abil_arr[0], abil_arr[1]))
 
-@bot.command()
-async def init(ctx, *, args = ""):
+
+#region Initiative
+
+async def init_helper(ctx, args):
     """
     Starts or adds players to initiative
     """
@@ -399,7 +425,7 @@ async def init(ctx, *, args = ""):
 
                     #name roll
                     elif split[1][0].isdigit():
-                        init = int(split[1])
+                        init = float(split[1])
 
                     else:
                         #mod name
@@ -410,7 +436,7 @@ async def init(ctx, *, args = ""):
 
                         #roll name
                         elif split[0][0].isdigit():
-                            init = int(split[0])
+                            init = float(split[0])
 
                 except Exception as e:
                     print(e)
@@ -424,12 +450,12 @@ Currently I don't support inline dice rolls such as !init Gandalf +1d6```''')
                 try:
                     if split[0][0].isdigit():
                         name = ctx.author.name
-                        init = int(split[0])
+                        init = float(split[0])
 
                     elif split[0].startswith("+") or split[0].startswith("-") or split[0].startswith("/") or split[0].startswith("*"):
                         name = ctx.author.name
                         roll = random.randint(1, 20)
-                        init = eval(str(roll) + split[0])
+                        init = eval(float(roll) + split[0])
 
                     else:
                         name = split[0]
@@ -441,6 +467,7 @@ Currently I don't support inline dice rolls such as !init Gandalf +1d6```''')
 Ex: !init [name] [value OR modifier]
 
 Currently I don't support inline dice rolls such as !init Gandalf +1d6```''')
+                    return
           
             else:
                 await ctx.send('''```There was something I didnt understand about your input.
@@ -448,7 +475,7 @@ Ex: !init [name] [value OR modifier]
 Currently I don't support inline dice rolls such as !init Gandalf +1d6```''')
 
             try:
-                init = int(init)
+                init = float(init)
                 name = str(name)
 
                 data.initDict[key].addPlayer(name, init)
@@ -468,10 +495,23 @@ Currently I don't support inline dice rolls such as !init Gandalf +1d6```''')
 Ex: !init [name] [value OR modifier]
 
 Currently I don't support inline dice rolls such as !init Gandalf +1d6```''')
+                return
 
         else:
             await ctx.send('''```Please start initiative with !init start before adding players```''')
-      
+
+
+@bot.command()
+async def init(ctx, *, args = ""):
+    await init_helper(ctx, args)
+
+@bot.command()
+async def i(ctx, *, args = ""):
+    await init_helper(ctx, args)
+
+#endregion
+
+#region Tor    
 @bot.command()
 async def tor(ctx, *, args):
     if (ctx.author.id not in data.userSet):
@@ -493,8 +533,9 @@ async def tor(ctx, *, args):
         newEmbed = discord.Embed(description = await data.bookOfTor.zodiac(), color=data.embedcolor)
 
     await ctx.send(embed=newEmbed)
+#endregion
 
-
+#region Stats
 @bot.command()
 async def stats(ctx):
     """
@@ -532,7 +573,9 @@ async def displayStats():
 = Server count: {len(bot.guilds)} =```'''
     return retStr
 
+#endregion
 
+#region Help
 @bot.command()
 async def help(ctx, *, args = None):
     if (ctx.author.id not in data.userSet):
@@ -718,18 +761,11 @@ Ex:
         helpstr = '''```I could not find that command. Try !help for a list of commands.```'''
 
     await ctx.send(helpstr)
+#endregion
 
-@bot.command()
-async def request(ctx, *, args = None):
-    #TODO: Finish implementing the request command
-    if (args == None):
-        await ctx.send("```!request requires arguments! Try !request [feature]```")
-    else:
-        User = bot.get_user(112041042894655488)
 
-        requestStr = f"**Feature Request**\nFrom: {ctx.author}\n\n{args}"
-        await User.send(requestStr)
 
+#region Admin
 @bot.command()
 async def admin(ctx):
     retstr = '''```!admin is for server administrators. Currently the only command available to adminstrators is !set_prefix.
@@ -740,37 +776,6 @@ Commands:
 Note: If you forget the bot's prefix you will no longer be able to summon it and reset it's prefix (as of now).```'''
 
     await ctx.send(retstr)
-
-@bot.command()
-async def quit(ctx):
-    if(ctx.author.id == 112041042894655488):
-        pyDir = path.dirname(__file__)
-        relPath = "_data//stats.txt"
-        absRelPath = path.join(pyDir, relPath)
-        with open(absRelPath, 'w') as file:
-            file.write(dumps(data.statsDict))
-
-        relPath = "_data//prefixes.txt"
-        absRelPath = path.join(pyDir, relPath)
-        with open(absRelPath, 'w') as file:
-            file.write(dumps(data.prefixDict))
-
-        relPath = "_data//users.txt"
-        absRelPath = path.join(pyDir, relPath)
-        with open(absRelPath, 'w') as file:
-            file.write(dumps(list(data.userSet)))
-
-        pyDir = path.dirname(__file__)
-        relPath = "_data//gms.txt"
-        absRelPath = path.join(pyDir, relPath)
-        with open(absRelPath, 'w') as file:
-            file.write(dumps(data.gmDict))
-
-        User = bot.get_user(112041042894655488)
-
-        requestStr = "Shutting down..."
-        await User.send(requestStr)
-        sys.exit()
 
 @bot.command()
 async def set_prefix(ctx, *, args = None):
@@ -807,161 +812,54 @@ async def set_prefix(ctx, *, args = None):
             return
         else:
             await ctx.send("Only server administrators have access to this command.")
+#endregion
 
+#region Developer
 @bot.command()
-async def r(ctx, *, args):
-    """
-    Rolls any number of dice in any format including skill checks
-        Ex: !roll 1d20+5*6>100
-    """
-
-    #This should be rewritten...
-
-    if (ctx.author.id not in data.userSet):
-        data.userSet.add(ctx.author.id)
-    data.statsDict['!roll'] += 1
-    await ctx.send(await data.diceRoller.parse(args, gm = False))
-
-@bot.command()
-async def i(ctx, *, args = ""):
-    """
-    Starts or adds players to initiative
-    """
-    if (ctx.author.id not in data.userSet):
-        data.userSet.add(ctx.author.id)
-    data.statsDict['!init'] += 1
-
-    #This command will be moved into its own class
-    if (args == 'start'):
-        key = ctx.guild.name + ":" + ctx.channel.name
-        i = Initiative()
-        data.initDict[key] = i
-        codeBlock = '''```diff
-- Initiative -```'''
-        msg = await ctx.send(codeBlock)
-        data.initEmbedDict[key] = msg
-
-    elif (args.strip().startswith('remove') or args.strip().startswith('-r')):
-        argsStr = str(args)
-        argsStr = argsStr.replace('remove', '').strip()
-        argsStr = argsStr.replace('-r', '').strip()
-
-        key = ctx.guild.name + ":" + ctx.channel.name
-
-        if(key in data.initDict):
-            name = argsStr.strip()
-            ret = data.initDict[key].removePlayer(name)
-
-            if(ret):
-                desc = data.initDict[key].displayInit()
-                #newEmbed = discord.Embed(title = "|------------- **Initiative** -------------|", description = data.initDict[key].displayInit(), color=data.embedcolor)
-
-                codeBlock = '''```diff
-- Initiative -''' + desc + '```'
-
-                #delete old message and send new one with updated values
-                data.initEmbedDict[key] = await  data.initEmbedDict[key].delete()
-                data.initEmbedDict[key] = await  ctx.send(codeBlock)
-
-            elif(not ret):
-                await ctx.send('''```I couldnt find the player you were looking for.```''')
-
-             
+async def request(ctx, *, args = None):
+    #TODO: Finish implementing the request command
+    if (args == None):
+        await ctx.send("```!request requires arguments! Try !request [feature]```")
     else:
-        argsStr = str(args)
+        User = bot.get_user(112041042894655488)
 
-        data.statsDict['!init'] += 1
-        key = ctx.guild.name + ":" + ctx.channel.name
+        requestStr = f"**Feature Request**\nFrom: {ctx.author}\n\n{args}"
+        await User.send(requestStr)
+        await ctx.send("```Thank you for submitting a request! Your request has been forwarded to the developer, kittysaurus.```")
 
-       
-        if(key in data.initDict):
-            split = argsStr.split(' ')
-            name = ""
-            init = ""
-        #mod = ""        
-            if len(split) == 2:
-                try:
-                    #name mod
-                    name = split[0]
-                    if split[1].startswith("+") or split[1].startswith("-") or split[1].startswith("/") or split[1].startswith("*"):
-                        roll = random.randint(1, 20)
-                        init = eval(str(roll) + split[1])
+@bot.command()
+async def quit(ctx):
+    if(ctx.author.id == 112041042894655488):
+        pyDir = path.dirname(__file__)
+        relPath = "_data//stats.txt"
+        absRelPath = path.join(pyDir, relPath)
+        with open(absRelPath, 'w') as file:
+            file.write(dumps(data.statsDict))
 
-                    #name roll
-                    elif split[1][0].isdigit():
-                        init = int(split[1])
+        relPath = "_data//prefixes.txt"
+        absRelPath = path.join(pyDir, relPath)
+        with open(absRelPath, 'w') as file:
+            file.write(dumps(data.prefixDict))
 
-                    else:
-                        #mod name
-                        name = split[1]
-                        if split[0].startswith("+") or split[0].startswith("-") or split[0].startswith("/") or split[0].startswith("*"):
-                            roll = random.randint(1, 20)
-                            init = eval(str(roll) + split[0])
+        relPath = "_data//users.txt"
+        absRelPath = path.join(pyDir, relPath)
+        with open(absRelPath, 'w') as file:
+            file.write(dumps(list(data.userSet)))
 
-                        #roll name
-                        elif split[0][0].isdigit():
-                            init = int(split[0])
+        pyDir = path.dirname(__file__)
+        relPath = "_data//gms.txt"
+        absRelPath = path.join(pyDir, relPath)
+        with open(absRelPath, 'w') as file:
+            file.write(dumps(data.gmDict))
 
-                except Exception as e:
-                    print(e)
-                    await ctx.send('''```There was something I didnt understand about your input.
-Ex: !init [name] [value OR modifier]
+        User = bot.get_user(112041042894655488)
 
-Currently I don't support inline dice rolls such as !init Gandalf +1d6```''')
+        requestStr = "Shutting down..."
+        await User.send(requestStr)
+        sys.exit()
+#endregion
 
-            elif len(split) == 1:
 
-                try:
-                    if split[0][0].isdigit():
-                        name = ctx.author.name
-                        init = int(split[0])
-
-                    elif split[0].startswith("+") or split[0].startswith("-") or split[0].startswith("/") or split[0].startswith("*"):
-                        name = ctx.author.name
-                        roll = random.randint(1, 20)
-                        init = eval(str(roll) + split[0])
-
-                    else:
-                        name = split[0]
-                        init = random.randint(1, 20)
-
-                except Exception as e:
-                    print(e)
-                    await ctx.send('''```There was something I didnt understand about your input.
-Ex: !init [name] [value OR modifier]
-
-Currently I don't support inline dice rolls such as !init Gandalf +1d6```''')
-          
-            else:
-                await ctx.send('''```There was something I didnt understand about your input.
-Ex: !init [name] [value OR modifier]
-Currently I don't support inline dice rolls such as !init Gandalf +1d6```''')
-
-            try:
-                init = int(init)
-                name = str(name)
-
-                data.initDict[key].addPlayer(name, init)
-                desc = data.initDict[key].displayInit()
-                #newEmbed = discord.Embed(title = "|------------- **Initiative** -------------|", description = data.initDict[key].displayInit(), color=data.embedcolor)
-
-                codeBlock = '''```diff
-- Initiative -''' + desc + '```'
-
-                #delete old message and send new one with updated values
-                data.initEmbedDict[key] = await  data.initEmbedDict[key].delete()
-                data.initEmbedDict[key] = await  ctx.send(codeBlock)
-
-            except Exception as e:
-                print(e)
-                await ctx.send('''```There was something I didnt understand about your input.
-Ex: !init [name] [value OR modifier]
-
-Currently I don't support inline dice rolls such as !init Gandalf +1d6```''')
-
-        else:
-            await ctx.send('''```Please start initiative with !init start before adding players```''')
-      
     
 @bot.event
 async def on_ready():
