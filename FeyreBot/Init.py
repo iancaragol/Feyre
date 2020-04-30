@@ -38,12 +38,12 @@ class Initiative():
         if(len(self.playerList) == 0):
             return ''
 
-
         sortedInit = sorted(self.playerList, key=lambda x: float(x[1]))
         sortedInit.reverse()
 
         if (self.marker_count >= len(sortedInit)):
             self.marker_count = 0
+            self.round_count += 1
 
         displayStr = "\n"
         for i in range(len(sortedInit)):

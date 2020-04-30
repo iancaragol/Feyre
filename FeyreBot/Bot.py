@@ -11,6 +11,7 @@ import discord
 import asyncio
 import sys
 import random
+import os
 
 #region Helper Functions
 async def get_pre(bot, message):
@@ -337,19 +338,19 @@ async def d4(ctx, *, args = None):
 #endregion
 
 #region Ability
-@bot.command()
-async def ability(ctx, *, args):
-    if (ctx.author.id not in data.userSet):
-        data.userSet.add(ctx.author.id)
-    #data.statsDict['!feat'] += 1
-    abil_arr = await data.class_abilities.search(args)
-    if (abil_arr == False):
-        await ctx.send("```I'm sorry. I wasn't able to find the feat you are looking for.```")
-    else:
-        await ctx.send(await codify(abil_arr[0], abil_arr[1]))
+# @bot.command()
+# async def ability(ctx, *, args):
+#     if (ctx.author.id not in data.userSet):
+#         data.userSet.add(ctx.author.id)
+#     #data.statsDict['!feat'] += 1
+#     abil_arr = await data.class_abilities.search(args)
+#     if (abil_arr == False):
+#         await ctx.send("```I'm sorry. I wasn't able to find the feat you are looking for.```")
+#     else:
+#         await ctx.send(await codify(abil_arr[0], abil_arr[1]))
 #endregion
 
-#region
+#region Items
 @bot.command()
 async def item(ctx, *, args):
     if (ctx.author.id not in data.userSet):
@@ -383,6 +384,24 @@ async def item(ctx, *, args):
     
     else:
         await ctx.send(item)
+#endregion
+
+#region ClassFeatures
+@bot.command()
+async def c(ctx, *, args):
+    """
+    Searches the Player's Handbook for a spell
+    """
+    if (ctx.author.id not in data.userSet):
+        data.userSet.add(ctx.author.id)
+    data.statsDict['!c'] += 1
+
+    classArr = await data.class_features.search(args)
+
+    if (classArr == False):
+        await ctx.send("```I'm sorry. I wasn't able to find the class you are looking for.```")
+    else:
+        await createAndSendEmbeds(ctx, classArr)
 #endregion
 
 #region Spell
@@ -426,6 +445,31 @@ async def w(ctx, *, args):
 
 #endregion
 
+#region DeckOfMany
+
+async def deck_of_many_helper(ctx, args):
+    if (ctx.author.id not in data.userSet):
+        data.userSet.add(ctx.author.id)
+    data.statsDict['!dom'] += 1
+
+    if (args == None):
+        card, effect = await data.deck_of_many.draw(data.deck_of_many.default_deck)
+        await ctx.send(await data.deck_of_many.card_to_string(card, effect))
+
+    if (len(ctx.args) == 1 and args == '-i'):
+        card, effect = await data.deck_of_many.draw(data.deck_of_many.default_deck)
+        embed = discord.Embed()
+        embed.set_image(url=await data.deck_of_many.get_image(card))
+        await ctx.send(embed=embed)
+        await ctx.send(await data.deck_of_many.card_to_string(card, effect))
+
+
+@bot.command()
+async def dom(ctx, *, args = None):
+    await deck_of_many_helper(ctx, args)
+
+#endregion
+
 #region Initiative
 
 @bot.event
@@ -439,7 +483,7 @@ async def on_raw_reaction_add(payload):
 
         reaction = get(msg.reactions, emoji=payload.emoji.name)
         if reaction and reaction.count > 1:
-            init.round_count += 1
+            #init.round_count += 1
             init.marker_count += 1
             await update_init(key)
             
@@ -677,6 +721,8 @@ async def displayStats(tor):
 > !spell: {data.statsDict['!spell']}
 > !weapon: {data.statsDict['!weapon']}
 > !item: {data.statsDict['!item']}
+> !dom: {data.statsDict['!dom']}
+> !c: {data.statsDict['!c']}
 > !randfeat: {data.statsDict['!randfeat']}
 > !randmonster: {data.statsDict['!randmonster']}
 
@@ -711,6 +757,8 @@ async def displayStats(tor):
 > !randmonster: {data.statsDict['!randmonster']}
 > !spell: {data.statsDict['!spell']}
 > !weapon: {data.statsDict['!weapon']}
+> !dom: {data.statsDict['!dom']}
+> !c: {data.statsDict['!c']}
 
 = Unique users: {len(data.userSet)} =
 = Server count: {len(bot.guilds)} =```'''
@@ -748,6 +796,8 @@ Commands:
 > item - Wondrous item lookup
 > mm - Monster Manual lookup
 > spell - Spell lookup
+> c - Class lookup
+> dom - Draw from the Deck of Many Things
 > request - Request new features!
 > admin - Change defualt command prefix
 > new - New features & updates
@@ -839,6 +889,17 @@ Commands:
 Ex:
 !mm Young Black Dragon
 !mm Tarrasque```'''
+
+    elif (args == "c" or args == "class"):
+        helpstr = '''```!c can be used to look up all of the features of a class. This can be a lot of text!
+
+Why is the command !c and not !class? Thats because class is a python keyword.
+
+Ex:
+!c wizard
+!c fighter
+```'''
+
     elif (args == "spell"):
                 helpstr = '''```!spell can be used to lookup spells from the Player's Handbook.
 
@@ -847,6 +908,18 @@ Ex:
 Ex: 
 !spell Wish
 !spell Cure Wounds```'''
+
+    elif (args == "dom"):
+        helpstr = '''```!dom can be used to draw a card from the deck of many things. The -i flag will include an image!
+
+Commands:
+!dom
+    > Draws one card from the Deck of Many Things
+!dom -i
+    > Draws one card form the Deck of Many Things and includes an image of the card
+Ex:
+!dom
+!dom -i```'''
 
     elif (args == "tor"):
                 helpstr = '''```!tor can be used to find character styles, horoscope, race/class combinations, and zodiac from the Book of Tor.
@@ -1033,17 +1106,13 @@ async def new(ctx):
 
     updateString = '''```asciidoc
 [Updates]
-
-+ Added round count to initative tracker
-+ Initative can now be decimals to allow players to insert themselves anywhere in the turn order
-+ Added response to !request command
-+ Changed initative tracker format slightly
-+ Added "all" argument to !stats to see stats for all commands
-+ Added this command :)
+> Added Deck of Many Things (!dom)
+> Added Class descriptions (!c)
 
 [Bugs]
-> Fixed issue with initative where !init with no arguments would fail
-> Fixed gm rolls which have been broken for months```'''
+> Fixed rolling dice with advantage/disadvantage to allow for skill checks
+> Fixed round counter on initiative tracker
+> Fixed bug where !spell light would return the Blight spell```'''
     await ctx.send(updateString)
 #endregion
     
