@@ -33,6 +33,7 @@ class Roller():
 
         #check formatting
         illegal = "abcefghijklmnopqrstuvwxyz!,[]|&"
+        inp = inp.replace(' ', '')
         m = re.match(r"^((\d*)d(\d*)([-+*/><]?\d*))*", inp)
     
         #sanitize inp
