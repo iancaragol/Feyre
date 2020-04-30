@@ -10,8 +10,10 @@ class ItemLookup():
         self.setup()
 
     def setup(self):
-        item_filepath = "/_data/_items/5e magic items.csv"
-        with open(os.getcwd() + item_filepath) as items:
+        pyDir = os.path.dirname(__file__)
+        relPath = "/_data/_items/5e magic items.csv"
+        absRelPath = pyDir + relPath
+        with open(absRelPath) as items:
             item_reader = csv.reader(items)
             for row in item_reader:
                 new_item = Item(row[0], row[1], row[2], row[3], row[4], row[5])

@@ -42,7 +42,8 @@ class Roller():
         if(sanitize == True):
             return "```I'm sorry, there was something I didnt understand about your input. See !help roll for more info```"
 
-        ms = re.split(r"([-+*/><])", m.string)
+        ms = re.split(r"([-+*/()><])", m.string)
+        ms = list(filter(None, ms)) #remove any empty strings that could cause issues
         adv = copy.deepcopy(ms)
 
         rollExp = copy.deepcopy(ms)
@@ -155,7 +156,7 @@ Rolls: {uES}
             outMsg = f'''```diff
 I interpreted your input as {rES}.
 Rolls: {uES}
-- Total: {t} -```'''
+- Total: {"%.2g" % t} -```'''
 
         return outMsg
 
@@ -180,7 +181,7 @@ Rolls: {uES}
             outMsg = f'''
 I interpreted the input as {rES}.
 Rolls: {uES}
-[Total: {t}]'''
+[Total: {"%.2g" % t}]'''
 
         return outMsg
 
