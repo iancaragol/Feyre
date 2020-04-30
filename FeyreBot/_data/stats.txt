@@ -1,1 +1,1 @@
-{"!tor horo": 198, "!tor zodiac": 196, "!hello": 230, "!tor styles": 26, "!tor randchar": 38, "!roll": 52779, "!help": 9184, "!mm": 1751, "!randmonster": 180, "!feat": 446, "!randfeat": 113, "!init": 16782, "!spell": 3518, "!weapon": 257, "!item": 275}
+{"!tor horo": 204, "!tor zodiac": 197, "!hello": 273, "!tor styles": 28, "!tor randchar": 42, "!roll": 75990, "!help": 9552, "!mm": 2113, "!randmonster": 200, "!feat": 519, "!randfeat": 115, "!init": 22188, "!spell": 4305, "!weapon": 306, "!item": 356, "!gm": 56, "!new": 46, "!admin": 13, "!set_prefix": 17, "!request": 9}
