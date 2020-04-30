@@ -4,11 +4,14 @@ import re
 import copy
 import numpy as np
 import math
+from asteval import Interpreter
+
+aeval = Interpreter()
 
 #rolls dice
 #accepts input in the form of !roll #dTYPE ex: !roll 1d20 + 5
 class Roller():
-    async def parse(self, input, gm = False):
+    async def parse(self, inp, gm = False):
         """
         Parses a string of the format !roll #d# +,/,*,- #d# or # ... evaulated 
         Ex: !roll 5d20 + 1d6 * 2
@@ -18,24 +21,28 @@ class Roller():
             #TODO: Fix this spaget
         advantage = False
         disadvantage = False
-        input = input.lower().strip()
-        input = input.replace('\\','')
-        if(input.startswith('-a')):
+        inp = inp.lower().strip()
+        inp = inp.replace('\\','')
+        if(inp.startswith('-a')):
             advantage = True
-            input = input.replace('-a', '').strip()
+            inp = inp.replace('-a', '').strip()
 
-        if(input.startswith('-d')):
+        if(inp.startswith('-d')):
             disadvantage = True
-            input = input.replace('-d', '').strip()
+            inp = inp.replace('-d', '').strip()
 
         #check formatting
-        m = re.match(r"^((\d*)d(\d*)([-+*/><]?\d*))*", input)
+        illegal = "abcefghijklmnopqrstuvwxyz!,[]|&"
+        m = re.match(r"^((\d*)d(\d*)([-+*/><]?\d*))*", inp)
+    
+        #sanitize inp
+        sanitize = any(c in inp.lower() for c in illegal)
 
-        if(m == None):
-            return "*I'm sorry, there was something I didnt understand about your input.*"
+        if(sanitize == True):
+            return "```I'm sorry, there was something I didnt understand about your input. See !help roll for more info```"
 
         ms = re.split(r"([-+*/><])", m.string)
-        adv = ms
+        adv = copy.deepcopy(ms)
 
         rollExp = copy.deepcopy(ms)
 
@@ -51,15 +58,15 @@ class Roller():
                 typeDice = int(split[1])
 
                 if(numDice > 100000):
-                    return "Your input is too big! Maximum number of dice is 100,000"
+                    return "Your inp is too big! Maximum number of dice is 100,000"
 
                 if(typeDice > 9223372036854775808):
-                    return ("Your input is too big! Maximum size is 9,223,372,036,854,775,807")
+                    return ("Your inp is too big! Maximum size is 9,223,372,036,854,775,807")
 
 
                 ms[i] = self.rollDice(numDice, typeDice)
                 if(advantage or disadvantage):
-                    adv = self.rollDice(numDice, typeDice)
+                    adv[i] = self.rollDice(numDice, typeDice)
        
         unEval = copy.deepcopy(ms)
         if(advantage or disadvantage):
@@ -67,7 +74,7 @@ class Roller():
             evalledAdv = adv
 
         evalled = ms
-
+        
         for i in range(0, len(ms)):
             try:
                 evalled[i] = sum(ms[i])
@@ -82,12 +89,12 @@ class Roller():
                     continue
             unEvalStrAdv = ''.join(str(e) for e in unEvalAdv)
             evalStrAdv = ''.join(str(e) for e in evalledAdv)
-            totalAdv = eval(evalStrAdv)
+            totalAdv = aeval(evalStrAdv)
             
         unEvalStr = ''.join(str(e) for e in unEval)
         evalStr = ''.join(str(e) for e in evalled)
         rollExpStr = ''.join(str(e) for e in rollExp)
-        total = eval(evalStr)
+        total = aeval(evalStr)
 
         if(advantage or disadvantage):
             return self.constructReturnStringAdvantage(advantage, disadvantage, rollExpStr, unEvalStr, unEvalStrAdv, total, totalAdv)
@@ -99,7 +106,7 @@ class Roller():
         
 
         #except Exception as e:
-            #return ("*I'm sorry, there was something I didnt understand about your input.*\n" + str(e))
+            #return ("*I'm sorry, there was something I didnt understand about your inp.*\n" + str(e))
 
     def constructReturnStringAdvantage(self, adv, disadv, rES, uES, uES2, t1, t2):
         """
@@ -110,7 +117,7 @@ class Roller():
 
         if(adv):
             outMsg = f'''```diff
-I interpreted your input as {rES} with advantage.
+I interpreted your inp as {rES} with advantage.
 Totals: [{t1}] & [{t2}]
 - You rolled [{max(t1, t2)}] with advantage -```'''
 
@@ -118,7 +125,7 @@ Totals: [{t1}] & [{t2}]
 
         elif(disadv):
             outMsg = f'''```diff
-I interpreted your input as {rES} with disadvantage.
+I interpreted your inp as {rES} with disadvantage.
 Totals: [{t1}] & [{t2}]
 - You rolled [{min(t1, t2)}] with disadvantage -```'''
 

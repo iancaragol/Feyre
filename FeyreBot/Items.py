@@ -10,7 +10,7 @@ class ItemLookup():
         self.setup()
 
     def setup(self):
-        item_filepath = "\\_data\\_items\\5e magic items.csv"
+        item_filepath = "/FeyreBot/_data/_items/5e magic items.csv"
         with open(os.getcwd() + item_filepath) as items:
             item_reader = csv.reader(items)
             for row in item_reader:

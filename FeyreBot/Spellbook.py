@@ -17,14 +17,14 @@ class Sb():
         absRelPath = os.path.join(pyDir, relPath)
 
         for file in os.listdir(absRelPath):
-                self.spellDictionary[file.replace(' ', '-').replace(".txt", "")] = self.readForDict(file)
+                self.spellDictionary[file.replace(' ', '-').replace(".txt", "").lower()] = self.readForDict(file)
         self.spellList = list(self.spellDictionary)
 
     async def search(self, message):
         """
         Searches the feat dictionary for the closest feat and returns a string with that feats description
         """
-        spell = message
+        spell = message.lower()
         closeMatches = difflib.get_close_matches(spell, list(self.spellDictionary.keys()))
 
         if(len(closeMatches) == 0):

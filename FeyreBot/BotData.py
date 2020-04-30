@@ -11,7 +11,8 @@ from Init import Initiative
 from Weapons import Weapons
 from Class_Abilities import Class_Abil
 from Items import ItemLookup
-
+from DeckOfMany import DeckOfMany
+from ClassFeatures import ClassFeatures
 
 import discord
 
@@ -53,8 +54,10 @@ class BotData():
         self.feats = Feats()
         self.bookOfTor = BookOfTor()
         self.weapons = Weapons()
-        self.class_abilities = Class_Abil()
+        #self.class_abilities = Class_Abil() #deprecated
         self.item_lookup = ItemLookup()
+        self.deck_of_many = DeckOfMany()
+        self.class_features = ClassFeatures()
 
         #Initiative tracking dictionaries
         self.initDict = {}
