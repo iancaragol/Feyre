@@ -169,17 +169,17 @@ Rolls: {uES}
 
         if(type(t) is bool):
             if(t):
-                outMsg = f'''I interpreted the input as {rES}.
+                outMsg = f'''I interpreted your input as {rES}.
 Rolls: {uES}
 [Ability/Skill Check: Succeeded]'''
             else:
-                outMsg = f'''I interpreted the input as {rES}.
+                outMsg = f'''I interpreted your input as {rES}.
 Rolls: {uES}
 [Ability/Skill Check: Failed]'''
 
         else:
             outMsg = f'''
-I interpreted the input as {rES}.
+I interpreted your input as {rES}.
 Rolls: {uES}
 [Total: {"%.2g" % t}]'''
 
