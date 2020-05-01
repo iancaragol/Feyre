@@ -119,7 +119,7 @@ class Roller():
 
         if(adv):
             outMsg = f'''```diff
-I interpreted your inp as {rES} with advantage.
+I interpreted your input as {rES} with advantage.
 Totals: [{t1}] & [{t2}]
 - You rolled [{max(t1, t2)}] with advantage -```'''
 
@@ -127,7 +127,7 @@ Totals: [{t1}] & [{t2}]
 
         elif(disadv):
             outMsg = f'''```diff
-I interpreted your inp as {rES} with disadvantage.
+I interpreted your input as {rES} with disadvantage.
 Totals: [{t1}] & [{t2}]
 - You rolled [{min(t1, t2)}] with disadvantage -```'''
 
