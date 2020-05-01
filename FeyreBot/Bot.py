@@ -6,6 +6,7 @@ from math import ceil
 from discord.ext import commands
 from discord.utils import get
 from Init import Initiative
+from asteval import Interpreter
 
 import discord
 import asyncio
@@ -55,6 +56,7 @@ async def codify(string, title = None):
 data = BotData()
 bot = commands.Bot(command_prefix = get_pre)
 bot.remove_command('help')
+aeval = Interpreter()
 
 
 #COMMANDS:
@@ -202,8 +204,8 @@ async def dp(ctx, *, args = None):
     try:
         roll = str(random.randint(1, 100))
         if(args):
-            total = eval(roll + args.strip())
-            msg = f'''```css\n{roll}{args} = [{total}%]```'''
+            total = aeval(roll + args.strip())
+            msg = f'''```css\n{roll}{args.replace(' ', '')} = [{"%.2g" % total}%]```'''
 
         else:
             total = roll
@@ -222,8 +224,8 @@ async def d20(ctx, *, args = None):
     try:
         roll = str(random.randint(1, 20))
         if(args):
-            total = eval(roll + args.strip())
-            msg = f'''```css\n{roll}{args} = [{total}]```'''
+            total = aeval(roll + args.strip())
+            msg = f'''```css\n{roll}{args.replace(' ', '')} = [{"%.2g" % total}]```'''
 
         else:
             total = roll
@@ -242,8 +244,8 @@ async def d12(ctx, *, args = None):
     try:
         roll = str(random.randint(1, 12))
         if(args):
-            total = eval(roll + args.strip())
-            msg = f'''```css\n{roll}{args} = [{total}]```'''
+            total = aeval(roll + args.strip())
+            msg = f'''```css\n{roll}{args.replace(' ', '')} = [{"%.2g" % total}]```'''
 
         else:
             total = roll
@@ -262,8 +264,8 @@ async def d10(ctx, *, args = None):
     try:
         roll = str(random.randint(1, 10))
         if(args):
-            total = eval(roll + args.strip())
-            msg = f'''```css\n{roll}{args} = [{total}]```'''
+            total = aeval(roll + args.strip())
+            msg = f'''```css\n{roll}{args.replace(' ', '')} = [{"%.2g" % total}]```'''
 
         else:
             total = roll
@@ -282,8 +284,8 @@ async def d8(ctx, *, args = None):
     try:
         roll = str(random.randint(1, 8))
         if(args):
-            total = eval(roll + args.strip())
-            msg = f'''```css\n{roll}{args} = [{total}]```'''
+            total = aeval(roll + args.strip())
+            msg = f'''```css\n{roll}{args.replace(' ', '')} = [{"%.2g" % total}]```'''
 
         else:
             total = roll
@@ -302,8 +304,8 @@ async def d6(ctx, *, args = None):
     try:
         roll = str(random.randint(1, 6))
         if(args):
-            total = eval(roll + args.strip())
-            msg = f'''```css\n{roll}{args} = [{total}]```'''
+            total = aeval(roll + args.strip())
+            msg = f'''```css\n{roll}{args.replace(' ', '')} = [{"%.2g" % total}]```'''
 
         else:
             total = roll
@@ -322,8 +324,8 @@ async def d4(ctx, *, args = None):
     try:
         roll = str(random.randint(1, 4))
         if(args):
-            total = eval(roll + args.strip())
-            msg = f'''```css\n{roll}{args} = [{total}]```'''
+            total = aeval(roll + args.strip())
+            msg = f'''```css\n{roll}{args.replace(' ', '')} = [{"%.2g" % total}]```'''
 
         else:
             total = roll
@@ -568,7 +570,7 @@ async def init_helper(ctx, args):
                     name = split[0]
                     if split[1].startswith("+") or split[1].startswith("-") or split[1].startswith("/") or split[1].startswith("*"):
                         roll = random.randint(1, 20)
-                        init = eval(str(roll) + split[1])
+                        init = aeval(str(roll) + split[1])
 
                     #name roll
                     elif split[1][0].isdigit():
@@ -579,7 +581,7 @@ async def init_helper(ctx, args):
                         name = split[1]
                         if split[0].startswith("+") or split[0].startswith("-") or split[0].startswith("/") or split[0].startswith("*"):
                             roll = random.randint(1, 20)
-                            init = eval(str(roll) + split[0])
+                            init = aeval(str(roll) + split[0])
 
                         #roll name
                         elif split[0][0].isdigit():
@@ -602,7 +604,7 @@ Currently I don't support inline dice rolls such as !init Gandalf +1d6```''')
                     elif split[0].startswith("+") or split[0].startswith("-") or split[0].startswith("/") or split[0].startswith("*"):
                         name = ctx.author.name
                         roll = random.randint(1, 20)
-                        init = eval(float(roll) + split[0])
+                        init = aeval(float(roll) + split[0])
 
                     else:
                         name = split[0]
