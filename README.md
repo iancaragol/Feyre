@@ -1,3 +1,4 @@
+﻿
 # Feyre
 ##### A Discord bot for D&amp;D and other RPG games
 
@@ -8,124 +9,211 @@ All spells, feats, and monsters are taken from the D&D Standard Reference Docume
 from the free sections of D&D beyond.
 
 ## Features
-#### > Dice Rolling:
-##### !roll (dice) (modifier) (skill check)
-	This bot has a robust dice rolling functionality that can handle multiple dice, modifiers, and ability checks.
-	
+#### -> Dice Rolling:
+This bot has a robust dice rolling functionality that can handle multiple dice, modifiers, ability checks, and rolling with advantage/disadvantage.
+##### Rolling with dice expressions
+!roll can be used to roll dice of any size with complicated expressions and built in skill checks. Dice are represented with the standard [# of dice]d[size of dice] format. You can also use !r. 
+
     Ex: !roll 1d20 + 1d6 - 6 < 15
-      Output: I interperted your input as 1d20+1d6-6<15.
-              Rolls: [8]+[4]-6<15
-              Ability/Skill Check: Succeeded
-    Ex: !roll 1d20 + 5 * 2
-      Output: I interperted your input as 1d20+5*2
-              Rolls: [20]+5*2
-              Total: 30
-#### > Initiative Tracking:
-##### !init start
-	Starts the initiative tracker.
-##### !init (player) (initiative)
-	The iniative tracker tracks iniative on a per-channel basis. Any player can add themselves to the initiative 
-	order or they can be added by the GM. 
-	If (player) is left blank the characters name will be the discord users name. 
-	If (initiative) is left blank a standard 1d20 will be rolled for that character.
+      Output: I interpreted your input as 1d20+1d6-6<15.
+		      Rolls: [7]+[4]-6<15 
+		      - Ability/Skill Check: Succeeded -
+		      
+    Ex: !r 1d20/1d50*(1d12/1d6)
+      Output: I interpreted your input as 1d20/1d50*(1d12/1d6). 
+		      Rolls: [13]/[29]*([8]/[3]) 
+		      - Total: 1.2 -
+
+Skill checks can be built into the dice expression using the < and > symbols. 
+
+	Ex: !roll 1d20 > 15 
+	  Output: I interpreted your input as 1d20>15. 
+			  Rolls: [8]>15 
+			  - Ability/Skill Check: Failed -
+
+You can roll with advantage or disadvantage using the -a and -d flags before the dice expression. 
+
+![enter image description here](https://i.imgur.com/J4YAhSI.png)
+
+	Ex: !roll -a 1d20 
+		!roll -d 1d20+5
+##### Simple dice rolling
+
+If you are only rolling one dice you can use !d [modifier] to roll. The following dice are supported.
+
+	!d4
+	!d6
+	!d8
+	!d10
+	!d12
+	!d20
+	!dp
 	
-	Ex: !start init
-	    !add init Gandalf 12
-      > Adds a player named Gandalf to the tracker with an iniative of 12
-	    !add init Frodo
-		  > Adds a player named Frodo to the tracker and rolls 1d20 for their initiative.
-	    !add init
-      > Adds a player with the users discord name and rolls 1d20 for their initiative.
-#### > Feat lookup
+![Simple Dice Rolling](https://i.imgur.com/c9X9PeZ.png)
+
+##### Gamemaster dice rolling
+!gm can be used to send dice rolls to the GM without other players being able to see the result. This is useful if a player is trying to do something sneaky, like steal from another player. GM's are set on a per channel basis. 
+
+Commands (can be shortened to !i): 
+
+	!gm > Sets the gamemaster for that channel
+	!gm roll [dice expression] > Rolls the dice so that only the player and gamemaster can see the result
+
+![Set GM](https://i.imgur.com/bBzip8b.png)
+
+![GM Roll](https://i.imgur.com/cnvKtHY.png)
+#### -> Initiative Tracking:
+
+!init is a per channel based initiative tracker. Click the Crossed Swords icon to move to the change turns! If you need to insert a player into the middle of initiative use decimals. 
+
+Commands (can be shortened to !i): 
+
+	!init start > Starts a new initiative tracker in the same channel 
+	
+	!init > Adds the player to initiative with their discord username and rolls 1d20 for them 
+	
+	!init [player name] > Adds a player with [player name] to initiative and rolls 1d20 for them 
+	
+	!init [player name] [initiative] > Adds a player with [player name] and [initiative] to iniative.
+	 
+	!init remove [player name] or !init -r [player name] > Removes a player from initiative.
+	 
+	!init [name] [modifier] or [modifier] [name] > Adds a player to initiative after rolling 1d20 and applying the modifier. 
+
+![Example initiative tracker](https://i.imgur.com/1D4oz9U.png)
+
+#### -> Feat lookup
 ##### !feat (name)
-	Searches the Players Handbook for a feat.
-	
-	Ex: !feat Keen Mind
-		Output: Keen Mind
-            (PH)
+!feat can be used to lookup feats from the Player's Handbook. 
 
-            You have a mind that can track time, direction, and detail with uncanny precision. 
-						You gain the following benefits:
-            - Increase your Intelligence score by 1, to a maximum of 20.
-            - You always know which way is north.
-            - You always know the number of hours left before the next sunrise or sunset.
-            - You can accurately recall anything you have seen or heard within the past month.
+Commands: 
 
-#### > Monster Manual
+	!feat [feat name] > Searches for a feat 
+	!randfeat > Gives a random feat Ex: !feat Keen Mind
+
+![Feat lookup example](https://i.imgur.com/yIIBBDN.png)
+
+#### -> Monster Manual
 ##### !mm (name)
-	Searches the monster manual for a monster.
-	
-	Ex: !mm guard
-		Output: Guard
-            Armor Class 16 (chain shirt, shield)
-            Hit Points 11 (2d8+2)
-            Speed 30 ft.
+!mm can be used to lookup monsters from the Monster Manual. 
 
-            | STR | DEX | CON | INT | WIS | CHA |
-            |:-----:|:-----:|:-----:|:-----:|:-----:|:-----:|
-            | 13 (+1) | 12 (+1) | 12 (+1) | 10 (0) | 11 (0) | 10 (0) |
+Commands: 
+
+	!mm [monster name] > Searches for a monster 
+	!randmonster > Gives a random monster 
 						
-            Skills Perception +2
-            Languages any one language (usually Common)
-
-            Challenge 1/8 (25 XP)
-
-            Actions
-            Spear. Melee or Ranged Weapon Attack: +3 to hit, reach 5 ft. or range 20/60 ft., one target. 
-            Hit: 4 (1d6 + 1) piercing damage or 5 (1d8 + 1) piercing damage if used with two hands to make a melee attack.
+![Monster lookup example](https://i.imgur.com/Bqj6qgy.png)
 						
-#### > Spellbook
+#### -> Spellbook
 ##### !spell (name)
-	Searches the Players Handbook and Standard Reference Document for a spell.
-	
-	Ex: !spell message
-		Output: Message
-            Level: Cantrip
-            Casting Time: 1 Action
-            Range: 120ft
-            Components: V, S, M *
-            Duration: 1 Round
-            School: Transmutation
-            Attack/Save: None
+!spell can be used to lookup spells from the Player's Handbook. 
 
-            You point your finger toward a creature within range and whisper a message. The target (and only the target) hears the message and can reply in a whisper that only you can hear.
-            You can cast this spell through solid objects if you are familiar with the target and know it is beyond the barrier. Magical silence, 1 foot of stone, 1 inch of common metal, a thin sheet of lead, or 3 feet of wood blocks the spell.
-            The spell doesn't have to follow a straight line and can travel freely around corners or through openings.
-            * - (a short piece of copper wire)
+Command:
+
+	!spell [spell name] 
+![Spell lookup example](https://i.imgur.com/oEeuTIY.png)
 		
-#### All Commands:
-	> !help: Displays all commands.
-	> !hello: Hi!
-	> !init start: Starts initiative tracker in channel
-	> !init (name) (roll): Adds player to initiative tracker. If left blank uses discord username and rolls 1d20.
-				Ex: !add init Feyre 20
-	> !roll (dice) (modifiers) (check): Rolls any number and types and dice. Supports complicated expressions and ability checks
-				Ex: !roll 1d20 + (5 - 1)/2 + 1d6 < 25
-	> !stats: Displays number of times each command has been used in the lifetime of the bot
+#### -> Weapons
+##### !weapon (name)
+!weapon is used to lookup simple adventuring weapons, such as a longsword.
 
-	D&D 5E Specific Commands:
-	> !feat (name): Search D&D 5E offical books for a feat (currently only PH). 
-			 Ex: !feat Keen Mind
-	> !mm (name): Search the D&D 5E Monster Manual for a monster. 
-			 Ex: !mm Goblin
-	> !spell (name): Search D&D 5E SRD for a spell. 
-			 Ex: !spell fireball
-	> !randfeat: Gives a random feat from offical 5E books.
-	> !randmonster: Gives a random monster from the D&D 5e Monster Manual.
+Commands:
 
-	Book of Tor Specific Commands:
-	> !tor horo: Gives a Torian Horoscope.
-	> !tor randchar: Gives a random race and class combination from the Book of Tor.
-	> !tor styles: Lists all character styles from the Book of Tor.
-	> !tor zodiac: Gives a Primidia's Zodiac animal from the Book of Tor.
+	!weapon [name] > Search for a weapon
+	!w [name] > Search for a weapon
+
+![Weapon lookup example](https://i.imgur.com/3JOHfOw.png)
+
+
+
+#### -> Items
+##### !item (name)
+!item is used to lookup any wondrous items.
+
+Command:
+
+	!item [name] > Search for an item
+
+![Item lookup example](https://i.imgur.com/0xsY43L.png)
+
+#### -> Classes
+##### !c (name)
+!c is used to lookup class features. The descriptions can be quite long so it is recommended that you DM the bot when using this command.
+
+Command:
+
+	!c [name] > Lookup class features
+
+![Class lookup example](https://i.imgur.com/XJZTP5a.png)
+
+#### -> Deck of Many Things
+##### !c (name)
+!dom can be used to draw a card from the deck of many things. The -i flag will include an image!
+
+Command:
+
+	!dom > Draws one card from the Deck of Many Things 
+	!dom -i > Draws one card form the Deck of Many Things and includes an image of the card
+
+![Drawing a card from the Deck of Many Things](https://i.imgur.com/q28Ecv3.png)
+
+#### -> Help
+##### !help
+!help gives information on all of the various commands
+
+Command:
+
+	!help > Shows all commands
+	!help [command] > Shows how to use a specific command
+
+![Help](https://i.imgur.com/jQ2MmCe.pngg)
+
+![Help Init](https://i.imgur.com/eLvIEa0.png)
+
+#### -> Stats
+##### !stats
+!stats shows command usage statistics.
+
+Command:
+
+	!stats > Show the most used commands
+	!stats all > Shows stats for all commands
 	
-#### Features in the works:
-	- Moving all data from .txt files to a database
-	- Max and Min roll commands
-	- Better search functionality
-	- Inline skill checks
-	- Add private rolls for GM
+![!stats](https://i.imgur.com/piCdGOn.png)
 
-#### Known bugs:
-	- Dice rolling does not handle parenthesis correctly
-	- Skill checks are strictly > or < instead of >= or <=
+#### -> New
+##### !new
+!new shows updates and bug fixes
+
+Command:
+
+	!new > Show most recent updates and bug fixes
+![!new](https://i.imgur.com/krC2ebT.png)
+
+#### -> Admin
+##### !admin
+!admin shows all commands available to server administrators.
+
+![Admin command](https://i.imgur.com/C29GpYN.png)
+##### !set_prefix
+!set_prefix is used by guild administrators to change the default prefix (!) used to call Feyre. This is particularly useful when two bots have the same set of commands such as !help. Once a prefix is changed a message will be pinned in the channel in case you forget.
+
+Command:
+
+	!set_prefix [/,!,~,`,#,$,%,^,&,*,,,.,;,:,<, or >] > Sets the default prefix
+![set_prefix command](https://i.imgur.com/2gdJckk.png)
+
+## Privacy and Data
+#### What kind of data does Feyre store?
+Feyre only stores command usage statistics, guild, channel, and player ids.
+
+Guild Ids: 
+Guild Ids are a unique integer that represents a guild. They are stored in pairs (id, prefix) by the !set_prefix command. They are also used by the GM roll and initative commands in conjunction with the channel id.
+	
+Channel Ids: 
+These are used by init and gm rolls to keep differentiate initatiave trackers and gms by channel. They are used stored in pairs (guild id: channel id, initative) and (guild id: channel id, gm's user id)
+	
+User Ids: 
+These are a unique integer that represents a discord user. You can find a user's unique id by enabling developer options in the settings, right clicking on a user, and selecting copy id. 
+These ids are used for setting a gm on a per channel basis. When a user uses any command, their user id is stored in a list of user ids. This list is used to keep track of the number of users that the bot has.
+	
