@@ -1,12 +1,12 @@
-from BotData import BotData
-
 from os import path
 from json import load, dumps
 from math import ceil
 from discord.ext import commands
 from discord.utils import get
-from Init import Initiative
 from asteval import Interpreter
+
+from _classes.BotData import BotData
+from _classes.Init import Initiative
 
 import discord
 import asyncio
@@ -24,7 +24,7 @@ async def get_pre(bot, message):
 
 async def createAndSendEmbeds(ctx, returnedArray):
     if(len(returnedArray[1]) < 2048):
-        embed = discord.Embed(title = returnedArray[0], description = returnedArray[1], color=data.embedcolor)
+        embed = discord.Embed(title = returnedArray[0], description = returnedArray[1])#, color=data.embedcolor)
         await ctx.send(embed = embed)
 
     #discord has a 2048 character limit so this is needed to split the message into chunks
@@ -34,9 +34,9 @@ async def createAndSendEmbeds(ctx, returnedArray):
                     
         for i in range(0, len(parts)):
             if(i == 0):
-                embed = discord.Embed(title = returnedArray[0], description = parts[i], color=data.embedcolor)
+                embed = discord.Embed(title = returnedArray[0], description = parts[i])#, color=data.embedcolor)
             else:
-                embed = discord.Embed(title = returnedArray[0] + " *- Continued*", description = parts[i], color=data.embedcolor)
+                embed = discord.Embed(title = returnedArray[0] + " *- Continued*", description = parts[i])#, color=data.embedcolor)
             await ctx.send(embed = embed)
     
 async def codify(string, title = None):
@@ -424,6 +424,41 @@ async def spell(ctx, *, args):
         await createAndSendEmbeds(ctx, spellArr)
 #endregion
 
+#region Voting
+@bot.command()
+async def vote(ctx,  *, args = None):
+    if (ctx.author.id not in data.userSet):
+        data.userSet.add(ctx.author.id)
+    data.statsDict['!vote'] += 1
+
+    embed = discord.Embed(description="If you have a moment, please [vote](https://top.gg/bot/500733845856059402) for Feyre on top.gg! This helps more people find the bot. Thanks :)")
+    embed.set_image(url='https://media.giphy.com/media/zGnnFpOB1OjMQ/giphy.gif')
+    await ctx.send(embed = embed)
+#endregion
+
+#region Currency
+
+async def currency_helper(ctx, args):
+    if (ctx.author.id not in data.userSet):
+        data.userSet.add(ctx.author.id)
+    data.statsDict['!currency'] += 1
+
+    await ctx.send(await data.currency_converter.parse_input(args))
+
+@bot.command()
+async def currency(ctx, *, args):
+    await currency_helper(ctx, args)
+
+@bot.command()
+async def cur(ctx, *, args):
+    await currency_helper(ctx, args)
+
+@bot.command()
+async def convert(ctx, *, args):
+    await currency_helper(ctx, args)
+
+#endregion
+
 #region Weapon
 
 async def weapon_helper(ctx, args):
@@ -725,6 +760,7 @@ async def displayStats(tor):
 > !item: {data.statsDict['!item']}
 > !dom: {data.statsDict['!dom']}
 > !c: {data.statsDict['!c']}
+> !currency: {data.statsDict['!currency']}
 > !randfeat: {data.statsDict['!randfeat']}
 > !randmonster: {data.statsDict['!randmonster']}
 
@@ -740,6 +776,7 @@ async def displayStats(tor):
 > !admin: {data.statsDict['!admin']}
 > !set-prefix: {data.statsDict['!set_prefix']}
 > !request: {data.statsDict['!request']}
+> !vote: {data.statsDict['!vote']}
  
 = Unique users: {len(data.userSet)} =
 = Server count: {len(bot.guilds)} =```'''
@@ -761,6 +798,7 @@ async def displayStats(tor):
 > !weapon: {data.statsDict['!weapon']}
 > !dom: {data.statsDict['!dom']}
 > !c: {data.statsDict['!c']}
+> !currency: {data.statsDict['!currency']}
 
 = Unique users: {len(data.userSet)} =
 = Server count: {len(bot.guilds)} =```'''
@@ -780,11 +818,13 @@ async def help(ctx, *, args = None):
         args = args.lower().strip()
 
     if (args == None):
-        helpstr = '''```diff
+        helpstr = '''```asciidoc
 Hello! My name is Feyre. You can use chat or DM's to summon me. 
+===============================================================
 
 The default prefix is !. To learn more about a command type !help [command].
 Like this: !help roll
+
 
 Commands:
 > hello - Hi!
@@ -799,16 +839,21 @@ Commands:
 > mm - Monster Manual lookup
 > spell - Spell lookup
 > c - Class lookup
+> currency - Currency conversions
 > dom - Draw from the Deck of Many Things
 > request - Request new features!
 > admin - Change defualt command prefix
 > new - New features & updates
+> vote - Vote for Feyre on top.gg
 
 Feyre always responds in the channel or direct message from which it was summoned.
 
-+ Use this link to add Feyre to your channel: [https://discordbots.org/bot/500733845856059402]
+Like Feyre?
+===========
+Use this link `https://top.gg/bot/500733845856059402' to add Feyre to your server!
+Also consider voting for Feyre on top.gg using the `!vote' command :)
 
-- Please report bugs with the !request command
+[Please report bugs and request new features with the !request command]
 ```''' 
 
     elif (args == "init"):
@@ -902,6 +947,32 @@ Ex:
 !c fighter
 ```'''
 
+    elif (args == "currency" or args == "cur" or args == "convert"):
+        helpstr = '''```!currency can be used to convert any denomination of platinum, gold, electrum, silver, and copper to gold, silver and copper.
+It can also be used to evenly divide an amount of currency between any number of players by including a /x at the end where x is the number of players.
+
+pp = Platinum
+gp = Gold
+ep = Electrum
+sp = Silver
+cp = Copper
+
+When providing the amounts there is no need to worry about capitlization or spacing. See the examples below :)
+
+Commands:
+!currency [amount][abbreviation]
+!currency [amount][abbreviation] / [number of players] <- Optional
+!convert [amount][abbreviation]
+!convert [amount][abbreviation] / [number of players] <- Optional
+!cur [amount][abbreviation]
+!cur [amount][abbreviation] / [number of players] <- Optional
+
+Ex:
+!currency 10gp 55ep 5sp
+!convert 13gp55pp/4 <- Divides amongst 4 players
+!cur 11sp 333ep 4cp
+```'''
+
     elif (args == "spell"):
                 helpstr = '''```!spell can be used to lookup spells from the Player's Handbook.
 
@@ -948,6 +1019,9 @@ Note: If you forget the bot's prefix you will no longer be able to summon it and
         helpstr = '''```Please help improve the bot by requesting features you would like to see!
 
 !request [feature]```'''
+
+    elif (args == "vote"):
+        helpstr = '''```top.gg ranks discord bots based on the number of votes that they have. Please vote for Feyre using !vote. Thanks!```'''
 
     elif (args == "hello"):
                 helpstr = '''```Hi?```'''
@@ -1093,6 +1167,13 @@ async def quit(ctx):
         requestStr = "Shutting down..."
         await User.send(requestStr)
         sys.exit()
+
+@bot.command()
+async def change_presence(ctx, *, args):
+    if(ctx.author.id == 112041042894655488):
+        await ctx.send("Changing presence to: " + args)
+        await bot.change_presence(activity = discord.Game(name=args))
+
 #endregion
 
 #region New
@@ -1110,6 +1191,8 @@ async def new(ctx):
 [Updates]
 > Added Deck of Many Things (!dom)
 > Added Class descriptions (!c)
+> Added currency conversions (!currency, !convert, !cur)
+> Added vote command 
 
 [Bugs]
 > Fixed rolling dice with advantage/disadvantage to allow for skill checks

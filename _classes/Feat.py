@@ -17,7 +17,7 @@ class Feats():
         Reads all txt files in _data/_feats and stores them in featDictionary
         """
         pyDir = os.path.dirname(__file__)
-        relPath = "_data//_feats"
+        relPath = "..//_data//_feats"
         absRelPath = os.path.join(pyDir, relPath)
 
         for file in os.listdir(absRelPath):
@@ -52,7 +52,7 @@ class Feats():
          Used for setup, reads all text files and adds them to feat dictionary
          """
          pyDir = os.path.dirname(__file__)
-         relPath = "_data//_feats"
+         relPath = "..//_data//_feats"
          absRelPath = os.path.join(pyDir, relPath)
          file = open(os.path.join(absRelPath, filename), 'r', encoding = 'latin-1')
 

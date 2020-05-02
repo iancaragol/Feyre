@@ -1,20 +1,21 @@
+import discord
+
 from os import path
 from json import load, dumps
-
-from BookOfTor import BookOfTor
-from Monster import MonsterManual
-from Feat import Feats
-from Spellbook import Sb
-from DiceRolls import Roller
 from datetime import datetime
-from Init import Initiative
-from Weapons import Weapons
-from Class_Abilities import Class_Abil
-from Items import ItemLookup
-from DeckOfMany import DeckOfMany
-from ClassFeatures import ClassFeatures
 
-import discord
+from .BookOfTor import BookOfTor
+from .Monster import MonsterManual
+from .Feat import Feats
+from .Spellbook import Sb
+from .DiceRolls import Roller
+from .Init import Initiative
+from .Weapons import Weapons
+from .Class_Abilities import Class_Abil
+from .Items import ItemLookup
+from .DeckOfMany import DeckOfMany
+from .ClassFeatures import ClassFeatures
+from .CurrencyConversion import CurrencyConverter
 
 class BotData():
     """
@@ -58,6 +59,7 @@ class BotData():
         self.item_lookup = ItemLookup()
         self.deck_of_many = DeckOfMany()
         self.class_features = ClassFeatures()
+        self.currency_converter = CurrencyConverter()
 
         #Initiative tracking dictionaries
         self.initDict = {}
@@ -74,7 +76,7 @@ class BotData():
 
         try:
             pyDir = path.dirname(__file__)
-            relPath = "_data//stats.txt"
+            relPath = "..//_data//stats.txt"
             absRelPath = path.join(pyDir, relPath)
             self.statsDict = load(open(absRelPath))
             print("Stats loaded succesfully")
@@ -86,7 +88,7 @@ class BotData():
 
         try:
             pyDir = path.dirname(__file__)
-            relPath = "_data//gms.txt"
+            relPath = "..//_data//gms.txt"
             absRelPath = path.join(pyDir, relPath)
             self.gmDict = load(open(absRelPath))
             print("GM's loaded succesfully")
@@ -96,7 +98,7 @@ class BotData():
  
         try:
             pyDir = path.dirname(__file__)
-            relPath = "_data//prefixes.txt"
+            relPath = "..//_data//prefixes.txt"
             absRelPath = path.join(pyDir, relPath)
             self.prefixDict = load(open(absRelPath))
             print("Prefixes loaded succesfully")
@@ -106,7 +108,7 @@ class BotData():
 
         try:
             pyDir = path.dirname(__file__)
-            relPath = "_data//users.txt"
+            relPath = "..//_data//users.txt"
             absRelPath = path.join(pyDir, relPath)
             self.userSet = set(load(open(absRelPath)))
             print("Users loaded succesfully")

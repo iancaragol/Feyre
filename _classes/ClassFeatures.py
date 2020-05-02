@@ -3,40 +3,38 @@ import difflib
 import random
 import asyncio
 
-#Bestow curse required some editing because of a hyperlink
-
-class Sb():
+class ClassFeatures():
     def __init__(self):
-        self.spellDictionary = {}
-        self.spellList = []
+        self.classDictionary = {}
+        self.classList = []
         self.setup()
       
     def setup(self):
         pyDir = os.path.dirname(__file__)
-        relPath = "_data//_spells"
+        relPath = "../_data/_character_classes"
         absRelPath = os.path.join(pyDir, relPath)
 
         for file in os.listdir(absRelPath):
-                self.spellDictionary[file.replace(' ', '-').replace(".txt", "").lower()] = self.readForDict(file)
-        self.spellList = list(self.spellDictionary)
+                self.classDictionary[file.replace(' ', '-').replace(".txt", "").lower()] = self.readForDict(file)
+        self.classList = list(self.classDictionary)
 
     async def search(self, message):
         """
         Searches the feat dictionary for the closest feat and returns a string with that feats description
         """
-        spell = message.lower()
-        closeMatches = difflib.get_close_matches(spell, list(self.spellDictionary.keys()))
+        class_info = message.lower()
+        closeMatches = difflib.get_close_matches(class_info, list(self.classDictionary.keys()))
 
         if(len(closeMatches) == 0):
             return False
 
-        return self.spellDictionary[closeMatches[0]]
+        return self.classDictionary[closeMatches[0]]
 
     def readForDict(self, filename):
          pyDir = os.path.dirname(__file__)
-         relPath = "_data//_spells"
+         relPath = "..//_data//_character_classes"
          absRelPath = os.path.join(pyDir, relPath)
-         file = open(os.path.join(absRelPath, filename), 'r', encoding = 'ascii')
+         file = open(os.path.join(absRelPath, filename), 'r', encoding = 'utf-8')
 
          retArr = []
          retStr = ""

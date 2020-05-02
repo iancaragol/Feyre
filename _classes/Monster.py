@@ -19,7 +19,7 @@ class MonsterManual():
         Constructs the monster dictionary by reading from all markdown files in _data/_monsters
         """
         pyDir = os.path.dirname(__file__)
-        relPath = "_data//_monsters"
+        relPath = "..//_data//_monsters"
         absRelPath = os.path.join(pyDir, relPath)
 
         for file in os.listdir(absRelPath):
@@ -64,7 +64,7 @@ class MonsterManual():
          Reads all markdown files in _data/_monster and adds them to the monster dictionary with the proper format
          """
          pyDir = os.path.dirname(__file__)
-         relPath = "_data//_monsters"
+         relPath = "..//_data//_monsters"
          absRelPath = os.path.join(pyDir, relPath)
 
          file = open(os.path.join(absRelPath, filename), 'r', encoding = 'latin-1')

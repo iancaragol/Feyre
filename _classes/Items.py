@@ -11,7 +11,7 @@ class ItemLookup():
 
     def setup(self):
         pyDir = os.path.dirname(__file__)
-        relPath = "/_data/_items/5e magic items.csv"
+        relPath = "/../_data/_items/5e magic items.csv"
         absRelPath = pyDir + relPath
         with open(absRelPath) as items:
             item_reader = csv.reader(items)
