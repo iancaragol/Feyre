@@ -147,15 +147,45 @@ Command:
 ![Class lookup example](https://i.imgur.com/XJZTP5a.png)
 
 #### -> Deck of Many Things
-##### !c (name)
+##### !dom
 !dom can be used to draw a card from the deck of many things. The -i flag will include an image!
 
-Command:
+Commands:
 
 	!dom > Draws one card from the Deck of Many Things 
 	!dom -i > Draws one card form the Deck of Many Things and includes an image of the card
 
 ![Drawing a card from the Deck of Many Things](https://i.imgur.com/q28Ecv3.png)
+
+#### -> Currency Conversion
+##### !currency (amount), !convert (amount), !cur (amount)
+!currency can be used to convert any denomination of platinum, gold, electrum, silver, and copper to gold, silver and copper.
+It can also be used to evenly divide an amount of currency between any number of players by including a /x at the end where x is the number of players.
+
+	pp = Platinum
+	gp = Gold
+	ep = Electrum
+	sp = Silver
+	cp = Copper
+
+When providing the amounts there is no need to worry about capitlization or spacing. See the examples below :)
+
+Commands:
+
+	!currency (amount)(abbreviation) > Converts (amount) into gp, sp, cp
+	!currency (amount)(abbreviation)/(number of players) > Converts (amount) into gp, sp, cp and then divides it amongst (number of players)
+	!convert (amount)(abbreviation) > Same as above
+	!convert (amount)(abbreviation)/(number of players) > Same as above
+	!cur (amount)(abbreviation) > Same as above
+	!cur (amount)(abbreviation)/(number of players) > Same as above
+
+![Converting between currencies](https://i.imgur.com/MNMfJ5P.png)
+
+#### -> Vote
+##### !vote
+!vote gives a link to Feyre's top.gg page where users can upvote Feyre. More votes means more users! If you like Feyre please vote :)
+
+![Please vote](https://i.imgur.com/p7A8rV9.png)
 
 #### -> Help
 ##### !help
