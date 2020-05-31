@@ -1331,7 +1331,7 @@ async def stop_stream(ctx):
         await ctx.send("`Stopping stream to Initial State`")
         send_data.stop()
 
-@loop(seconds=5)
+@loop(seconds=300)
 async def send_data():
     print("Constructing stream data...")
     stream_data = copy.deepcopy(data.statsDict)
