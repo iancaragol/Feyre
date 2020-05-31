@@ -1324,7 +1324,7 @@ async def new(ctx):
 
 [Bugs]
 > Fixed bug where roll results would be formatted in scientific notation or include unneccessary decimal points
-> Added dirty error handling so incorrect commands like !1d20 will still be recognized'''
+> Added dirty error handling so incorrect commands like !1d20 will still be recognized```'''
     await ctx.send(updateString)
 #endregion
     
