@@ -417,7 +417,7 @@ async def item(ctx, *, args = None):
 async def condition(ctx, *, args = None):
     if (ctx.author.id not in data.userSet):
         data.userSet.add(ctx.author.id)
-    #data.statsDict['!item'] += 1
+    data.statsDict['!condition'] += 1
 
     if not args:
         await ctx.send('''```asciidoc
@@ -867,6 +867,7 @@ async def displayStats(tor):
 > !currency: {data.statsDict['!currency']}
 > !randfeat: {data.statsDict['!randfeat']}
 > !randmonster: {data.statsDict['!randmonster']}
+> !condtion: {data.statsDict['!condition']
 
 [Book of Tor]
 > !tor horo: {data.statsDict['!tor horo']}
