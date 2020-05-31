@@ -3,7 +3,10 @@ from json import load, dumps
 from math import ceil
 from discord.ext import commands
 from discord.utils import get
+from discord.ext.tasks import loop
 from asteval import Interpreter
+from ISStreamer.Streamer import Streamer
+from datetime import datetime
 
 from _classes.BotData import BotData
 from _classes.Init import Initiative
@@ -13,6 +16,8 @@ import asyncio
 import sys
 import random
 import os
+import copy
+import time
 
 #region Helper Functions
 async def get_pre(bot, message):
@@ -1313,6 +1318,37 @@ async def new(ctx):
     await ctx.send(updateString)
 #endregion
     
+#region Usage Statistics
+@bot.command()
+async def start_stream(ctx):
+    if(ctx.author.id == 112041042894655488):
+        await ctx.send("`Starting stream to Initial State`")
+        send_data.start()
+
+@bot.command()
+async def stop_stream(ctx):
+    if(ctx.author.id == 112041042894655488):
+        await ctx.send("`Stopping stream to Initial State`")
+        send_data.stop()
+
+@loop(seconds=5)
+async def send_data():
+    print("Constructing stream data...")
+    stream_data = copy.deepcopy(data.statsDict)
+    stream_data['user_count'] = len(data.userSet)
+    stream_data['server_count'] = len(bot.guilds)
+    stream_data['total_command_count'] = sum(data.statsDict.values())
+
+    print("Streaming data to intial state...")
+    streamer = Streamer(bucket_name="Feyre", bucket_key=bucket_key, access_key=access_key, buffer_size=200, debug_level=1)
+    streamer.log_object(stream_data)
+
+    streamer.flush()
+    streamer.close()
+    print("Done!")
+#endregion
+
+
 @bot.event
 async def on_ready():
     print()
@@ -1322,16 +1358,31 @@ async def on_ready():
 
     await bot.change_presence(activity = discord.Game(name="!help (chat or DM)"))
 #Start the bot
+
+global bucket_key
+global access_key
+
 if(sys.argv[1] == 'test'):
     pyDir = path.dirname(__file__)
-    file = open(path.join(pyDir, 'test_token.txt'), 'r')
-    testToken = file.readline().strip()
+    testToken = ""
+    with open(path.join(pyDir, 'test_token.txt'), 'r') as file:
+        testToken = file.readline().strip()
+    with open(path.join(pyDir, 'bucket_key.txt'), 'r') as file:
+        bucket_key = file.readline().strip()
+    with open(path.join(pyDir, 'access_key.txt'), 'r') as file:
+        access_key = file.readline().strip()
     bot.run(testToken)
+    
+
     
 elif (sys.argv[1] == 'release'):
     pyDir = path.dirname(__file__)
-    file = open(path.join(pyDir, 'release_token.txt'), 'r')
-    releaseToken = file.readline().strip()
+    releaseToken = ""
+    with open(path.join(pyDir, 'release_token.txt'), 'r') as file:
+        releaseToken = file.readline().strip()
+    with open(path.join(pyDir, 'bucket_key.txt'), 'r') as file:
+        bucket_key = file.readline().strip()
+    with open(path.join(pyDir, 'access_key.txt'), 'r') as file:
+        access_key = file.readline().strip()
     bot.run(releaseToken)
-
 
