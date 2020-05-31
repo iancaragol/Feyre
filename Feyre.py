@@ -954,6 +954,7 @@ Commands:
 > gm - GM only dice rolling
 > stats - Bot usage statistics
 > feat - Feat lookup
+> condition - Condition lookup
 > weapon - Weapon lookup
 > item - Wondrous item lookup
 > mm - Monster Manual lookup
@@ -1053,6 +1054,17 @@ Commands:
     > Gives a random feat
 Ex:
 !feat Keen Mind```'''
+
+    elif (args == "condition"):
+        helpstr = '''```!condition can be used to conditions from the PHB 
+
+Commands:
+!condition
+    > Lists all conditions
+!condition [condition]
+    > Gives more info on the specified condition
+Ex:
+!condition Prone```'''
     elif (args == "mm"):
         helpstr = '''```!mm can be used to lookup monsters from the Monster Manual.
 
