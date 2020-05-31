@@ -629,6 +629,10 @@ async def init_helper(ctx, args):
         data.userSet.add(ctx.author.id)
     data.statsDict['!init'] += 1
 
+    if (not ctx.guild):
+        await ctx.send("""```The initative tracker can only be used in a guild channel at this time. It is not supported when direct messaging Feyre. See !help init for more info.```""")
+        return 
+        
     #This command will be moved into its own class
     if (args == 'start'):
         key = str(ctx.guild.id) + ":" + str(ctx.channel.id)
