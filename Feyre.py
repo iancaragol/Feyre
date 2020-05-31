@@ -884,7 +884,8 @@ async def displayStats(tor):
 > !vote: {data.statsDict['!vote']}
  
 = Unique users: {len(data.userSet)} =
-= Server count: {len(bot.guilds)} =```'''
+= Server count: {len(bot.guilds)} =
+= Total command count: {sum(data.statsDict.values())} =````'''
 
     else:
         retStr = f'''```asciidoc
@@ -906,7 +907,8 @@ async def displayStats(tor):
 > !currency: {data.statsDict['!currency']}
 
 = Unique users: {len(data.userSet)} =
-= Server count: {len(bot.guilds)} =```'''
+= Server count: {len(bot.guilds)} =
+= Total command count: {sum(data.statsDict.values())} =```'''
     return retStr
 
 #endregion
