@@ -885,7 +885,7 @@ async def displayStats(tor):
  
 = Unique users: {len(data.userSet)} =
 = Server count: {len(bot.guilds)} =
-= Total command count: {sum(data.statsDict.values())} =````'''
+= Total command count: {sum(data.statsDict.values())} =```'''
 
     else:
         retStr = f'''```asciidoc
