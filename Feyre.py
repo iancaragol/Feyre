@@ -867,7 +867,7 @@ async def displayStats(tor):
 > !currency: {data.statsDict['!currency']}
 > !randfeat: {data.statsDict['!randfeat']}
 > !randmonster: {data.statsDict['!randmonster']}
-> !condtion: {data.statsDict['!condition']
+> !condtion: {data.statsDict['!condition']}
 
 [Book of Tor]
 > !tor horo: {data.statsDict['!tor horo']}
