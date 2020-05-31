@@ -152,11 +152,17 @@ I interpreted your input as {rES}.
 Rolls: {uES}
 - Ability/Skill Check: Failed -```'''
 
+        elif float(t).is_integer():
+            outMsg = f'''```diff
+I interpreted your input as {rES}.
+Rolls: {uES}
+- Total: {t} -```'''
+
         else:
             outMsg = f'''```diff
 I interpreted your input as {rES}.
 Rolls: {uES}
-- Total: {"%.2g" % t} -```'''
+- Total: {"%.2f" % t} -```'''
 
         return outMsg
 
@@ -177,11 +183,17 @@ Rolls: {uES}
 Rolls: {uES}
 [Ability/Skill Check: Failed]'''
 
+        elif float(t).is_integer():
+            outMsg = f'''
+I interpreted your input as {rES}.
+Rolls: {uES}
+- Total: {t} -'''
+
         else:
             outMsg = f'''
 I interpreted your input as {rES}.
 Rolls: {uES}
-[Total: {"%.2g" % t}]'''
+- Total: {"%.2f" % t} -'''
 
         return outMsg
 
