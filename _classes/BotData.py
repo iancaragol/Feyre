@@ -4,19 +4,19 @@ from os import path
 from json import load, dumps
 from datetime import datetime
 
-from .BookOfTor import BookOfTor
-from .Monster import MonsterManual
-from .Feat import Feats
-from .Spellbook import Sb
-from .DiceRolls import Roller
-from .Init import Initiative
-from .Weapons import Weapons
-from .Class_Abilities import Class_Abil
-from .Items import ItemLookup
-from .DeckOfMany import DeckOfMany
-from .ClassFeatures import ClassFeatures
-from .CurrencyConversion import CurrencyConverter
-from .Conditions import ConditionLookup
+from _classes.BookOfTor import BookOfTor
+from _classes.Monster import MonsterManual
+from _classes.Feat import Feats
+from _classes.Spellbook import Sb
+from _classes.DiceRolls import Roller
+from _classes.Init import Initiative
+from _classes.Weapons import Weapons
+from _classes.Class_Abilities import Class_Abil
+from _classes.Items import ItemLookup
+from _classes.DeckOfMany import DeckOfMany
+from _classes.ClassFeatures import ClassFeatures
+from _classes.CurrencyConversion import CurrencyConverter
+from _classes.Conditions import ConditionLookup
 
 class BotData():
     """
