@@ -7,6 +7,14 @@ class Initiative():
         self.round_count = 0
         self.marker_count = 0
 
+    def changeRound(self, new_round):
+        self.round_count = new_round
+        return True
+
+    def changeMarker(self, new_marker):
+        self.marker_count = new_marker
+        return True
+
     def addPlayer(self, Name = None, init = 0):
         """
         Adds a new player to the list of players with the format (Name, Initiative roll)

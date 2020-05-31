@@ -16,6 +16,7 @@ from .Items import ItemLookup
 from .DeckOfMany import DeckOfMany
 from .ClassFeatures import ClassFeatures
 from .CurrencyConversion import CurrencyConverter
+from .Conditions import ConditionLookup
 
 class BotData():
     """
@@ -60,6 +61,7 @@ class BotData():
         self.deck_of_many = DeckOfMany()
         self.class_features = ClassFeatures()
         self.currency_converter = CurrencyConverter()
+        self.condition_lookup = ConditionLookup()
 
         #Initiative tracking dictionaries
         self.initDict = {}

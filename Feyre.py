@@ -116,7 +116,7 @@ Roll from [{ctx.author.name}]
                 await ctx.send("```This channel does not have a dedicated GM. Type !gm to set yourself as GM.```")
 
 @bot.command()
-async def roll(ctx, *, args):
+async def roll(ctx, *, args = None):
     """
     Rolls any number of dice in any format including skill checks
         Ex: !roll 1d20+5*6>100
@@ -124,10 +124,15 @@ async def roll(ctx, *, args):
     if (ctx.author.id not in data.userSet):
         data.userSet.add(ctx.author.id)
     data.statsDict['!roll'] += 1
+
+    if not args:
+        await ctx.send('''```Missing command arguments, see !help roll for more information.\nEx: !roll 1d20+5```''')
+        return
+
     await ctx.send(await data.diceRoller.parse(args, gm = False))
 
 @bot.command()
-async def r(ctx, *, args):
+async def r(ctx, *, args = None):
     """
     Rolls any number of dice in any format including skill checks
         Ex: !roll 1d20+5*6>100
@@ -138,18 +143,27 @@ async def r(ctx, *, args):
     if (ctx.author.id not in data.userSet):
         data.userSet.add(ctx.author.id)
     data.statsDict['!roll'] += 1
+
+    if not args:
+        await ctx.send('''```Missing command arguments, see !help roll for more information.\nEx: !roll 1d20+5```''')
+        return
     await ctx.send(await data.diceRoller.parse(args, gm = False))
 #endregion
 
 #region Monster Manual
 @bot.command()
-async def mm(ctx, *, args):
+async def mm(ctx, *, args = None):
     """
     Searches the Monster Manual for a monster
     """
     if (ctx.author.id not in data.userSet):
         data.userSet.add(ctx.author.id)
     data.statsDict['!mm'] += 1
+
+    if not args:
+        await ctx.send('''```Missing command arguments, see !help mm for more information.\nEx: !mm Tarrasque```''')
+        return
+
     mmArr = await data.monsterManual.search(args)
     if (mmArr == False):
         await ctx.send("```I'm sorry. I wasn't able to find the monster you are looking for.```")
@@ -170,13 +184,18 @@ async def randmonster(ctx):
 
 #region Feats
 @bot.command()
-async def feat(ctx, *, args):
+async def feat(ctx, *, args = None):
     """
     Searches the Player's Handbook for a feat
     """
     if (ctx.author.id not in data.userSet):
         data.userSet.add(ctx.author.id)
     data.statsDict['!feat'] += 1
+
+    if not args:
+        await ctx.send('''```Missing command arguments, see !help feat for more information.\nEx: !feat Lucky```''')
+        return
+
     featArr = await data.feats.search(args)
     if (featArr == False):
         await ctx.send("```I'm sorry. I wasn't able to find the feat you are looking for.```")
@@ -354,10 +373,15 @@ async def d4(ctx, *, args = None):
 
 #region Items
 @bot.command()
-async def item(ctx, *, args):
+async def item(ctx, *, args = None):
     if (ctx.author.id not in data.userSet):
         data.userSet.add(ctx.author.id)
     data.statsDict['!item'] += 1
+
+    if not args:
+        await ctx.send('''```Missing the search argument! See !help item for more info.```''')
+        return
+
     item = await data.item_lookup.search(args)
 
     if len(item) >= 1997 and len(item) < 3997:
@@ -388,15 +412,57 @@ async def item(ctx, *, args):
         await ctx.send(item)
 #endregion
 
+#region Conditions
+@bot.command()
+async def condition(ctx, *, args = None):
+    if (ctx.author.id not in data.userSet):
+        data.userSet.add(ctx.author.id)
+    #data.statsDict['!item'] += 1
+
+    if not args:
+        await ctx.send('''```asciidoc
+[Conditions]
+
+- Blinded
+- Charmed
+- Deafened
+- Fatigued
+- Exhaustion
+- Frightened
+- Grappled
+- Incapacitated
+- Invisible
+- Paralyzed
+- Petrified
+- Poisoned
+- Prone
+- Restrained
+- Stunned 
+- Unconscious
+
+Try !condition [condition] for more info!
+Ex: !condition Prone
+```''')
+        return
+
+
+    condition = await data.condition_lookup.search(args)
+    await ctx.send(condition)
+#endregion
+
 #region ClassFeatures
 @bot.command()
-async def c(ctx, *, args):
+async def c(ctx, *, args = None):
     """
     Searches the Player's Handbook for a spell
     """
     if (ctx.author.id not in data.userSet):
         data.userSet.add(ctx.author.id)
     data.statsDict['!c'] += 1
+
+    if not args:
+        await ctx.send('''```Missing command arguments, see !help class for more information.\nEx: !c Wizard```''')
+        return
 
     classArr = await data.class_features.search(args)
 
@@ -408,13 +474,17 @@ async def c(ctx, *, args):
 
 #region Spell
 @bot.command()
-async def spell(ctx, *, args):
+async def spell(ctx, *, args = None):
     """
     Searches the Player's Handbook for a spell
     """
     if (ctx.author.id not in data.userSet):
         data.userSet.add(ctx.author.id)
     data.statsDict['!spell'] += 1
+
+    if not args:
+        await ctx.send('''```Missing command arguments, see !help spell for more information.\nEx: !spell Wish```''')
+        return
 
     spellArr = await data.spellBook.search(args)
 
@@ -443,18 +513,21 @@ async def currency_helper(ctx, args):
         data.userSet.add(ctx.author.id)
     data.statsDict['!currency'] += 1
 
+    if not args:
+        await ctx.send('''```Missing command arguments, see !help currency for more information.\nEx: !currency 10gp 55ep 5sp```''')
+        return
     await ctx.send(await data.currency_converter.parse_input(args))
 
 @bot.command()
-async def currency(ctx, *, args):
+async def currency(ctx, *, args = None):
     await currency_helper(ctx, args)
 
 @bot.command()
-async def cur(ctx, *, args):
+async def cur(ctx, *, args = None):
     await currency_helper(ctx, args)
 
 @bot.command()
-async def convert(ctx, *, args):
+async def convert(ctx, *, args = None):
     await currency_helper(ctx, args)
 
 #endregion
@@ -466,6 +539,10 @@ async def weapon_helper(ctx, args):
         data.userSet.add(ctx.author.id)
     data.statsDict['!weapon'] += 1
 
+    if not args:
+        await ctx.send('''```Missing command arguments, see !help weapon for more information.\nEx: !w Longsword```''')
+        return
+
     wep = await data.weapons.search(args)
     if wep == False:
         await ctx.send("```Sorry, I couldn't find that weapon.```")
@@ -473,11 +550,11 @@ async def weapon_helper(ctx, args):
         await ctx.send(await wep.to_string())
 
 @bot.command()
-async def weapon(ctx, *, args):
+async def weapon(ctx, *, args = None):
     await weapon_helper(ctx, args)
 
 @bot.command()
-async def w(ctx, *, args):
+async def w(ctx, *, args = None):
     await weapon_helper(ctx, args)
 
 #endregion
@@ -560,6 +637,33 @@ async def init_helper(ctx, args):
         cross = '\N{CROSSED SWORDS}'
         await msg.add_reaction(cross)
         data.initEmbedDict[key] = msg
+
+    elif (args.strip().startswith('reset')):
+        argsStr = str(args)
+        key = str(ctx.guild.id) + ":" + str(ctx.channel.id)
+
+        if(key in data.initDict):
+            name = argsStr.strip()
+            mark = data.initDict[key].changeMarker(0)
+            ret = data.initDict[key].changeRound(0)
+
+            if(ret):
+                await update_init(key)
+
+    elif (args.strip().startswith('round')):
+        argsStr = str(args)
+        argsStr = argsStr.replace('round', '').strip()
+        key = str(ctx.guild.id) + ":" + str(ctx.channel.id)
+
+        if(key in data.initDict):
+            name = argsStr.strip()
+            try:
+                ret = data.initDict[key].changeRound(int(argsStr))
+            except:
+                 await ctx.send('''```Something went wrong! Make sure the new round is a number. See !help init for more info.```''')
+            if(ret):
+                await update_init(key)
+
 
     elif (args.strip().startswith('remove') or args.strip().startswith('-r')):
         argsStr = str(args)
@@ -862,7 +966,7 @@ If you need to insert a player into the middle of initative use decimals.
 
 Commands (can be shortened to !i):
 !init start
-    > Starts a new initiative tracker in the same channel
+    > Starts a new initiative tracker in the same channel, also used to create a new one
 !init
     > Adds the player to initiative with their discord username and rolls 1d20 for them
 !init [player name]
@@ -873,6 +977,10 @@ Commands (can be shortened to !i):
     > Removes a player from initiative. 
 !init [name] [modifier] or [modifier] [name]
     > Adds a plyer to inititative after rolling 1d20 and applying the modifier.
+!init reset
+    > Restarts the initiative tracker with the same initiative values for each player.
+!init round [num]
+    > Changes the current round to [num]
 
 Ex:
 !init start
@@ -882,7 +990,11 @@ Ex:
 !init Gandalf 1
 !init Frodo
 !init remove Frodo
-!init -r Gandalf```'''
+!init -r Gandalf
+!init round 3
+
+Reset tracker but keep Legolas, Aragorn, and Sauron's rolls.
+!init reset```'''
     elif (args == "roll"):
         helpstr = '''```!roll can be used to roll dice of any size with complicated expressions and built in skill checks.
 
@@ -1130,6 +1242,7 @@ async def request(ctx, *, args = None):
 
     if (args == None):
         await ctx.send("```!request requires arguments! Try !request [feature]```")
+        return
     else:
         User = bot.get_user(112041042894655488)
 
@@ -1189,15 +1302,11 @@ async def new(ctx):
 
     updateString = '''```asciidoc
 [Updates]
-> Added Deck of Many Things (!dom)
-> Added Class descriptions (!c)
-> Added currency conversions (!currency, !convert, !cur)
-> Added vote command 
+> Added condtion lookup (!condition)
+> Added initiative reset command (!init reset)
+> Added the ability to change round count in initative tracker (!init round [num])
 
-[Bugs]
-> Fixed rolling dice with advantage/disadvantage to allow for skill checks
-> Fixed round counter on initiative tracker
-> Fixed bug where !spell light would return the Blight spell```'''
+[Bugs]`'''
     await ctx.send(updateString)
 #endregion
     
