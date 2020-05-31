@@ -4,6 +4,7 @@ from math import ceil
 from discord.ext import commands
 from discord.utils import get
 from discord.ext.tasks import loop
+from discord.ext.commands import CommandNotFound
 from asteval import Interpreter
 from ISStreamer.Streamer import Streamer
 from datetime import datetime
@@ -107,13 +108,13 @@ async def gm(ctx, *, args = None):
                 result = await data.diceRoller.parse(expression, gm = True)
 
                 gmUser = bot.get_user(data.gmDict[ctx.channel.id])
-                gmResult = f'''```asciidoc
+                gmResult = f'''```diff
 Roll from [{ctx.author.name}]
 {result} ```'''
 
                 await gmUser.send(gmResult)
 
-                userResult = f'''```asciidoc
+                userResult = f'''```diff
 {result}```'''
                 sendUser = bot.get_user(ctx.author.id)
                 await sendUser.send(userResult)
@@ -221,6 +222,9 @@ async def randfeat(ctx):
 #endregion
 
 #region Shorthand dice rolls
+
+
+
 @bot.command()
 async def dp(ctx, *, args = None):
     data.statsDict['!roll'] += 1
@@ -632,7 +636,7 @@ async def init_helper(ctx, args):
     if (not ctx.guild):
         await ctx.send("""```The initative tracker can only be used in a guild channel at this time. It is not supported when direct messaging Feyre. See !help init for more info.```""")
         return 
-        
+
     #This command will be moved into its own class
     if (args == 'start'):
         key = str(ctx.guild.id) + ":" + str(ctx.channel.id)
@@ -1318,7 +1322,9 @@ async def new(ctx):
 > Added initiative reset command (!init reset)
 > Added the ability to change round count in initative tracker (!init round [num])
 
-[Bugs]`'''
+[Bugs]
+> Fixed bug where roll results would be formatted in scientific notation or include unneccessary decimal points
+> Added dirty error handling so incorrect commands like !1d20 will still be recognized'''
     await ctx.send(updateString)
 #endregion
     
@@ -1352,6 +1358,21 @@ async def send_data():
     print("Done!")
 #endregion
 
+
+@bot.event
+async def on_command_error(ctx, error):
+    if isinstance(error, CommandNotFound):
+        result = None
+        if((ctx.invoked_with[0] == 'r' and 'd' in ctx.invoked_with)): # Treat this as some attempted dice input
+            result = await data.diceRoller.parse(ctx.invoked_with[1:], gm = False)
+        elif((ctx.invoked_with[1] == 'd' or ctx.invoked_with[2] == 'd')): # Treat this as some attempted dice input
+            result = await data.diceRoller.parse(ctx.invoked_with[1:], gm = False)
+
+        if(result):
+            await ctx.send(result)
+
+
+    raise error
 
 @bot.event
 async def on_ready():
