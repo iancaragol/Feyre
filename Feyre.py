@@ -1317,6 +1317,27 @@ async def change_presence(ctx, *, args):
 
 #endregion
 
+#region Bank
+@bot.command()
+async def bank(ctx, *, args = None):
+    """
+    Rolls any number of dice in any format including skill checks
+        Ex: !roll 1d20+5*6>100
+    """
+    # if (ctx.author.id not in data.userSet):
+    #     data.userSet.add(ctx.author.id)
+    # data.statsDict['!roll'] += 1
+
+    if not args:
+        await ctx.send(await data.bank.get_characters_formatted(ctx.author.id))
+
+    if args:
+        if '-a' in args:
+            args.remove('-a')
+            await ctx.send(await data.bank.add_character(ctx.author.id, args))
+#endregion
+
+
 #region New
 @bot.command()
 async def new(ctx):
