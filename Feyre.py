@@ -19,6 +19,7 @@ import random
 import os
 import copy
 import time
+import textwrap
 
 #region Helper Functions
 async def get_pre(bot, message):
@@ -878,9 +879,11 @@ async def displayStats(tor):
 > !dom: {data.statsDict['!dom']}
 > !c: {data.statsDict['!c']}
 > !currency: {data.statsDict['!currency']}
+> !condtion: {data.statsDict['!condition']}
+> !bank: {data.statsDict['!bank']}
 > !randfeat: {data.statsDict['!randfeat']}
 > !randmonster: {data.statsDict['!randmonster']}
-> !condtion: {data.statsDict['!condition']}
+
 
 [Book of Tor]
 > !tor horo: {data.statsDict['!tor horo']}
@@ -911,13 +914,16 @@ async def displayStats(tor):
 [D&D 5E]
 > !feat: {data.statsDict['!feat']}
 > !mm: {data.statsDict['!mm']}   
-> !randfeat: {data.statsDict['!randfeat']}
-> !randmonster: {data.statsDict['!randmonster']}
 > !spell: {data.statsDict['!spell']}
 > !weapon: {data.statsDict['!weapon']}
 > !dom: {data.statsDict['!dom']}
 > !c: {data.statsDict['!c']}
 > !currency: {data.statsDict['!currency']}
+> !condtion: {data.statsDict['!condition']}
+> !bank: {data.statsDict['!bank']}
+> !randfeat: {data.statsDict['!randfeat']}
+> !randmonster: {data.statsDict['!randmonster']}
+
 
 = Unique users: {len(data.userSet)} =
 = Server count: {len(bot.guilds)} =
@@ -961,9 +967,10 @@ Commands:
 > spell - Spell lookup
 > c - Class lookup
 > currency - Currency conversions
+> bank - Manage your all of your characters' wallets
 > dom - Draw from the Deck of Many Things
 > request - Request new features!
-> admin - Change defualt command prefix
+> admin - Change default command prefix
 > new - New features & updates
 > vote - Vote for Feyre on top.gg
 
@@ -1196,10 +1203,50 @@ If you find any errors or a item is missing please use !request to let me know. 
 Ex:
 !item Portable Hole```'''
 
+    elif (args == "bank"):
+        helpstr = textwrap.dedent("""```
+You can use Feyre to manage all of your character's wallets. Your bank is tied to your Discord ID and can be accessed from any server/channel or by direct messaging Feyre.
+
+Interacting with your bank requires the use of argument flags (-a, -r, -d, -w). If you have any suggestions on how this experience can be streamlined please use the !request command and let me know!
+
+Commands:
+!bank
+    > Shows all of your characters and their unique IDs. The character's id (a unique number representing that character) can be used instead of [character name].
+
+!bank -a [character name]
+    > Adds a new character to your bank with [character name]. This character will also be assigned a unique ID which can be used to access its account.
+
+!bank -r [character name] OR [character id]
+    > Deletes the account associated with [character name] or [character id]
+
+!bank -d [character name] [currency values] OR [character name] [currency values]
+    > Deposits the specified [currency values] into the account associated with [character name] or [character id]
+
+!bank -w [character name] [currency values] OR [character name] [currency values]
+    > Withdraws the specified [currency values] into the account associated with [character name] or [character id]
+
+[currency values] have the same format as the !currency command. For example you can represent 10 platinum, 9 gold, 8 electrum, 7 silver, and 6 copper like this: 10pp9gp8ep7sp6cp.
+
+Examples:
+!bank -a Bilbo
+    > Add a character with the name Bilbo to your bank
+
+!bank -d Bilbo 10sp5cp
+    > Deposit (-d) 10 silver and 5 copper into Bilbo's account
+
+!bank
+    > See all of your characters and their unique ids
+
+!bank -w 1 3cp
+    > Withdraw 3 copper from Bilbo's account. In this example Bilbo has been assigned the unique ID 1 because he is the first character associated with the example user
+
+!bank -r Bilbo
+    > Delete Bilbo from the bank```""")
+
     else:
         helpstr = '''```I could not find that command. Try !help for a list of commands.```'''
 
-    await ctx.send(helpstr)
+    await ctx.send(str(helpstr))
 #endregion
 
 #region Admin
@@ -1324,9 +1371,9 @@ async def bank(ctx, *, args = None):
     Rolls any number of dice in any format including skill checks
         Ex: !roll 1d20+5*6>100
     """
-    # if (ctx.author.id not in data.userSet):
-    #     data.userSet.add(ctx.author.id)
-    # data.statsDict['!roll'] += 1
+    if (ctx.author.id not in data.userSet):
+        data.userSet.add(ctx.author.id)
+    data.statsDict['!bank'] += 1
 
     if not args:
         await ctx.send(await data.bank.get_characters_formatted(ctx.author.id))
@@ -1350,13 +1397,12 @@ async def new(ctx):
 
     updateString = '''```asciidoc
 [Updates]
-> Added condtion lookup (!condition)
-> Added initiative reset command (!init reset)
-> Added the ability to change round count in initative tracker (!init round [num])
+> Added Feyre Bank. Use !bank to access and manage your character's purse strings!
 
 [Bugs]
-> Fixed bug where roll results would be formatted in scientific notation or include unneccessary decimal points
-> Added dirty error handling so incorrect commands like !1d20 will still be recognized```'''
+> Fixed a few typos.
+
+Please report bugs using the !request command```'''
     await ctx.send(updateString)
 #endregion
     

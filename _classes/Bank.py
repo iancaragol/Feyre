@@ -70,11 +70,27 @@ class Bank():
 
     async def parse_args(self, user_id, args):
         # Basically the entry point for the bank.
-        if '-a' in args: # Add character
+        
+
+        if '-add' in args: # Add character
+            args = args.replace('-add', '').strip()
+            return await self.add_character(user_id, args)
+
+        elif '-a' in args: # Add character
             args = args.replace('-a', '').strip()
             return await self.add_character(user_id, args)
         
-        if '-r' in args: # Remove character
+        elif '-remove' in args: # Remove character
+            args = args.replace('-remove', '').strip()
+            
+            # First check if we got a character name or a character id
+            try:
+                character_id = int(args)
+                return await self.remove_character(user_id, None, character_id)
+            except ValueError:
+                return await self.remove_character(user_id, args, None)
+
+        elif '-r' in args: # Remove character
             args = args.replace('-r', '').strip()
             
             # First check if we got a character name or a character id
@@ -84,7 +100,26 @@ class Bank():
             except ValueError:
                 return await self.remove_character(user_id, args, None)
         
-        if '-d' in args:
+        elif '-deposit' in args:
+            character_id = None
+
+            args = args.replace('-deposit', '').strip()
+            split = args.split(' ')
+
+            # First check if we got a character name or a character id
+            try:
+                character_id = int(split[0])
+            except ValueError:
+                pass
+
+            values = await self.parse_currency_input(args[args.find(split[0])+len(split[0]):].strip())
+
+            if type(values) is str:
+                return values
+
+            return await self.change_balance(True, user_id, split[0], character_id, values[0], values[1], values[2], values[3], values[4])
+
+        elif '-d' in args:
             character_id = None
 
             args = args.replace('-d', '').strip()
@@ -102,8 +137,27 @@ class Bank():
                 return values
 
             return await self.change_balance(True, user_id, split[0], character_id, values[0], values[1], values[2], values[3], values[4])
+        
+        elif '-withdraw' in args: # Withdraw
+            character_id = None
 
-        if '-w' in args: # Withdraw
+            args = args.replace('-withdraw', '').strip()
+            split = args.split(' ')
+
+            # First check if we got a character name or a character id
+            try:
+                character_id = int(split[0])
+            except ValueError:
+                pass
+
+            values = await self.parse_currency_input(args[args.find(split[0])+len(split[0]):].strip())
+
+            if len(values) == 1:
+                return values[0]
+
+            return await self.change_balance(False, user_id, split[0], character_id, values[0], values[1], values[2], values[3], values[4])
+
+        elif '-w' in args: # Withdraw
             character_id = None
 
             args = args.replace('-w', '').strip()
@@ -243,32 +297,32 @@ class Bank():
                 await cnxn.close()
 
             
-                if pp == 0 and gp == 0 and ep == 0 and sp == 0 and cp == 0:
-                    return f"```{current_character.character_name}'s account balance did not change.```"
+            if pp == 0 and gp == 0 and ep == 0 and sp == 0 and cp == 0:
+                return f"```{current_character.character_name}'s account balance did not change.```"
 
-                if deposit:
-                    s = "```Deposited "
-                    if pp != 0: s += f"{pp}pp, "
-                    if gp != 0: s += f"{gp}gp, "
-                    if ep != 0: s += f"{ep}ep, "
-                    if sp != 0: s += f"{sp}sp, "
-                    if cp != 0: s += f"{cp}cp"
-                    if s[len(s)-2] == ',':s = s[:-2]
-                    s += f" into {current_character.character_name}'s account.```"
+            if deposit:
+                s = "```Deposited "
+                if pp != 0: s += f"{pp}pp, "
+                if gp != 0: s += f"{gp}gp, "
+                if ep != 0: s += f"{ep}ep, "
+                if sp != 0: s += f"{sp}sp, "
+                if cp != 0: s += f"{cp}cp"
+                if s[len(s)-2] == ',':s = s[:-2]
+                s += f" into {current_character.character_name}'s account.```"
 
-                    return s
-                
-                elif not deposit:
-                    s = "```Withrdrew "
-                    if pp != 0: s += f"{-pp}pp, "
-                    if gp != 0: s += f"{-gp}gp, "
-                    if ep != 0: s += f"{-ep}ep, "
-                    if sp != 0: s += f"{-sp}sp, "
-                    if cp != 0: s += f"{-cp}cp"
-                    if s[len(s)-2] == ',':s = s[:-2]
-                    s += f" from {current_character.character_name}'s account.```"
+                return s
+            
+            elif not deposit:
+                s = "```Withdrew "
+                if pp != 0: s += f"{-pp}pp, "
+                if gp != 0: s += f"{-gp}gp, "
+                if ep != 0: s += f"{-ep}ep, "
+                if sp != 0: s += f"{-sp}sp, "
+                if cp != 0: s += f"{-cp}cp"
+                if s[len(s)-2] == ',':s = s[:-2]
+                s += f" from {current_character.character_name}'s account.```"
 
-                    return s
+                return s
 
         else:
             await cursor.close()
@@ -291,7 +345,7 @@ class Bank():
                 await cnxn.close()
 
                 for result in results:
-                    return Character(user_id, result.character_name, result.character_id, result.pp, result.gp, result.ep, result.sp, result.cp)
+                    return Character(user_id, result.character_name, int(result.character_id), int(result.pp), int(result.gp), int(result.ep), int(result.sp), int(result.cp))
             else:
                 await cursor.close()
                 await cnxn.close()
@@ -309,7 +363,7 @@ class Bank():
                 await cnxn.close()
 
                 for result in results:
-                    return Character(user_id, result.character_name, result.character_id, result.pp, result.gp, result.ep, result.sp, result.cp)
+                    return Character(user_id, result.character_name, int(result.character_id), int(result.pp), int(result.gp), int(result.ep), int(result.sp), int(result.cp))
             else:
                 await cursor.close()
                 await cnxn.close()
@@ -320,7 +374,7 @@ class Bank():
         character = await self.get_character(user_id, character_name, character_id)
 
         if not character:
-            return """```I could not find that character in your bank. Try !bank to see your characters.```"""
+            return """```I could not find that character in your bank. Try !bank to see your characters or !bank -a [character name] to add a new character.```"""
 
         code_block = textwrap.dedent(f"""
         ```asciidoc
@@ -354,7 +408,7 @@ class Bank():
 
         if results:
             for result in results:
-                character = Character(user_id, result.character_name, result.character_id, result.pp, result.gp, result.ep, result.sp, result.cp)
+                character = Character(user_id, result.character_name, int(result.character_id), int(result.pp), int(result.gp), int(result.ep), int(result.sp), int(result.cp))
                 characters.append(character)
 
         await cursor.close()
@@ -377,7 +431,7 @@ class Bank():
             code_block += str(c.character_id)
             code_block += '\n'
 
-        code_block = code_block.strip() + "```"
+        code_block = code_block.strip() + "\n\nSee !help bank for examples.```"
         return str(code_block)
 
 
