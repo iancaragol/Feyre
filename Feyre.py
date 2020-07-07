@@ -1427,19 +1427,19 @@ async def stop_stream(ctx):
 
 @loop(seconds=300)
 async def send_data():
-    print("Constructing stream data...")
+    # print("Constructing stream data...")
     stream_data = copy.deepcopy(data.statsDict)
     stream_data['user_count'] = len(data.userSet)
     stream_data['server_count'] = len(bot.guilds)
     stream_data['total_command_count'] = sum(data.statsDict.values())
 
-    print("Streaming data to intial state...")
-    streamer = Streamer(bucket_name="Feyre", bucket_key=bucket_key, access_key=access_key, buffer_size=200, debug_level=1)
+    # print("Streaming data to intial state...")
+    streamer = Streamer(bucket_name="Feyre", bucket_key=bucket_key, access_key=access_key, buffer_size=200)
     streamer.log_object(stream_data)
 
     streamer.flush()
     streamer.close()
-    print("Done!")
+    # print("Done!")
 #endregion
 
 
