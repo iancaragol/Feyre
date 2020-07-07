@@ -1332,9 +1332,8 @@ async def bank(ctx, *, args = None):
         await ctx.send(await data.bank.get_characters_formatted(ctx.author.id))
 
     if args:
-        if '-a' in args:
-            args.remove('-a')
-            await ctx.send(await data.bank.add_character(ctx.author.id, args))
+        await ctx.send(await data.bank.parse_args(ctx.author.id, args))
+
 #endregion
 
 
