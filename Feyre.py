@@ -951,14 +951,16 @@ Hello! My name is Feyre. You can use chat or DM's to summon me.
 The default prefix is !. To learn more about a command type !help [command].
 Like this: !help roll
 
+`NEW: Try !bank to manage your characters bank accounts'
 
-Commands:
+[Commands]
 > hello - Hi!
+
 > init- Initiative tracking
 > roll - Dice rolling with complicated expressions
 > d - Simple dice rolling
 > gm - GM only dice rolling
-> stats - Bot usage statistics
+
 > feat - Feat lookup
 > condition - Condition lookup
 > weapon - Weapon lookup
@@ -966,9 +968,13 @@ Commands:
 > mm - Monster Manual lookup
 > spell - Spell lookup
 > c - Class lookup
+
 > currency - Currency conversions
 > bank - Manage your all of your characters' wallets
+
 > dom - Draw from the Deck of Many Things
+
+> stats - Bot usage statistics
 > request - Request new features!
 > admin - Change default command prefix
 > new - New features & updates
