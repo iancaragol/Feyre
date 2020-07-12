@@ -898,6 +898,7 @@ async def displayStats(tor):
 > !set-prefix: {data.statsDict['!set_prefix']}
 > !request: {data.statsDict['!request']}
 > !vote: {data.statsDict['!vote']}
+> (dirty rolls): {data.statsDict['dirty_rolls']}
  
 = Unique users: {len(data.userSet)} =
 = Server count: {len(bot.guilds)} =
@@ -1331,33 +1332,38 @@ async def request(ctx, *, args = None):
         await User.send(requestStr)
         await ctx.send("```Thank you for submitting a request! Your request has been forwarded to the developer, kittysaurus.```")
 
+async def save_to_disk():
+    pyDir = path.dirname(__file__)
+    relPath = "_data//stats.txt"
+    absRelPath = path.join(pyDir, relPath)
+    with open(absRelPath, 'w') as file:
+        file.write(dumps(data.statsDict))
+
+    relPath = "_data//prefixes.txt"
+    absRelPath = path.join(pyDir, relPath)
+    with open(absRelPath, 'w') as file:
+        file.write(dumps(data.prefixDict))
+
+    relPath = "_data//users.txt"
+    absRelPath = path.join(pyDir, relPath)
+    with open(absRelPath, 'w') as file:
+        file.write(dumps(list(data.userSet)))
+
+    pyDir = path.dirname(__file__)
+    relPath = "_data//gms.txt"
+    absRelPath = path.join(pyDir, relPath)
+    with open(absRelPath, 'w') as file:
+        file.write(dumps(data.gmDict))
+
+
+
+
 @bot.command()
 async def quit(ctx):
     if(ctx.author.id == 112041042894655488):
-        pyDir = path.dirname(__file__)
-        relPath = "_data//stats.txt"
-        absRelPath = path.join(pyDir, relPath)
-        with open(absRelPath, 'w') as file:
-            file.write(dumps(data.statsDict))
-
-        relPath = "_data//prefixes.txt"
-        absRelPath = path.join(pyDir, relPath)
-        with open(absRelPath, 'w') as file:
-            file.write(dumps(data.prefixDict))
-
-        relPath = "_data//users.txt"
-        absRelPath = path.join(pyDir, relPath)
-        with open(absRelPath, 'w') as file:
-            file.write(dumps(list(data.userSet)))
-
-        pyDir = path.dirname(__file__)
-        relPath = "_data//gms.txt"
-        absRelPath = path.join(pyDir, relPath)
-        with open(absRelPath, 'w') as file:
-            file.write(dumps(data.gmDict))
-
+        print("Saving to disk...")
+        await save_to_disk()
         User = bot.get_user(112041042894655488)
-
         requestStr = "Shutting down..."
         await User.send(requestStr)
         sys.exit()
@@ -1442,20 +1448,29 @@ async def send_data():
     # print("Done!")
 #endregion
 
+@loop(hours=12)
+async def save_data():
+    print("Saving data to disk...")
+    await save_to_disk()
+
 
 @bot.event
 async def on_command_error(ctx, error):
     if isinstance(error, CommandNotFound):
         result = None
-        if((ctx.invoked_with[0] == 'r' and 'd' in ctx.invoked_with)): # Treat this as some attempted dice input
-            result = await data.diceRoller.parse(ctx.invoked_with[1:], gm = False)
-        elif((ctx.invoked_with[1] == 'd' or ctx.invoked_with[2] == 'd')): # Treat this as some attempted dice input
-            result = await data.diceRoller.parse(ctx.invoked_with[1:], gm = False)
-
-        if(result):
-            await ctx.send(result)
-
-
+        try:
+            if((ctx.invoked_with[0] == 'r' and 'd' in ctx.invoked_with)): # Treat this as some attempted dice input
+                result = await data.diceRoller.parse(ctx.invoked_with[0:], gm = False)
+            elif((ctx.invoked_with[1] == 'd' or ctx.invoked_with[2] == 'd')): # Treat this as some attempted dice input
+                result = await data.diceRoller.parse(ctx.invoked_with[0:], gm = False)
+            if(result):
+                await ctx.send(result)
+                data.statsDict['dirty_rolls'] += 1
+                return
+        except Exception as e:
+            print("Attempted dice roll failed...")
+            print(e)
+            return
     raise error
 
 @bot.event
@@ -1466,6 +1481,12 @@ async def on_ready():
     print ("With the ID: " + str(bot.user.id))
 
     await bot.change_presence(activity = discord.Game(name="!help (chat or DM)"))
+    if(sys.argv[2] == 'true'):
+        print("Starting stream to initial state...")
+        send_data.start()
+    elif (sys.argv[2] == 'false'):
+        print("Stream argument is set to false. Skipping stream.")
+    save_data.start()
 #Start the bot
 
 global bucket_key
@@ -1481,8 +1502,6 @@ if(sys.argv[1] == 'test'):
     with open(path.join(pyDir, 'access_key.txt'), 'r') as file:
         access_key = file.readline().strip()
     bot.run(testToken)
-    
-
     
 elif (sys.argv[1] == 'release'):
     pyDir = path.dirname(__file__)
