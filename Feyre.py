@@ -643,7 +643,6 @@ async def init_helper(ctx, args):
         key = str(ctx.guild.id) + ":" + str(ctx.channel.id)
         i = Initiative()
         data.initDict[key] = i
-        # await update_init(key)
         codeBlock = '''```asciidoc
 = Initiative = 
 [Round: {}]```'''.format(i.round_count)
@@ -692,14 +691,6 @@ async def init_helper(ctx, args):
 
             if(ret):
                 await update_init(key)
-#                 desc = data.initDict[key].displayInit()
-#                 codeBlock = '''```asciidoc
-# = Initiative =
-# [Round: {}]'''.format(data.initDict[key].round_count) + desc + '```'
-
-#                 #delete old message and send new one with updated values
-#                 data.initEmbedDict[key] = await  data.initEmbedDict[key].delete()
-#                 data.initEmbedDict[key] = await  ctx.send(codeBlock)
 
             elif(not ret):
                 await ctx.send('''```I couldnt find the player you were looking for.```''')
@@ -787,16 +778,6 @@ Currently I don't support inline dice rolls such as !init Gandalf +1d6```''')
 
                 data.initDict[key].addPlayer(name, init)
                 await update_init(key)
-#                 desc = data.initDict[key].displayInit()
-#                 #newEmbed = discord.Embed(title = "|------------- **Initiative** -------------|", description = data.initDict[key].displayInit(), color=data.embedcolor)
-
-#                 codeBlock = '''```asciidoc
-# = Initiative =
-# [Round: {}]'''.format(data.initDict[key].round_count) + desc + '```'
-
-#                 #delete old message and send new one with updated values
-#                 data.initEmbedDict[key] = await  data.initEmbedDict[key].delete()
-#                 data.initEmbedDict[key] = await  ctx.send(codeBlock)
 
             except Exception as e:
                 print(e)
@@ -853,84 +834,11 @@ async def stats(ctx, *, args = None):
     """
     if (ctx.author.id not in data.userSet):
         data.userSet.add(ctx.author.id)
-    #embed = discord.Embed(description = await data.displayStats(), color=data.embedcolor)
-    if not args:
-        await ctx.send(await displayStats(False))
-    elif args == 'all':
-        await ctx.send(await displayStats(True))
-    else:
-        await ctx.send("```I didnt understand your input. Try !stats or !stats all")
-        
-async def displayStats(tor):
-    if tor:
-        retStr = f'''```asciidoc
-= Lifetime Stats =
-> !help: {data.statsDict['!help']}
-> !hello: {data.statsDict['!hello']}
-> !init: {data.statsDict['!init']}
-> !roll: {data.statsDict['!roll']}
 
-[D&D 5E]
-> !feat: {data.statsDict['!feat']}
-> !mm: {data.statsDict['!mm']}   
-> !spell: {data.statsDict['!spell']}
-> !weapon: {data.statsDict['!weapon']}
-> !item: {data.statsDict['!item']}
-> !dom: {data.statsDict['!dom']}
-> !c: {data.statsDict['!c']}
-> !currency: {data.statsDict['!currency']}
-> !condtion: {data.statsDict['!condition']}
-> !bank: {data.statsDict['!bank']}
-> !randfeat: {data.statsDict['!randfeat']}
-> !randmonster: {data.statsDict['!randmonster']}
-
-
-[Book of Tor]
-> !tor horo: {data.statsDict['!tor horo']}
-> !tor randchar: {data.statsDict['!tor randchar']}
-> !tor styles: {data.statsDict['!tor styles']}
-> !tor zodiac: {data.statsDict['!tor zodiac']}
-
-[Others]
-> !new: {data.statsDict['!new']}
-> !gm: {data.statsDict['!gm']}
-> !admin: {data.statsDict['!admin']}
-> !set-prefix: {data.statsDict['!set_prefix']}
-> !request: {data.statsDict['!request']}
-> !vote: {data.statsDict['!vote']}
-> (dirty rolls): {data.statsDict['dirty_rolls']}
- 
-= Unique users: {len(data.userSet)} =
-= Server count: {len(bot.guilds)} =
-= Total command count: {sum(data.statsDict.values())} =```'''
-
-    else:
-        retStr = f'''```asciidoc
-= Lifetime Stats =
-> !help: {data.statsDict['!help']}
-> !hello: {data.statsDict['!hello']}
-> !init: {data.statsDict['!init']}
-> !roll: {data.statsDict['!roll']}
-
-[D&D 5E]
-> !feat: {data.statsDict['!feat']}
-> !mm: {data.statsDict['!mm']}   
-> !spell: {data.statsDict['!spell']}
-> !weapon: {data.statsDict['!weapon']}
-> !dom: {data.statsDict['!dom']}
-> !c: {data.statsDict['!c']}
-> !currency: {data.statsDict['!currency']}
-> !condtion: {data.statsDict['!condition']}
-> !bank: {data.statsDict['!bank']}
-> !randfeat: {data.statsDict['!randfeat']}
-> !randmonster: {data.statsDict['!randmonster']}
-
-
-= Unique users: {len(data.userSet)} =
-= Server count: {len(bot.guilds)} =
-= Total command count: {sum(data.statsDict.values())} =```'''
-    return retStr
-
+    if args != None:
+        args = args.lower().strip()
+    
+    await ctx.send(await data.stats_handler.get_stats(args, data.statsDict, len(data.userSet), len(bot.guilds)))
 #endregion
 
 #region Help
@@ -939,321 +847,13 @@ async def help(ctx, *, args = None):
     if (ctx.author.id not in data.userSet):
         data.userSet.add(ctx.author.id)
     data.statsDict['!help'] += 1
-    helpstr = ""
 
-    if (args != None):
-        args = args.lower().strip()
+    if args != None:
+        args = args.strip().lower()
 
-    if (args == None):
-        helpstr = '''```asciidoc
-Hello! My name is Feyre. You can use chat or DM's to summon me. 
-===============================================================
+    help_str = await data.help_handler.help(args)
 
-The default prefix is !. To learn more about a command type !help [command].
-Like this: !help roll
-
-`NEW: Try !bank to manage your characters bank accounts'
-
-[Commands]
-> hello - Hi!
-
-> init- Initiative tracking
-> roll - Dice rolling with complicated expressions
-> d - Simple dice rolling
-> gm - GM only dice rolling
-
-> feat - Feat lookup
-> condition - Condition lookup
-> weapon - Weapon lookup
-> item - Wondrous item lookup
-> mm - Monster Manual lookup
-> spell - Spell lookup
-> c - Class lookup
-
-> currency - Currency conversions
-> bank - Manage your all of your characters' wallets
-
-> dom - Draw from the Deck of Many Things
-
-> stats - Bot usage statistics
-> request - Request new features!
-> admin - Change default command prefix
-> new - New features & updates
-> vote - Vote for Feyre on top.gg
-
-Feyre always responds in the channel or direct message from which it was summoned.
-
-Like Feyre?
-===========
-Use this link `https://top.gg/bot/500733845856059402' to add Feyre to your server!
-Also consider voting for Feyre on top.gg using the `!vote' command :)
-
-[Please report bugs and request new features with the !request command]
-```''' 
-
-    elif (args == "init"):
-        helpstr = '''```!init is a per channel based initiative tracker. Click the Crossed Swords icon to move to the next round!
-If you need to insert a player into the middle of initative use decimals.
-
-Commands (can be shortened to !i):
-!init start
-    > Starts a new initiative tracker in the same channel, also used to create a new one
-!init
-    > Adds the player to initiative with their discord username and rolls 1d20 for them
-!init [player name]
-    > Adds a player with [player name] to initiative and rolls 1d20 for them
-!init [player name] [initiative]
-    > Adds a player with [player name] and [initiative] to iniative.
-!init remove [player name] or !init -r [player name]
-    > Removes a player from initiative. 
-!init [name] [modifier] or [modifier] [name]
-    > Adds a plyer to inititative after rolling 1d20 and applying the modifier.
-!init reset
-    > Restarts the initiative tracker with the same initiative values for each player.
-!init round [num]
-    > Changes the current round to [num]
-
-Ex:
-!init start
-!i Legolas 15
-!i Aragorn 15.1
-!i Sauron +5
-!init Gandalf 1
-!init Frodo
-!init remove Frodo
-!init -r Gandalf
-!init round 3
-
-Reset tracker but keep Legolas, Aragorn, and Sauron's rolls.
-!init reset```'''
-    elif (args == "roll"):
-        helpstr = '''```!roll can be used to roll dice of any size with complicated expressions and built in skill checks.
-
-Dice are represented with the standard [# of dice]d[size of dice] format. You can also use !r.
-Ex: !roll 4d6
-!roll 1d6*2
-!r 1d20 + 5
-!r 1d1000 + 2d2000 * 3 / 3 - 1
-
-Skill checks can be built into the dice expression using the < and > symbols.
-Ex: !roll 1d20 > 15
-
-You can roll with advantage or disadvantage using the -a and -d flags before the dice expression.
-Ex: !roll -a 1d20
-    !roll -d 1d20+5
-```'''
-
-    elif (args == "d"):
-        helpstr = '''```!d[size] [expression] can be used if you only want to roll one dice.
-This command supports standard dice sizes [4,6,8,10,12,20] and expressions. A space is neccessary between the dice and any modifiers.
-
-You can also use !dp to roll for percentile.
-
-Ex:
-!d20
-!d6 +2
-!dp
-```'''
-
-    elif (args == "stats"):
-        helpstr = '''```Feyre keeps track of the number of times each command has been used and the total user count.
-```'''
-    elif (args == "feat"):
-        helpstr = '''```!feat can be used to lookup feats from the Player's Handbook. 
-
-Commands:
-!feat [feat name] 
-    > Searches for a feat
-!randfeat
-    > Gives a random feat
-Ex:
-!feat Keen Mind```'''
-
-    elif (args == "condition"):
-        helpstr = '''```!condition can be used to conditions from the PHB 
-
-Commands:
-!condition
-    > Lists all conditions
-!condition [condition]
-    > Gives more info on the specified condition
-Ex:
-!condition Prone```'''
-    elif (args == "mm"):
-        helpstr = '''```!mm can be used to lookup monsters from the Monster Manual.
-
-Commands:
-!mm [monster name]
-    > Searches for a monster
-!randmonster
-    > Gives a random monster
-Ex:
-!mm Young Black Dragon
-!mm Tarrasque```'''
-
-    elif (args == "c" or args == "class"):
-        helpstr = '''```!c can be used to look up all of the features of a class. This can be a lot of text!
-
-Why is the command !c and not !class? Thats because class is a python keyword.
-
-Ex:
-!c wizard
-!c fighter
-```'''
-
-    elif (args == "currency" or args == "cur" or args == "convert"):
-        helpstr = '''```!currency can be used to convert any denomination of platinum, gold, electrum, silver, and copper to gold, silver and copper.
-It can also be used to evenly divide an amount of currency between any number of players by including a /x at the end where x is the number of players.
-
-pp = Platinum
-gp = Gold
-ep = Electrum
-sp = Silver
-cp = Copper
-
-When providing the amounts there is no need to worry about capitlization or spacing. See the examples below :)
-
-Commands:
-!currency [amount][abbreviation]
-!currency [amount][abbreviation] / [number of players] <- Optional
-!convert [amount][abbreviation]
-!convert [amount][abbreviation] / [number of players] <- Optional
-!cur [amount][abbreviation]
-!cur [amount][abbreviation] / [number of players] <- Optional
-
-Ex:
-!currency 10gp 55ep 5sp
-!convert 13gp55pp/4 <- Divides amongst 4 players
-!cur 11sp 333ep 4cp
-```'''
-
-    elif (args == "spell"):
-                helpstr = '''```!spell can be used to lookup spells from the Player's Handbook.
-
-!spell [spell name]
-
-Ex: 
-!spell Wish
-!spell Cure Wounds```'''
-
-    elif (args == "dom"):
-        helpstr = '''```!dom can be used to draw a card from the deck of many things. The -i flag will include an image!
-
-Commands:
-!dom
-    > Draws one card from the Deck of Many Things
-!dom -i
-    > Draws one card form the Deck of Many Things and includes an image of the card
-Ex:
-!dom
-!dom -i```'''
-
-    elif (args == "tor"):
-                helpstr = '''```!tor can be used to find character styles, horoscope, race/class combinations, and zodiac from the Book of Tor.
-
-Commands:
-!tor styles
-    > Displays character styles
-!tor horo
-    > Gives a Torian horoscope
-!tor zodiac
-    > Gives a Torian zodiac
-!tor randchar
-    > Gives a random Torian race/class combination.```'''
-
-    elif (args == "admin"):
-                helpstr = '''```!admin is for server administrators. Currently the only command available to adminstrators is !set_prefix.
-
-Commands:
-!set_prefix [prefix]
-    > Sets the server wide prefix to [prefix]. Prefix must be !, ~, `, #, $, %, ^, &, *, ,, ., ;, :, <, or >
-Note: If you forget the bot's prefix you will no longer be able to summon it and reset it's prefix (as of now).```'''
-
-    elif (args == "request"):
-        helpstr = '''```Please help improve the bot by requesting features you would like to see!
-
-!request [feature]```'''
-
-    elif (args == "vote"):
-        helpstr = '''```top.gg ranks discord bots based on the number of votes that they have. Please vote for Feyre using !vote. Thanks!```'''
-
-    elif (args == "hello"):
-                helpstr = '''```Hi?```'''
-
-    elif (args == "gm"):
-                helpstr = '''```!gm can be used to send dice rolls to the GM without other players being able to see the result.
-GM's are set on a per channel basis.
-                
-Commands:
-!gm
-    > Sets the channels GM to the user
-!gm roll [expression]
-    > Rolls dice and sends the result to the user and the GM
-
-Ex:
-!gm
-!gm roll 1d20```'''
-
-    elif (args == "weapon"):
-        helpstr = '''```!weapon or !w can be used to lookup weapons from the players handbook. 
-If you find any errors or a weapon is missing please use !request to let me know.
-
-Built in attack rolls are coming soon.
-
-Ex:
-!w Longbow```'''
-
-    elif (args == "item"):
-        helpstr = '''```!item can be used to lookup items from the Dungeon Master's Guide. 
-If you find any errors or a item is missing please use !request to let me know. Some items have a lot of text, and may be sent in multiple message blocks.
-
-Ex:
-!item Portable Hole```'''
-
-    elif (args == "bank"):
-        helpstr = textwrap.dedent("""```
-You can use Feyre to manage all of your character's wallets. Your bank is tied to your Discord ID and can be accessed from any server/channel or by direct messaging Feyre.
-
-Interacting with your bank requires the use of argument flags (-a, -r, -d, -w). If you have any suggestions on how this experience can be streamlined please use the !request command and let me know!
-
-Commands:
-!bank
-    > Shows all of your characters and their unique IDs. The character's id (a unique number representing that character) can be used instead of [character name].
-
-!bank -a [character name]
-    > Adds a new character to your bank with [character name]. This character will also be assigned a unique ID which can be used to access its account.
-
-!bank -r [character name] OR [character id]
-    > Deletes the account associated with [character name] or [character id]
-
-!bank -d [character name] [currency values] OR [character name] [currency values]
-    > Deposits the specified [currency values] into the account associated with [character name] or [character id]
-
-!bank -w [character name] [currency values] OR [character name] [currency values]
-    > Withdraws the specified [currency values] into the account associated with [character name] or [character id]
-
-[currency values] have the same format as the !currency command. For example you can represent 10 platinum, 9 gold, 8 electrum, 7 silver, and 6 copper like this: 10pp9gp8ep7sp6cp.
-
-Examples:
-!bank -a Bilbo
-    > Add a character with the name Bilbo to your bank
-
-!bank -d Bilbo 10sp5cp
-    > Deposit (-d) 10 silver and 5 copper into Bilbo's account
-
-!bank
-    > See all of your characters and their unique ids
-
-!bank -w 1 3cp
-    > Withdraw 3 copper from Bilbo's account. In this example Bilbo has been assigned the unique ID 1 because he is the first character associated with the example user
-
-!bank -r Bilbo
-    > Delete Bilbo from the bank```""")
-
-    else:
-        helpstr = '''```I could not find that command. Try !help for a list of commands.```'''
-
-    await ctx.send(str(helpstr))
+    await ctx.send(help_str)
 #endregion
 
 #region Admin

@@ -19,6 +19,9 @@ from _classes.CurrencyConversion import CurrencyConverter
 from _classes.Conditions import ConditionLookup
 from _classes.Bank import Character, Bank
 
+from _classes.HelpHandler import HelpHandler
+from _classes.StatsHandler import StatsHandler
+
 class BotData():
     """
     Main class for bot. Adds all commands to the bot and starts it with the start(token) function.
@@ -65,6 +68,8 @@ class BotData():
         self.condition_lookup = ConditionLookup()
 
         self.bank = Bank()
+        self.help_handler = HelpHandler()
+        self.stats_handler = StatsHandler()
 
         #Initiative tracking dictionaries
         self.initDict = {}
