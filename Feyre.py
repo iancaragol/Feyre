@@ -136,7 +136,34 @@ async def roll(ctx, *, args = None):
         await ctx.send('''```Missing command arguments, see !help roll for more information.\nEx: !roll 1d20+5```''')
         return
 
-    await ctx.send(await data.diceRoller.parse(args, gm = False))
+    roll_msg = await data.diceRoller.parse(args, gm = False)
+    msg = await ctx.send(roll_msg)
+
+    # Add emoji to roll
+    arrows = '🔁'
+    await msg.add_reaction(arrows)
+    await reroll_helper(ctx, args, roll_msg, msg)
+    
+
+async def reroll_helper(ctx, args, roll_msg, msg):
+    try:
+        reaction, u = await bot.wait_for('reaction_add', check=lambda r, u:str(r.emoji) == '🔁' and u.id != bot.user.id and r.message.id == msg.id, timeout=21600) # Times out after 6 hours
+
+        if reaction != None:
+            print("Rerolling")
+            roll_msg = await data.diceRoller.parse(args, gm = False)
+            if ctx.channel.type is discord.ChannelType.private:
+                await msg.delete()
+                msg = await ctx.send(roll_msg)
+                await msg.add_reaction('🔁')
+            else:
+                await msg.edit(content=roll_msg)
+                await reaction.remove(u)
+            await reroll_helper(ctx, args, roll_msg, msg)
+    
+    except asyncio.exceptions.TimeoutError as e:
+        await msg.clear_reaction('🔁')
+        
 
 @bot.command()
 async def r(ctx, *, args = None):
@@ -145,16 +172,7 @@ async def r(ctx, *, args = None):
         Ex: !roll 1d20+5*6>100
     """
 
-    #This should be rewritten...
-
-    if (ctx.author.id not in data.userSet):
-        data.userSet.add(ctx.author.id)
-    data.statsDict['!roll'] += 1
-
-    if not args:
-        await ctx.send('''```Missing command arguments, see !help roll for more information.\nEx: !roll 1d20+5```''')
-        return
-    await ctx.send(await data.diceRoller.parse(args, gm = False))
+    await roll(ctx, args = args)
 #endregion
 
 #region Monster Manual
@@ -366,19 +384,6 @@ async def d4(ctx, *, args = None):
 
     await ctx.send(msg)
 
-#endregion
-
-#region Ability
-# @bot.command()
-# async def ability(ctx, *, args):
-#     if (ctx.author.id not in data.userSet):
-#         data.userSet.add(ctx.author.id)
-#     #data.statsDict['!feat'] += 1
-#     abil_arr = await data.class_abilities.search(args)
-#     if (abil_arr == False):
-#         await ctx.send("```I'm sorry. I wasn't able to find the feat you are looking for.```")
-#     else:
-#         await ctx.send(await codify(abil_arr[0], abil_arr[1]))
 #endregion
 
 #region Items
@@ -598,19 +603,19 @@ async def dom(ctx, *, args = None):
 
 @bot.event
 async def on_raw_reaction_add(payload):
-    key = str(payload.guild_id) + ":" + str(payload.channel_id)
-    if(key in data.initDict.keys()):
+    init_key = str(payload.guild_id) + ":" + str(payload.channel_id)
+    if(init_key in data.initDict.keys()):
         channel = bot.get_channel(payload.channel_id)
         msg = await channel.fetch_message(payload.message_id)
 
-        init = data.initDict[key]
+        init = data.initDict[init_key]
 
         reaction = get(msg.reactions, emoji=payload.emoji.name)
         if reaction and reaction.count > 1:
             #init.round_count += 1
             init.marker_count += 1
-            await update_init(key)
-            
+            await update_init(init_key)
+    
 
 async def update_init(key):
     desc = data.initDict[key].displayInit()
@@ -843,7 +848,7 @@ async def stats(ctx, *, args = None):
 
 #region Help
 @bot.command()
-async def help(ctx, *, args = None):
+async def p(ctx, *, args = None):
     if (ctx.author.id not in data.userSet):
         data.userSet.add(ctx.author.id)
     data.statsDict['!help'] += 1
@@ -1061,14 +1066,14 @@ async def on_command_error(ctx, error):
         try:
             if((ctx.invoked_with[0] == 'r' and 'd' in ctx.invoked_with)): # Treat this as some attempted dice input
                 result = await data.diceRoller.parse(ctx.invoked_with[0:], gm = False)
-            elif((ctx.invoked_with[1] == 'd' or ctx.invoked_with[2] == 'd')): # Treat this as some attempted dice input
+            elif((ctx.invoked_with[0] == 'd' or ctx.invoked_with[1] == 'd' or ctx.invoked_with[2] == 'd')): # Treat this as some attempted dice input
                 result = await data.diceRoller.parse(ctx.invoked_with[0:], gm = False)
-            if(result):
-                await ctx.send(result)
+            if(result and not result.startswith("```I'm sorry")): # this is bad but ill accept it for now
+                await roll(ctx, args = ctx.invoked_with[0:])
                 data.statsDict['dirty_rolls'] += 1
                 return
         except Exception as e:
-            print("Attempted dice roll failed...")
+            print("Attempted dice roll: " + ctx.invoked_with)
             print(e)
             return
     raise error

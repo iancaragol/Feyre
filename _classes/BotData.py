@@ -75,6 +75,8 @@ class BotData():
         self.initDict = {}
         self.initEmbedDict = {}
 
+        self.roll_dict = {}
+
         self.gmDict = {}
 
         self.statsDict = {}
