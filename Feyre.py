@@ -150,7 +150,7 @@ async def reroll_helper(ctx, args, roll_msg, msg):
         reaction, u = await bot.wait_for('reaction_add', check=lambda r, u:str(r.emoji) == '🔁' and u.id != bot.user.id and r.message.id == msg.id, timeout=21600) # Times out after 6 hours
 
         if reaction != None:
-            print("Rerolling")
+            data.statsDict['rerolls'] += 1
             roll_msg = await data.diceRoller.parse(args, gm = False)
             if ctx.channel.type is discord.ChannelType.private:
                 await msg.delete()
@@ -162,7 +162,12 @@ async def reroll_helper(ctx, args, roll_msg, msg):
             await reroll_helper(ctx, args, roll_msg, msg)
     
     except asyncio.exceptions.TimeoutError as e:
-        await msg.clear_reaction('🔁')
+        if ctx.channel.type is discord.ChannelType.private:
+                contents = msg.content
+                await msg.delete()
+                await ctx.send(contents)
+        else:
+            await msg.clear_reaction('🔁')
         
 
 @bot.command()
@@ -848,7 +853,7 @@ async def stats(ctx, *, args = None):
 
 #region Help
 @bot.command()
-async def p(ctx, *, args = None):
+async def help(ctx, *, args = None):
     if (ctx.author.id not in data.userSet):
         data.userSet.add(ctx.author.id)
     data.statsDict['!help'] += 1
@@ -1093,6 +1098,162 @@ async def on_ready():
         print("Stream argument is set to false. Skipping stream.")
     save_data.start()
 #Start the bot
+
+
+#region upper/lowercase
+@bot.command()
+async def Help(ctx, *, args = None):
+    await help(ctx, args = args)
+
+@bot.command()
+async def Hello(ctx, *, args = None):
+    await hello(ctx)
+
+@bot.command()
+async def Init(ctx, *, args = ""):
+    await init(ctx, args = args)
+
+@bot.command()
+async def Gm(ctx, *, args = None):
+    await gm(ctx, args = args)
+
+@bot.command()
+async def Roll(ctx, *, args = None):
+    await roll(ctx, args = args)
+
+@bot.command()
+async def R(ctx, *, args = None):
+    await r(ctx, args = args)
+
+@bot.command()
+async def Mm(ctx, *, args = None):
+    await mm(ctx, args = args)
+
+@bot.command()
+async def Randmonster(ctx, *, args = None):
+    await randmonster(ctx)
+
+@bot.command()
+async def Feat(ctx, *, args = None):
+    await feat(ctx, args = args)
+
+@bot.command()
+async def Randfeat(ctx, *, args = None):
+    await randfeat(ctx)
+
+@bot.command()
+async def Dp(ctx, *, args = None):
+    await dp(ctx, args = args)
+
+@bot.command()
+async def D20(ctx, *, args = None):
+    await d20(ctx, args = args)
+
+@bot.command()
+async def D12(ctx, *, args = None):
+    await d12(ctx, args = args)
+
+@bot.command()
+async def D10(ctx, *, args = None):
+    await d10(ctx, args = args)
+
+@bot.command()
+async def D8(ctx, *, args = None):
+    await d8(ctx, args = args)
+
+@bot.command()
+async def D6(ctx, *, args = None):
+    await d6(ctx, args = args)
+
+@bot.command()
+async def D4(ctx, *, args = None):
+    await d4(ctx, args = args)
+
+@bot.command()
+async def Item(ctx, *, args = None):
+    await item(ctx, args = args)
+
+@bot.command()
+async def Condition(ctx, *, args = None):
+    await condition(ctx, args = args)
+
+@bot.command()
+async def C(ctx, *, args = None):
+    await c(ctx, args = args)
+
+@bot.command()
+async def Spell(ctx, *, args = None):
+    await spell(ctx, args = args)
+
+@bot.command()
+async def Vote(ctx, *, args = None):
+    await vote(ctx, args = args)
+
+@bot.command()
+async def Currency(ctx, *, args = None):
+    await currency(ctx, args = args)
+
+@bot.command()
+async def Cur(ctx, *, args = None):
+    await cur(ctx, args = args)
+
+@bot.command()
+async def Convert(ctx, *, args = None):
+    await convert(ctx, args = args)
+
+@bot.command()
+async def Weapon(ctx, *, args = None):
+    await weapon(ctx, args = args)
+
+@bot.command()
+async def W(ctx, *, args = None):
+    await w(ctx, args = args)
+
+@bot.command()
+async def Dom(ctx, *, args = None):
+    await dom(ctx, args = args)
+
+@bot.command()
+async def I(ctx, *, args = ""):
+    await i(ctx, args = args)
+
+@bot.command()
+async def Tor(ctx, *, args = None):
+    await tor(ctx, args = args)
+
+@bot.command()
+async def Stats(ctx, *, args = None):
+    await stats(ctx, args = args)
+
+@bot.command()
+async def Admin(ctx, *, args = None):
+    await admin(ctx)
+
+@bot.command()
+async def Set_prefix(ctx, *, args = None):
+    await set_prefix(ctx, args = args)
+
+@bot.command()
+async def Request(ctx, *, args = None):
+    await request(ctx, args = args)
+
+@bot.command()
+async def Quit(ctx, *, args = None):
+    await quit(ctx)
+
+@bot.command()
+async def Change_presence(ctx, *, args = None):
+    await change_presence(ctx, args = args)
+
+@bot.command()
+async def Bank(ctx, *, args = None):
+    await bank(ctx, args = args)
+
+@bot.command()
+async def New(ctx, *, args = None):
+    await new(ctx)
+#endregion
+
 
 global bucket_key
 global access_key
