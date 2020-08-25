@@ -19,6 +19,7 @@ from _cogs.Bank import Banker
 from _cogs.DeckOfManyThings import DeckOfManyThings
 from _cogs.DiceRolls import DiceRoller
 from _cogs.CurrencyConversion import CurrencyConverter
+from _cogs.Administrator import Administrator
 
 import discord
 import asyncio
@@ -81,8 +82,9 @@ bot.add_cog(SimpleDiceRoller(bot, data)) # Simple Dice: dp, d20, d12, etc...
 bot.add_cog(CharacterSelector(bot, data)) # Character Selection
 bot.add_cog(Banker(bot, data)) # Bank
 bot.add_cog(DeckOfManyThings(bot, data)) # Deck of Many Things
-bot.add_cog(DiceRoller(bot, data))
-bot.add_cog(CurrencyConverter(bot, data))
+bot.add_cog(DiceRoller(bot, data)) # Dice Rolling
+bot.add_cog(CurrencyConverter(bot, data)) # Currency Converstion
+bot.add_cog(Administrator(bot, data)) # Adminstrator Commands
 
 #COMMANDS:
 
@@ -375,64 +377,6 @@ async def stats(ctx, *, args = None):
     await ctx.send(await data.stats_handler.get_stats(args, data.statsDict, len(data.userSet), len(bot.guilds)))
 #endregion
 
-#region Admin
-@bot.command()
-async def admin(ctx):
-    if (ctx.author.id not in data.userSet):
-        data.userSet.add(ctx.author.id)
-    data.statsDict['!admin'] += 1
-
-    retstr = '''```!admin is for server administrators. Currently the only command available to adminstrators is !set_prefix.
-
-Commands:
-!set_prefix [prefix]
-    > Sets the server wide prefix to [prefix]. 
-    Prefix must be /, !, ~, `, #, $, %, ^, &, *, ,, ., ;, :, <, or >
-Note: If you forget the bot's prefix you will no longer be able to summon it and reset it's prefix.
-For this reason, the prefix will be pinned in the channel from which it is changed.```'''
-
-    await ctx.send(retstr)
-
-@bot.command()
-async def set_prefix(ctx, *, args = None):
-    #TO DO:
-    #Support pinging bot if you do not know the prefix
-    #Removing bot from server should reset bot's prefix
-    if (ctx.author.id not in data.userSet):
-        data.userSet.add(ctx.author.id)
-    data.statsDict['!set_prefix'] += 1
-
-    if(not hasattr(ctx.author, 'ctx.author.guild_permissions')):
-        await ctx.send(f"This command is for server use only.")
-
-    if args:
-        args = args.strip()
-
-        if(ctx.author.guild_permissions.administrator):
-            possibleArgs = set(['/','!','~','`','#','$','%','^','&','*',',','.',';',':','>','<'])
-
-            if(len(args) < 1):
-                await ctx.send(f"<@{ctx.author.id}>\n You must include arguments! Ex: !set_prefix &")
-                return
-
-            elif (args not in possibleArgs):
-                await ctx.send(f"<@{ctx.author.id}>\n Prefix must be /, !, ~, `, #, $, %, ^, &, *, ,, ., ;, :, <, or >")
-                return
-
-            data.prefixDict[str(ctx.message.guild.id)] = args   
-           
-            msg = await ctx.send(f"<@{ctx.author.id}>\n Prefix for this server set to: {args.strip()}")
-            await msg.pin()
-
-        else:
-                await ctx.send("Only server administrators have access to this command.")
-    else:
-        if(ctx.author.guild_permissions.administrator):
-            await ctx.send(f"<@{ctx.author.id}>\n You must include arguments! Ex: !set_prefix &")
-            return
-        else:
-            await ctx.send("Only server administrators have access to this command.")
-#endregion
 
 #region Developer
 @bot.command()
@@ -591,10 +535,6 @@ async def on_ready():
 
 #region upper/lowercase
 @bot.command()
-async def Help(ctx, *, args = None):
-    await help(ctx, args = args)
-
-@bot.command()
 async def Hello(ctx, *, args = None):
     await hello(ctx)
 
@@ -635,8 +575,6 @@ async def Spell(ctx, *, args = None):
 async def Vote(ctx, *, args = None):
     await vote(ctx, args = args)
 
-
-
 @bot.command()
 async def Weapon(ctx, *, args = None):
     await weapon(ctx, args = args)
@@ -653,13 +591,6 @@ async def Tor(ctx, *, args = None):
 async def Stats(ctx, *, args = None):
     await stats(ctx, args = args)
 
-@bot.command()
-async def Admin(ctx, *, args = None):
-    await admin(ctx)
-
-@bot.command()
-async def Set_prefix(ctx, *, args = None):
-    await set_prefix(ctx, args = args)
 
 @bot.command()
 async def Request(ctx, *, args = None):

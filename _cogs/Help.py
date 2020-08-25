@@ -312,7 +312,7 @@ class Helper(commands.Cog):
 
             Commands:
             !set_prefix [prefix]
-                > Sets the server wide prefix to [prefix]. Prefix must be !, ~, `, #, $, %, ^, &, *, ,, ., ;, :, <, or >
+                > Sets the server wide prefix to [prefix]. Prefix must be ?, !, ~, `, #, $, %, ^, &, *, ,, ., ;, :, <, or >
             Note: If you forget the bot's prefix you will no longer be able to summon it and reset it's prefix (as of now).
             ```
             '''
@@ -463,6 +463,10 @@ class Helper(commands.Cog):
         help_str = await self.helper(args)
 
         await ctx.send(help_str)
+
+    @commands.command()
+    async def Help(self, ctx, *, args = None):
+        await self.help(ctx, args = args)
 
     async def helper(self, args):
         if not args:
