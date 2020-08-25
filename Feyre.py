@@ -16,6 +16,8 @@ from _cogs.Help import Helper
 from _cogs.SimpleDiceRoll import SimpleDiceRoller
 from _cogs.CharacterSelection import CharacterSelector
 from _cogs.Bank import Banker
+from _cogs.DeckOfManyThings import DeckOfManyThings
+from _cogs.DiceRolls import DiceRoller
 
 import discord
 import asyncio
@@ -72,11 +74,13 @@ bot = commands.Bot(command_prefix = get_pre)
 bot.remove_command('help')
 
 # Add Cogs
-bot.add_cog(InitiativeCog(bot, data))
-bot.add_cog(Helper(bot, data))
-bot.add_cog(SimpleDiceRoller(bot, data))
-bot.add_cog(CharacterSelector(bot, data))
-bot.add_cog(Banker(bot, data))
+bot.add_cog(InitiativeCog(bot, data)) # Initiative
+bot.add_cog(Helper(bot, data)) # Help
+bot.add_cog(SimpleDiceRoller(bot, data)) # Simple Dice: dp, d20, d12, etc...
+bot.add_cog(CharacterSelector(bot, data)) # Character Selection
+bot.add_cog(Banker(bot, data)) # Bank
+bot.add_cog(DeckOfManyThings(bot, data)) # Deck of Many Things
+bot.add_cog(DiceRoller(bot, data))
 
 #COMMANDS:
 
@@ -101,100 +105,6 @@ async def hello(ctx):
 @bot.command()
 async def ping(ctx):
     await ctx.send('`Pong! {0}ms`'.format(round(bot.latency, 3)))
-
-#region Dice Rolls
-@bot.command()
-async def gm(ctx, *, args = None):
-    if (ctx.author.id not in data.userSet):
-        data.userSet.add(ctx.author.id)
-    data.statsDict['!gm'] += 1
-
-    if (ctx.guild == None):
-        await ctx.send("```GM rolls must be done in a channel with a dedicated gm.```")
-        return
-
-    elif (args == None):
-        data.gmDict[ctx.channel.id] = ctx.author.id
-        await ctx.send(f"```{ctx.author} was made GM of this channel.```")
-
-    elif (args != None):
-        args = args.strip()
-        if (args.startswith('roll')):
-            try:
-                expression = args.replace('roll', '').strip()
-                result = await data.diceRoller.parse(expression, gm = True)
-
-                gmUser = bot.get_user(data.gmDict[ctx.channel.id])
-                gmResult = f'''```diff
-Roll from [{ctx.author.name}]
-{result} ```'''
-
-                await gmUser.send(gmResult)
-
-                userResult = f'''```diff
-{result}```'''
-                sendUser = bot.get_user(ctx.author.id)
-                await sendUser.send(userResult)
-            except:
-                await ctx.send("```This channel does not have a dedicated GM. Type !gm to set yourself as GM.```")
-
-@bot.command()
-async def roll(ctx, *, args = None):
-    """
-    Rolls any number of dice in any format including skill checks
-        Ex: !roll 1d20+5*6>100
-    """
-    if (ctx.author.id not in data.userSet):
-        data.userSet.add(ctx.author.id)
-    data.statsDict['!roll'] += 1
-
-    if not args:
-        await ctx.send('''```Missing command arguments, see !help roll for more information.\nEx: !roll 1d20+5```''')
-        return
-
-    roll_msg = await data.diceRoller.parse(args, gm = False)
-    msg = await ctx.send(roll_msg)
-
-    # Add emoji to roll
-    arrows = '🔁'
-    await msg.add_reaction(arrows)
-    await reroll_helper(ctx, args, roll_msg, msg)
-    
-
-async def reroll_helper(ctx, args, roll_msg, msg):
-    try:
-        reaction, u = await bot.wait_for('reaction_add', check=lambda r, u:str(r.emoji) == '🔁' and u.id != bot.user.id and r.message.id == msg.id, timeout=21600) # Times out after 6 hours
-
-        if reaction != None:
-            data.statsDict['rerolls'] += 1
-            roll_msg = await data.diceRoller.parse(args, gm = False)
-            if ctx.channel.type is discord.ChannelType.private:
-                await msg.delete()
-                msg = await ctx.send(roll_msg)
-                await msg.add_reaction('🔁')
-            else:
-                await msg.edit(content=roll_msg)
-                await reaction.remove(u)
-            await reroll_helper(ctx, args, roll_msg, msg)
-    
-    except asyncio.exceptions.TimeoutError as e:
-        if ctx.channel.type is discord.ChannelType.private:
-                contents = msg.content
-                await msg.delete()
-                await ctx.send(contents)
-        else:
-            await msg.clear_reaction('🔁')
-        
-
-@bot.command()
-async def r(ctx, *, args = None):
-    """
-    Rolls any number of dice in any format including skill checks
-        Ex: !roll 1d20+5*6>100
-    """
-
-    await roll(ctx, args = args)
-#endregion
 
 #region Monster Manual
 @bot.command()
@@ -449,31 +359,6 @@ async def w(ctx, *, args = None):
 
 #endregion
 
-#region DeckOfMany
-
-async def deck_of_many_helper(ctx, args):
-    if (ctx.author.id not in data.userSet):
-        data.userSet.add(ctx.author.id)
-    data.statsDict['!dom'] += 1
-
-    if (args == None):
-        card, effect = await data.deck_of_many.draw(data.deck_of_many.default_deck)
-        await ctx.send(await data.deck_of_many.card_to_string(card, effect))
-
-    if (len(ctx.args) == 1 and args == '-i'):
-        card, effect = await data.deck_of_many.draw(data.deck_of_many.default_deck)
-        embed = discord.Embed()
-        embed.set_image(url=await data.deck_of_many.get_image(card))
-        await ctx.send(embed=embed)
-        await ctx.send(await data.deck_of_many.card_to_string(card, effect))
-
-
-@bot.command()
-async def dom(ctx, *, args = None):
-    await deck_of_many_helper(ctx, args)
-
-#endregion
-
 #region Tor    
 @bot.command()
 async def tor(ctx, *, args):
@@ -698,11 +583,11 @@ async def on_command_error(ctx, error):
         result = None
         try:
             if((ctx.invoked_with[0] == 'r' and 'd' in ctx.invoked_with)): # Treat this as some attempted dice input
-                result = await data.diceRoller.parse(ctx.invoked_with[0:], gm = False)
+                result = await bot.get_cog('DiceRoller').dice_roll.parse(ctx.invoked_with[0:], gm = False)
             elif((ctx.invoked_with[0] == 'd' or ctx.invoked_with[1] == 'd' or ctx.invoked_with[2] == 'd')): # Treat this as some attempted dice input
-                result = await data.diceRoller.parse(ctx.invoked_with[0:], gm = False)
+                result = await bot.get_cog('DiceRoller').dice_roll.parse(ctx.invoked_with[0:], gm = False)
             if(result and not result.startswith("```I'm sorry")): # this is bad but ill accept it for now
-                await roll(ctx, args = ctx.invoked_with[0:])
+                await bot.get_cog('DiceRoller').roll(ctx, args = ctx.invoked_with[0:])
                 data.statsDict['dirty_rolls'] += 1
                 return
         except Exception as e:
@@ -737,17 +622,6 @@ async def Help(ctx, *, args = None):
 async def Hello(ctx, *, args = None):
     await hello(ctx)
 
-@bot.command()
-async def Gm(ctx, *, args = None):
-    await gm(ctx, args = args)
-
-@bot.command()
-async def Roll(ctx, *, args = None):
-    await roll(ctx, args = args)
-
-@bot.command()
-async def R(ctx, *, args = None):
-    await r(ctx, args = args)
 
 @bot.command()
 async def Mm(ctx, *, args = None):
@@ -804,10 +678,6 @@ async def Weapon(ctx, *, args = None):
 @bot.command()
 async def W(ctx, *, args = None):
     await w(ctx, args = args)
-
-@bot.command()
-async def Dom(ctx, *, args = None):
-    await dom(ctx, args = args)
 
 @bot.command()
 async def Tor(ctx, *, args = None):

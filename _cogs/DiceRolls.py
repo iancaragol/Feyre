@@ -5,12 +5,15 @@ import copy
 import numpy as np
 import math
 from asteval import Interpreter
+import discord
+
+from discord.ext import commands
 
 aeval = Interpreter()
 
 #rolls dice
 #accepts input in the form of !roll #dTYPE ex: !roll 1d20 + 5
-class Roller():
+class DiceRoll():
     async def parse(self, inp, gm = False, total_only = False):
         """
         Parses a string of the format !roll #d# +,/,*,- #d# or # ... evaulated 
@@ -206,3 +209,113 @@ Rolls: {uES}
         """
         rolls = np.random.randint(1,typeDice+1,numDice, dtype=np.int64)     
         return list(rolls)
+
+class DiceRoller(commands.Cog):
+    def __init__(self, bot, data):
+        self.bot = bot
+        self.data = data
+        self.dice_roll = DiceRoll()
+
+    @commands.command()
+    async def gm(self, ctx, *, args = None):
+        if (ctx.author.id not in self.data.userSet):
+            self.data.userSet.add(ctx.author.id)
+        self.data.statsDict['!gm'] += 1
+
+        if (ctx.guild == None):
+            await ctx.send("```GM rolls must be done in a channel with a dedicated gm.```")
+            return
+
+        elif (args == None):
+            self.data.gmDict[ctx.channel.id] = ctx.author.id
+            await ctx.send(f"```{ctx.author} was made GM of this channel.```")
+
+        elif (args != None):
+            args = args.strip()
+            if (args.startswith('roll')):
+                try:
+                    expression = args.replace('roll', '').strip()
+                    result = await self.dice_roll.parse(expression, gm = True)
+
+                    gmUser = self.bot.get_user(self.data.gmDict[ctx.channel.id])
+                    gmResult = f'''```diff
+    Roll from [{ctx.author.name}]
+    {result} ```'''
+
+                    await gmUser.send(gmResult)
+
+                    userResult = f'''```diff
+    {result}```'''
+                    sendUser = self.bot.get_user(ctx.author.id)
+                    await sendUser.send(userResult)
+                except:
+                    await ctx.send("```This channel does not have a dedicated GM. Type !gm to set yourself as GM.```")
+
+    @commands.command()
+    async def roll(self, ctx, *, args = None):
+        """
+        Rolls any number of dice in any format including skill checks
+            Ex: !roll 1d20+5*6>100
+        """
+        if (ctx.author.id not in self.data.userSet):
+            self.data.userSet.add(ctx.author.id)
+        self.data.statsDict['!roll'] += 1
+
+        if not args:
+            await ctx.send('''```Missing command arguments, see !help roll for more information.\nEx: !roll 1d20+5```''')
+            return
+
+        roll_msg = await self.dice_roll.parse(args, gm = False)
+        msg = await ctx.send(roll_msg)
+
+        # Add emoji to roll
+        arrows = '🔁'
+        await msg.add_reaction(arrows)
+        await self.reroll_helper(ctx, args, roll_msg, msg)
+        
+
+    async def reroll_helper(self, ctx, args, roll_msg, msg):
+        try:
+            reaction, u = await self.bot.wait_for('reaction_add', check=lambda r, u:str(r.emoji) == '🔁' and u.id != self.bot.user.id and r.message.id == msg.id, timeout=21600) # Times out after 6 hours
+
+            if reaction != None:
+                self.data.statsDict['rerolls'] += 1
+                roll_msg = await self.dice_roll.parse(args, gm = False)
+                if ctx.channel.type is discord.ChannelType.private:
+                    await msg.delete()
+                    msg = await ctx.send(roll_msg)
+                    await msg.add_reaction('🔁')
+                else:
+                    await msg.edit(content=roll_msg)
+                    await reaction.remove(u)
+                await self.reroll_helper(ctx, args, roll_msg, msg)
+        
+        except asyncio.exceptions.TimeoutError as e:
+            if ctx.channel.type is discord.ChannelType.private:
+                    contents = msg.content
+                    await msg.delete()
+                    await ctx.send(contents)
+            else:
+                await msg.clear_reaction('🔁')
+            
+
+    @commands.command()
+    async def r(self, ctx, *, args = None):
+        """
+        Rolls any number of dice in any format including skill checks
+            Ex: !roll 1d20+5*6>100
+        """
+
+        await self.roll(ctx, args = args)
+
+    @commands.command()
+    async def Gm(self, ctx, *, args = None):
+        await self.gm(ctx, args = args)
+
+    @commands.command()
+    async def Roll(self, ctx, *, args = None):
+        await self.roll(ctx, args = args)
+
+    @commands.command()
+    async def R(self, ctx, *, args = None):
+        await self.r(ctx, args = args)

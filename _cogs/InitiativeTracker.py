@@ -3,7 +3,7 @@ import textwrap
 import asyncio
 from discord.ext import commands
 from operator import attrgetter
-from _classes.DiceRolls import Roller
+from _cogs.DiceRolls import DiceRoll
 from _cogs.CharacterSelection import CharacterSelectionHandler
 
 
@@ -19,7 +19,7 @@ class InitiativeTracker:
         self.add_order = []
         self.character_list = []
         self.init_messages = []
-        self.dr = Roller()
+        self.dr = DiceRoll()
         self.content = ""
         self.header = "```asciidoc\n= Initiative ="
         self.footer = "```"

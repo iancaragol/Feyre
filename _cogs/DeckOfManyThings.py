@@ -1,7 +1,10 @@
 import random
 import os
+import discord
 
-class DeckOfMany:
+from discord.ext import commands
+
+class DeckOfManyThingsHandler:
     def __init__(self):
         self.default_deck = {
             "balance" : "Your mind suffers a wrenching alteration, causing your Alignment to change. Lawful becomes chaotic, good becomes evil, and vice versa. If you are true neutral or unaligned, this card has no effect on you.",
@@ -67,3 +70,34 @@ class DeckOfMany:
 
     async def get_image(self, card):
         return self.default_deck_images[card]
+
+class DeckOfManyThings(commands.Cog):
+    def __init__(self, bot, data):
+        self.bot = bot
+        self.data = data
+        self.dom_handler = DeckOfManyThingsHandler()
+
+    async def deck_of_many_helper(self, ctx, args):
+        if (ctx.author.id not in self.data.userSet):
+            self.data.userSet.add(ctx.author.id)
+        self.data.statsDict['!dom'] += 1
+
+        if (args == None):
+            card, effect = await self.dom_handler.draw(self.dom_handler.default_deck)
+            await ctx.send(await self.dom_handler.card_to_string(card, effect))
+
+        if (args.strip() == '-i'):
+            card, effect = await self.dom_handler.draw(self.dom_handler.default_deck)
+            embed = discord.Embed()
+            embed.set_image(url=await self.dom_handler.get_image(card))
+            await ctx.send(embed=embed)
+            await ctx.send(await self.dom_handler.card_to_string(card, effect))
+
+
+    @commands.command()
+    async def dom(self, ctx, *, args = None):
+        await self.deck_of_many_helper(ctx, args)
+
+    @commands.command()
+    async def Dom(self, ctx, *, args = None):
+        await self.dom(ctx, args = args)
