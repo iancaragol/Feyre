@@ -18,6 +18,7 @@ from _cogs.CharacterSelection import CharacterSelector
 from _cogs.Bank import Banker
 from _cogs.DeckOfManyThings import DeckOfManyThings
 from _cogs.DiceRolls import DiceRoller
+from _cogs.CurrencyConversion import CurrencyConverter
 
 import discord
 import asyncio
@@ -81,6 +82,7 @@ bot.add_cog(CharacterSelector(bot, data)) # Character Selection
 bot.add_cog(Banker(bot, data)) # Bank
 bot.add_cog(DeckOfManyThings(bot, data)) # Deck of Many Things
 bot.add_cog(DiceRoller(bot, data))
+bot.add_cog(CurrencyConverter(bot, data))
 
 #COMMANDS:
 
@@ -304,32 +306,6 @@ async def vote(ctx,  *, args = None):
     embed = discord.Embed(description="If you have a moment, please [vote](https://top.gg/bot/500733845856059402) for Feyre on top.gg! This helps more people find the bot. Thanks :)")
     embed.set_image(url='https://media.giphy.com/media/zGnnFpOB1OjMQ/giphy.gif')
     await ctx.send(embed = embed)
-#endregion
-
-#region Currency
-
-async def currency_helper(ctx, args):
-    if (ctx.author.id not in data.userSet):
-        data.userSet.add(ctx.author.id)
-    data.statsDict['!currency'] += 1
-
-    if not args:
-        await ctx.send('''```Missing command arguments, see !help currency for more information.\nEx: !currency 10gp 55ep 5sp```''')
-        return
-    await ctx.send(await data.currency_converter.parse_input(args))
-
-@bot.command()
-async def currency(ctx, *, args = None):
-    await currency_helper(ctx, args)
-
-@bot.command()
-async def cur(ctx, *, args = None):
-    await currency_helper(ctx, args)
-
-@bot.command()
-async def convert(ctx, *, args = None):
-    await currency_helper(ctx, args)
-
 #endregion
 
 #region Weapon
@@ -659,17 +635,7 @@ async def Spell(ctx, *, args = None):
 async def Vote(ctx, *, args = None):
     await vote(ctx, args = args)
 
-@bot.command()
-async def Currency(ctx, *, args = None):
-    await currency(ctx, args = args)
 
-@bot.command()
-async def Cur(ctx, *, args = None):
-    await cur(ctx, args = args)
-
-@bot.command()
-async def Convert(ctx, *, args = None):
-    await convert(ctx, args = args)
 
 @bot.command()
 async def Weapon(ctx, *, args = None):

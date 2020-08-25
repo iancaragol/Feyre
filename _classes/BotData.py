@@ -15,7 +15,7 @@ from _classes.Class_Abilities import Class_Abil
 from _classes.Items import ItemLookup
 # from _classes.DeckOfMany import DeckOfMany
 from _classes.ClassFeatures import ClassFeatures
-from _classes.CurrencyConversion import CurrencyConverter
+# from _classes.CurrencyConversion import CurrencyConverter
 from _classes.Conditions import ConditionLookup
 # from _classes.Bank import Character, Bank
 
@@ -65,7 +65,7 @@ class BotData():
         self.item_lookup = ItemLookup()
         # self.deck_of_many = DeckOfMany()
         self.class_features = ClassFeatures()
-        self.currency_converter = CurrencyConverter()
+        # self.currency_converter = CurrencyConverter()
         self.condition_lookup = ConditionLookup()
 
         # self.bank = Bank()
