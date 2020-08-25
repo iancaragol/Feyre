@@ -5,6 +5,9 @@ import asyncio
 import operator
 import re
 
+import discord
+from discord.ext import commands
+
 from itertools import count, filterfalse
 from os import path
 from _classes.Character import Character
@@ -464,15 +467,25 @@ class Bank():
             elif character_name:
                 return f"""```{character_name} does not have a bank account. Try !bank to see your characters.```"""
             
-            
-        
 
-# def main():
-#     b = Bank()
-#     b.add_character(0, "Test Character")
-#     b.deposit(0, "Test Character", 0, 1, 2, 3, 4, 5)
+class Banker(commands.Cog):
+    def __init__(self, bot, data):
+        self.bot = bot
+        self.data = data
+        self.bank_class = Bank()
 
-#     b.remove_character(0, "Test Character", 0)
+    @commands.command()
+    async def bank(self, ctx, *, args = None):
+        if (ctx.author.id not in self.data.userSet):
+            self.data.userSet.add(ctx.author.id)
+        self.data.statsDict['!bank'] += 1
 
-# if __name__ == "__main__":
-#     main()
+        if not args:
+            await ctx.send(await self.bank_class.get_characters_formatted(ctx.author.id))
+
+        if args:
+            await ctx.send(await self.bank_class.parse_args(ctx.author.id, args))
+
+    @commands.command()
+    async def Bank(self, ctx, *, args = None):
+        await self.bank(ctx, args = args)

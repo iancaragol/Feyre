@@ -142,3 +142,31 @@ class SimpleDiceRoller(commands.Cog):
             msg = f'''```I didn't understand something about your input. Try !roll for more complicated expressions.```'''
 
         await ctx.send(msg)
+
+    @commands.command()
+    async def Dp(self, ctx, *, args = None):
+        await self.dp(ctx, args = args)
+
+    @commands.command()
+    async def D20(self, ctx, *, args = None):
+        await self.d20(ctx, args = args)
+
+    @commands.command()
+    async def D12(self, ctx, *, args = None):
+        await self.d12(ctx, args = args)
+
+    @commands.command()
+    async def D10(self, ctx, *, args = None):
+        await self.d10(ctx, args = args)
+
+    @commands.command()
+    async def D8(self, ctx, *, args = None):
+        await self.d8(ctx, args = args)
+
+    @commands.command()
+    async def D6(self, ctx, *, args = None):
+        await self.d6(ctx, args = args)
+
+    @commands.command()
+    async def D4(self, ctx, *, args = None):
+        await self.d4(ctx, args = args)

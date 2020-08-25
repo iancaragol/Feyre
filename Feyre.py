@@ -15,6 +15,7 @@ from _cogs.InitiativeTracker import InitiativeCog
 from _cogs.Help import Helper
 from _cogs.SimpleDiceRoll import SimpleDiceRoller
 from _cogs.CharacterSelection import CharacterSelector
+from _cogs.Bank import Banker
 
 import discord
 import asyncio
@@ -75,6 +76,7 @@ bot.add_cog(InitiativeCog(bot, data))
 bot.add_cog(Helper(bot, data))
 bot.add_cog(SimpleDiceRoller(bot, data))
 bot.add_cog(CharacterSelector(bot, data))
+bot.add_cog(Banker(bot, data))
 
 #COMMANDS:
 
@@ -632,25 +634,6 @@ async def change_presence(ctx, *, args):
 
 #endregion
 
-#region Bank
-@bot.command()
-async def bank(ctx, *, args = None):
-    """
-    Rolls any number of dice in any format including skill checks
-        Ex: !roll 1d20+5*6>100
-    """
-    if (ctx.author.id not in data.userSet):
-        data.userSet.add(ctx.author.id)
-    data.statsDict['!bank'] += 1
-
-    if not args:
-        await ctx.send(await data.bank.get_characters_formatted(ctx.author.id))
-
-    if args:
-        await ctx.send(await data.bank.parse_args(ctx.author.id, args))
-
-#endregion
-
 #region New
 @bot.command()
 async def new(ctx):
@@ -783,34 +766,6 @@ async def Randfeat(ctx, *, args = None):
     await randfeat(ctx)
 
 @bot.command()
-async def Dp(ctx, *, args = None):
-    await dp(ctx, args = args)
-
-@bot.command()
-async def D20(ctx, *, args = None):
-    await d20(ctx, args = args)
-
-@bot.command()
-async def D12(ctx, *, args = None):
-    await d12(ctx, args = args)
-
-@bot.command()
-async def D10(ctx, *, args = None):
-    await d10(ctx, args = args)
-
-@bot.command()
-async def D8(ctx, *, args = None):
-    await d8(ctx, args = args)
-
-@bot.command()
-async def D6(ctx, *, args = None):
-    await d6(ctx, args = args)
-
-@bot.command()
-async def D4(ctx, *, args = None):
-    await d4(ctx, args = args)
-
-@bot.command()
 async def Item(ctx, *, args = None):
     await item(ctx, args = args)
 
@@ -881,10 +836,6 @@ async def Quit(ctx, *, args = None):
 @bot.command()
 async def Change_presence(ctx, *, args = None):
     await change_presence(ctx, args = args)
-
-@bot.command()
-async def Bank(ctx, *, args = None):
-    await bank(ctx, args = args)
 
 @bot.command()
 async def New(ctx, *, args = None):

@@ -17,7 +17,7 @@ from _classes.DeckOfMany import DeckOfMany
 from _classes.ClassFeatures import ClassFeatures
 from _classes.CurrencyConversion import CurrencyConverter
 from _classes.Conditions import ConditionLookup
-from _classes.Bank import Character, Bank
+# from _classes.Bank import Character, Bank
 
 # from _classes.HelpHandler import HelpHandler
 from _classes.StatsHandler import StatsHandler
@@ -68,7 +68,7 @@ class BotData():
         self.currency_converter = CurrencyConverter()
         self.condition_lookup = ConditionLookup()
 
-        self.bank = Bank()
+        # self.bank = Bank()
         # self.help_handler = HelpHandler()
         self.stats_handler = StatsHandler()
         # self.character_selection_handler = CharacterSelectionHandler()
