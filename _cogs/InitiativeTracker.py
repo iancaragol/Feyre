@@ -1,5 +1,6 @@
 import discord
 import textwrap
+import asyncio
 from discord.ext import commands
 from operator import attrgetter
 from _classes.DiceRolls import Roller
@@ -9,8 +10,7 @@ from _classes.CharacterSelection import CharacterSelectionHandler
 class PlayerCharacter:
     def __init__(self, user_id, name, init_mod, init_value):
         self.user_id = user_id
-        self.character_name = name
-        self.init_mod = init_mod
+        self.character_name = name[:32] + '...' if len(name) > 32 else name
         self.init_value = init_value
 
 
@@ -39,6 +39,8 @@ class InitiativeTracker:
 
         if self.verbose:
             self.init_messages.append(f"{name} was added to initiative.")
+
+        return True
 
     async def remove_player(self, user_id, name = None):
         if len(self.add_order) == 0:
@@ -77,9 +79,9 @@ class InitiativeTracker:
         self.content += f"\n[Round: {self.round_count}]"
         for i in range(len(self.character_list)):
             if i == self.marker_pos:
-                self.content += f"\n> {self.character_list[i].character_name} {self.character_list[i].init_value}"
+                self.content += f"\n> {self.character_list[i].character_name} [{self.character_list[i].init_value}]"
             else:
-                self.content += f"\n{self.character_list[i].character_name} {self.character_list[i].init_value}"
+                self.content += f"\n{self.character_list[i].character_name} [{self.character_list[i].init_value}]"
 
         self.content += "\n"
         count = 0
@@ -94,6 +96,14 @@ class InitiativeTracker:
     async def get_contents(self):
         return self.content
 
+    async def timeout_tracker(self):
+        self.footer = "\nThis initiative tracker has timed out after 3 days of inactivity. You will need to create a new one using !init start.```"
+    async def add_error_msg(self, error_msg):
+        self.footer = "\n" + error_msg + "```"
+
+    async def reset_footer(self):
+        self.footer = "```"
+
     async def parse_args(self, user_id, args):
         name = ""
         init_mod = ""
@@ -102,7 +112,10 @@ class InitiativeTracker:
         if '-i' in args.strip().lower():
             name = args[:args.index('-i')].strip()
             init_mod = args[args.index('-i') + 2:].strip()
-            await self.add_player(user_id, name, init_mod)
+            added = await self.add_player(user_id, name, init_mod)
+
+            if added:
+                return added
 
 
         elif '-r' in args.strip().lower():
@@ -113,17 +126,32 @@ class InitiativeTracker:
             else:
                 await self.remove_player(user_id) # Otherwise remove the last character added by that player
         else:
-            split = args.splt(' ')
+            split = args.strip().split(' ')
+            name = ""
+            init_mod = ""
             for s in split:
                 total = await self.dr.parse(s, total_only=True)
-                print(total)
+                if total != "```I'm sorry, there was something I didnt understand about your input. See !help roll for more info```": # TODO Remove this when dice roller is rewritten. 
+                    init_mod = s
+            
+            name = " ".join([str(item) for item in split]).replace(init_mod, '').strip()
+            
+            if init_mod == "": # Default to 1d20
+                init_mod = "1d20"
+            
+            added = await self.add_player(user_id, name, init_mod)
+
+            if added:
+                return added
 
     async def move_marker(self):
         self.marker_pos += 1
         if self.marker_pos == len(self.character_list):
             self.round_count += 1
             self.marker_pos = 0
-
+        elif len(self.character_list) == 0:
+            self.marker_pos = 0
+            
 class InitiativeCog(commands.Cog):
     tracker_dict = {}
     msg_dict = {}
@@ -131,12 +159,23 @@ class InitiativeCog(commands.Cog):
     skull = '☠️'
     swords = '⚔️'
 
-    def __init__(self, bot):
+    dm_error_msg = "`An initiative tracker cannot be started in DM's. Try creating one in a guild channel instead.`"
+
+    def __init__(self, bot, data):
         self.bot = bot
         self.character_selector = CharacterSelectionHandler()
+        self.data = data
 
     @commands.command()
-    async def init_cogs(self, ctx, *, args = None):
+    async def init(self, ctx, *, args = None):
+        if (ctx.author.id not in self.data.userSet):
+            self.data.userSet.add(ctx.author.id)
+        self.data.statsDict['!init'] += 1
+
+        if ctx.channel.type is discord.ChannelType.private: # If user has DM'd the bot
+            await ctx.send(self.dm_error_msg)
+            return
+
         tracker_key = str(ctx.guild.id) + ":" + str(ctx.channel.id)
         if not args and tracker_key not in self.tracker_dict.keys(): # No tracker in this channel
             await ctx.send("```asciidoc\nYou need to start an initiative tracker in this channel before adding a character using [!init start]```")
@@ -157,20 +196,53 @@ class InitiativeCog(commands.Cog):
                 await self.send_msg_helper(ctx, tracker_key, contents, None, False)
 
             else:
-                await self.tracker_dict[tracker_key].parse_args(ctx.author.id, args)
+                added = await self.tracker_dict[tracker_key].parse_args(ctx.author.id, args)
                 await self.tracker_dict[tracker_key].update_contents()
+
+                if added:
+                    self.data.statsDict['chars_added'] += 1
+                    
 
                 contents = await self.tracker_dict[tracker_key].get_contents()
                 await self.send_msg_helper(ctx, tracker_key, contents, None, True)
 
             
         else:
-            await ctx.send("`This doesnt do anything yet but it will add your active character`")
+            # await ctx.send("`This doesnt do anything yet but it will add your active character`")
+            new_character = await self.character_selector.get_selected_character(ctx.author.id)
+
+            if new_character == None:
+                await self.tracker_dict[tracker_key].add_error_msg("No character selected! Select a character using the !char command.")
+                await self.tracker_dict[tracker_key].update_contents()
+            else:
+                await self.tracker_dict[tracker_key].add_player(ctx.author.id, new_character.character_name, new_character.init_mod)
+                await self.tracker_dict[tracker_key].update_contents()
+                self.data.statsDict['chars_added'] += 1
+
+            contents = await self.tracker_dict[tracker_key].get_contents()
+            await self.send_msg_helper(ctx, tracker_key, contents, None, True)
+
+    @commands.command()
+    async def i(self, ctx, *, args = None):
+        await self.init(ctx, args = args)
+    
+    @commands.command()
+    async def Init(self, ctx, *, args = None):
+        await self.init(ctx, args = args)
+
+    @commands.command()
+    async def I(self, ctx, *, args = None):
+        await self.init(ctx, args = args)
 
     async def add_reactions_helper(self, msg):     
         await msg.add_reaction(self.swords)
         await msg.add_reaction(self.plus)
         await msg.add_reaction(self.skull)
+
+    async def remove_reactions_helper(self, msg):
+        await msg.clear_reaction(self.skull)
+        await msg.clear_reaction(self.plus)
+        await msg.clear_reaction(self.swords)
 
     async def send_msg_helper(self, ctx, tracker_key, contents, msg, repost):
         if not msg and not repost: # If this was called through a command and not through a reaction
@@ -187,33 +259,54 @@ class InitiativeCog(commands.Cog):
             msg = await ctx.send(contents)
             self.msg_dict[tracker_key] = msg
             await self.add_reactions_helper(msg)
-        
-        reaction, user = await self.bot.wait_for('reaction_add', check=lambda r, u:u.id != self.bot.user.id and r.message.id == msg.id, timeout=21600) # Times out after 6 hours
 
-        if reaction != None:
-            if str(reaction.emoji) == self.plus:
-                # Get users active character, add it to tracker, then update tracker contents for display
-                new_character = await self.character_selector.get_selected_character(user.id)
-                await self.tracker_dict[tracker_key].add_player(user.id, new_character.character_name, new_character.init_mod)
-                await self.tracker_dict[tracker_key].update_contents()
-                content = await self.tracker_dict[tracker_key].get_contents()
+        await self.tracker_dict[tracker_key].reset_footer()
+           
+        try:           
+            reaction, user = await self.bot.wait_for('reaction_add', check=lambda r, u:u.id != self.bot.user.id and r.message.id == msg.id, timeout=259200) # Times out after 3 days
 
-                await reaction.remove(user) # Remove users reaction
-                await self.send_msg_helper(ctx, tracker_key, content, msg, False)
+            if reaction != None:
+                if str(reaction.emoji) == self.plus:
+                    # Get users active character, add it to tracker, then update tracker contents for display
+                    new_character = await self.character_selector.get_selected_character(user.id)
 
-            elif str(reaction.emoji) == self.skull:
-                # Get users active character, add it to tracker, then update tracker contents for display
-                await self.tracker_dict[tracker_key].remove_player(user.id)
-                await self.tracker_dict[tracker_key].update_contents()
-                content = await self.tracker_dict[tracker_key].get_contents()
+                    if new_character == None:
+                        await self.tracker_dict[tracker_key].add_error_msg("No character selected! Select a character using the !char command.")
+                        await self.tracker_dict[tracker_key].update_contents()
 
-                await reaction.remove(user) # Remove users reaction
-                await self.send_msg_helper(ctx, tracker_key, content, msg, False)
+                    else:
+                        await self.tracker_dict[tracker_key].add_player(user.id, new_character.character_name, new_character.init_mod)
+                        await self.tracker_dict[tracker_key].update_contents()
+                        self.data.statsDict['chars_added'] += 1
 
-            elif str(reaction.emoji) == self.swords:
-                await self.tracker_dict[tracker_key].move_marker()
-                await self.tracker_dict[tracker_key].update_contents()
-                content = await self.tracker_dict[tracker_key].get_contents()
+                    content = await self.tracker_dict[tracker_key].get_contents()
 
-                await reaction.remove(user)
-                await self.send_msg_helper(ctx, tracker_key, content, msg, False)
+                    await reaction.remove(user) # Remove users reaction
+                    await self.send_msg_helper(ctx, tracker_key, content, msg, False)
+
+                elif str(reaction.emoji) == self.skull:
+                    # Get users active character, add it to tracker, then update tracker contents for display
+                    await self.tracker_dict[tracker_key].remove_player(user.id)
+                    await self.tracker_dict[tracker_key].update_contents()
+                    content = await self.tracker_dict[tracker_key].get_contents()
+
+                    await reaction.remove(user) # Remove users reaction
+                    await self.send_msg_helper(ctx, tracker_key, content, msg, False)
+
+                elif str(reaction.emoji) == self.swords:
+                    await self.tracker_dict[tracker_key].move_marker()
+                    await self.tracker_dict[tracker_key].update_contents()
+                    content = await self.tracker_dict[tracker_key].get_contents()
+
+                    await reaction.remove(user)
+                    await self.send_msg_helper(ctx, tracker_key, content, msg, False)
+            
+        except asyncio.exceptions.TimeoutError:
+            await self.tracker_dict[tracker_key].timeout_tracker()
+            await self.tracker_dict[tracker_key].update_contents()
+            content = await self.tracker_dict[tracker_key].get_contents()
+            await self.msg_dict[tracker_key].edit(content=content)
+            await self.remove_reactions_helper(msg)
+            del self.tracker_dict[tracker_key]
+            del self.msg_dict[tracker_key]
+            return # Now that this has timed out there is no need to wait on it

@@ -1,7 +1,10 @@
 import textwrap
+import discord
+from discord.ext import commands
 
-class HelpHandler:
-    def __init__(self):
+
+class Helper(commands.Cog):
+    def __init__(self, bot, data):
         self.command_list = [
             "help", "hello", "init", 
             "roll", "d", "gm",
@@ -11,6 +14,9 @@ class HelpHandler:
             "stats", "request", "admin", 
             "new", "vote"
         ]
+
+        self.bot = bot
+        self.data = data
 
 #region Help_Strings
         self.help_str_base = textwrap.dedent(
@@ -437,7 +443,20 @@ class HelpHandler:
 
 #endregion
 
-    async def help(self, args):
+    @commands.command()
+    async def help(self, ctx, *, args = None):
+        if (ctx.author.id not in self.data.userSet):
+            self.data.userSet.add(ctx.author.id)
+        self.data.statsDict['!help'] += 1
+
+        if args != None:
+            args = args.strip().lower()
+
+        help_str = await self.helper(args)
+
+        await ctx.send(help_str)
+
+    async def helper(self, args):
         if not args:
             return self.help_str_base
 

@@ -1,7 +1,7 @@
 class Character():
     def __init__(self, user_id, character_name, character_id, pp, gp, ep, sp, cp, init_mod = None, selected = False):
         self.user_id = user_id
-        self.character_name = character_name
+        self.character_name = character_name[:32] + '...' if len(character_name) > 32 else character_name
         self.character_id = character_id
         self.pp = pp
         self.gp = gp

@@ -9,7 +9,7 @@ from _classes.Monster import MonsterManual
 from _classes.Feat import Feats
 from _classes.Spellbook import Sb
 from _classes.DiceRolls import Roller
-from _classes.Init import Initiative
+# from _classes.Init import Initiative
 from _classes.Weapons import Weapons
 from _classes.Class_Abilities import Class_Abil
 from _classes.Items import ItemLookup
@@ -19,7 +19,7 @@ from _classes.CurrencyConversion import CurrencyConverter
 from _classes.Conditions import ConditionLookup
 from _classes.Bank import Character, Bank
 
-from _classes.HelpHandler import HelpHandler
+# from _classes.HelpHandler import HelpHandler
 from _classes.StatsHandler import StatsHandler
 from _classes.CharacterSelection import CharacterSelectionHandler
 
@@ -69,13 +69,13 @@ class BotData():
         self.condition_lookup = ConditionLookup()
 
         self.bank = Bank()
-        self.help_handler = HelpHandler()
+        # self.help_handler = HelpHandler()
         self.stats_handler = StatsHandler()
         self.character_selection_handler = CharacterSelectionHandler()
 
         #Initiative tracking dictionaries
-        self.initDict = {}
-        self.initEmbedDict = {}
+        # self.initDict = {}
+        # self.initEmbedDict = {}
 
         self.roll_dict = {}
 

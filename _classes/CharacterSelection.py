@@ -88,7 +88,6 @@ class CharacterSelectionHandler:
         if results:
             for result in results:
                 character = Character(user_id, result.characterName, int(result.characterId), int(result.pp), int(result.gp), int(result.ep), int(result.sp), int(result.cp), selected=bool(result.selected), init_mod=str(result.initMod))
-                print("CH: " + result.characterName)
                 characters.append(character)
 
         await cursor.close()
