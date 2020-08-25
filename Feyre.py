@@ -14,6 +14,7 @@ from _classes.BotData import BotData
 from _cogs.InitiativeTracker import InitiativeCog
 from _cogs.Help import Helper
 from _cogs.SimpleDiceRoll import SimpleDiceRoller
+from _cogs.CharacterSelection import CharacterSelector
 
 import discord
 import asyncio
@@ -73,6 +74,7 @@ bot.remove_command('help')
 bot.add_cog(InitiativeCog(bot, data))
 bot.add_cog(Helper(bot, data))
 bot.add_cog(SimpleDiceRoller(bot, data))
+bot.add_cog(CharacterSelector(bot, data))
 
 #COMMANDS:
 
@@ -93,6 +95,10 @@ async def hello(ctx):
     embed.set_image(url='https://cdn.discordapp.com/attachments/401837411291627524/538476988357148675/hello.gif')
     await ctx.send(embed=embed)
 #endregion
+
+@bot.command()
+async def ping(ctx):
+    await ctx.send('`Pong! {0}ms`'.format(round(bot.latency, 3)))
 
 #region Dice Rolls
 @bot.command()
@@ -466,12 +472,6 @@ async def dom(ctx, *, args = None):
 
 #endregion
 
-#region Initiative
-
-
-
-#endregion
-
 #region Tor    
 @bot.command()
 async def tor(ctx, *, args):
@@ -649,42 +649,6 @@ async def bank(ctx, *, args = None):
     if args:
         await ctx.send(await data.bank.parse_args(ctx.author.id, args))
 
-#endregion
-
-#region Character
-@bot.command()
-async def character(ctx, *, args = None):
-    contents = await data.character_selection_handler.parse_args(ctx.author.id, args = args)
-    characters = await data.character_selection_handler.get_characters(ctx.author.id)
-    msg = await ctx.send(contents)
-
-    # Add reactions for managing the character
-
-    if args == None:
-        numerals = ['1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣', '6️⃣', '7️⃣', '8️⃣', '9️⃣']
-
-        for c in characters:
-            await msg.add_reaction(numerals[c.character_id-1])
-
-        await character_helper(ctx, args, contents, msg)
-    
-
-async def character_helper(ctx, args, contents, msg):
-    numerals = ['1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣', '6️⃣', '7️⃣', '8️⃣', '9️⃣']
-
-
-    reaction, u = await bot.wait_for('reaction_add', check=lambda r, u:u.id != bot.user.id and r.message.id == msg.id, timeout=21600)
-
-    if reaction != None:
-        selected_id = numerals.index(str(reaction.emoji))+1
-        print(selected_id)
-        await data.character_selection_handler.select_character(ctx.author.id, selected_id)
-        new_contents = await data.character_selection_handler.get_characters_formatted(ctx.author.id)
-        print(new_contents)
-        await msg.edit(content=new_contents)
-        await reaction.remove(u)
-        await character_helper(ctx, args, new_contents, msg)
-            
 #endregion
 
 #region New

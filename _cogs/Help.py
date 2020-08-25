@@ -72,26 +72,34 @@ class Helper(commands.Cog):
         self.help_str_init = textwrap.dedent(
             '''
             ```
-            !init is a per channel based initiative tracker. Click the Crossed Swords icon to move to the next round!
+            !init is a per channel based initiative tracker. 
+
+            Buttons:
+                Crossed Swords : Moves turn icon (>).
+                Plus Sign : Adds user's active character to initiative, see !help character for details.
+                Skull and Crossbones : Removes the user's most recent character from initiative.
+
             If you need to insert a player into the middle of initative use decimals.
 
             Commands (can be shortened to !i):
             !init start
                 > Starts a new initiative tracker in the same channel, also used to create a new one
+            !init start -v
+                > Starts a new initative trcker with verbosity.
             !init
-                > Adds the player to initiative with their discord username and rolls 1d20 for them
+                > Adds the player to initiative with their active character and that characters initiative modifier.
             !init [player name]
                 > Adds a player with [player name] to initiative and rolls 1d20 for them
             !init [player name] [initiative]
-                > Adds a player with [player name] and [initiative] to iniative.
-            !init remove [player name] or !init -r [player name]
+                > Adds a player with [player name] and [initiative] to initiative.
+            !init [player name] -i [any dice expression]
+                > Adds a player with [player name] and rolls any dice expression for them.
+            !!init -r [player name]
                 > Removes a player from initiative. 
+            !init -r
+                > Removes the most recent player added by the user from initiative.
             !init [name] [modifier] or [modifier] [name]
                 > Adds a player to inititative after rolling 1d20 and applying the modifier.
-            !init reset
-                > Restarts the initiative tracker with the same initiative values for each player.
-            !init round [num]
-                > Changes the current round to [num]
 
             Ex:
             !init start

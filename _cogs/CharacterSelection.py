@@ -5,6 +5,8 @@ from os import path
 
 import aioodbc
 import operator
+import discord
+from discord.ext import commands
 
 import pyodbc
 from _classes.Character import Character
@@ -252,3 +254,40 @@ class CharacterSelectionHandler:
             except Exception as e:
                 print(e)
                 return "```Something went wrong. Check your character's id and try again. See !help characters for more info. \n\nIf you believe this is a bug use the !request command to report it.```"
+
+class CharacterSelector(commands.Cog):
+    def __init__(self, bot, data):
+        self.bot = bot
+        self.data = data
+        self.character_selection_handler = CharacterSelectionHandler()
+
+    @commands.command()
+    async def character(self, ctx, *, args = None):
+        contents = await self.character_selection_handler.parse_args(ctx.author.id, args = args)
+        characters = await self.character_selection_handler.get_characters(ctx.author.id)
+        msg = await ctx.send(contents)
+
+        # Add reactions for managing the character
+
+        if args == None:
+            numerals = ['1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣', '6️⃣', '7️⃣', '8️⃣', '9️⃣']
+
+            for c in characters:
+                await msg.add_reaction(numerals[c.character_id-1])
+
+            await self.character_helper(ctx, args, contents, msg)
+        
+
+    async def character_helper(self, ctx, args, contents, msg):
+        numerals = ['1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣', '6️⃣', '7️⃣', '8️⃣', '9️⃣']
+
+
+        reaction, u = await self.bot.wait_for('reaction_add', check=lambda r, u:u.id != self.bot.user.id and r.message.id == msg.id, timeout=21600)
+
+        if reaction != None:
+            selected_id = numerals.index(str(reaction.emoji))+1
+            await self.character_selection_handler.select_character(ctx.author.id, selected_id)
+            new_contents = await self.character_selection_handler.get_characters_formatted(ctx.author.id)
+            await msg.edit(content=new_contents)
+            await reaction.remove(u)
+            await self.character_helper(ctx, args, new_contents, msg)

@@ -4,7 +4,7 @@ import asyncio
 from discord.ext import commands
 from operator import attrgetter
 from _classes.DiceRolls import Roller
-from _classes.CharacterSelection import CharacterSelectionHandler
+from _cogs.CharacterSelection import CharacterSelectionHandler
 
 
 class PlayerCharacter:
