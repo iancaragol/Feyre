@@ -11,7 +11,7 @@ aeval = Interpreter()
 #rolls dice
 #accepts input in the form of !roll #dTYPE ex: !roll 1d20 + 5
 class Roller():
-    async def parse(self, inp, gm = False):
+    async def parse(self, inp, gm = False, total_only = False):
         """
         Parses a string of the format !roll #d# +,/,*,- #d# or # ... evaulated 
         Ex: !roll 5d20 + 1d6 * 2
@@ -97,6 +97,9 @@ class Roller():
         evalStr = ''.join(str(e) for e in evalled)
         rollExpStr = ''.join(str(e) for e in rollExp)
         total = aeval(evalStr)
+
+        if total_only:
+            return total
 
         if(advantage or disadvantage):
             return self.constructReturnStringAdvantage(advantage, disadvantage, rollExpStr, unEvalStr, unEvalStrAdv, total, totalAdv)

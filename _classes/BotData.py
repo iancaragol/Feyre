@@ -21,6 +21,7 @@ from _classes.Bank import Character, Bank
 
 from _classes.HelpHandler import HelpHandler
 from _classes.StatsHandler import StatsHandler
+from _classes.CharacterSelection import CharacterSelectionHandler
 
 class BotData():
     """
@@ -70,6 +71,7 @@ class BotData():
         self.bank = Bank()
         self.help_handler = HelpHandler()
         self.stats_handler = StatsHandler()
+        self.character_selection_handler = CharacterSelectionHandler()
 
         #Initiative tracking dictionaries
         self.initDict = {}

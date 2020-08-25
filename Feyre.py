@@ -12,6 +12,8 @@ from datetime import datetime
 from _classes.BotData import BotData
 from _classes.Init import Initiative
 
+from _classes.InitiativeTracker import InitiativeCog
+
 import discord
 import asyncio
 import sys
@@ -63,6 +65,7 @@ async def codify(string, title = None):
 data = BotData()
 bot = commands.Bot(command_prefix = get_pre)
 bot.remove_command('help')
+bot.add_cog(InitiativeCog(bot))
 aeval = Interpreter()
 
 
@@ -608,18 +611,20 @@ async def dom(ctx, *, args = None):
 
 @bot.event
 async def on_raw_reaction_add(payload):
-    init_key = str(payload.guild_id) + ":" + str(payload.channel_id)
-    if(init_key in data.initDict.keys()):
-        channel = bot.get_channel(payload.channel_id)
-        msg = await channel.fetch_message(payload.message_id)
+    cross = '\N{CROSSED SWORDS}'
+    if(str(payload.emoji) == cross):
+        init_key = str(payload.guild_id) + ":" + str(payload.channel_id)
+        if(init_key in data.initDict.keys()):
+            channel = bot.get_channel(payload.channel_id)
+            msg = await channel.fetch_message(payload.message_id)
 
-        init = data.initDict[init_key]
+            init = data.initDict[init_key]
 
-        reaction = get(msg.reactions, emoji=payload.emoji.name)
-        if reaction and reaction.count > 1:
-            #init.round_count += 1
-            init.marker_count += 1
-            await update_init(init_key)
+            reaction = get(msg.reactions, emoji=payload.emoji.name)
+            if reaction and reaction.count > 1:
+                #init.round_count += 1
+                init.marker_count += 1
+                await update_init(init_key)
     
 
 async def update_init(key):
@@ -634,7 +639,25 @@ async def update_init(key):
     data.initEmbedDict[key] = await  old_msg.channel.send(codeBlock)
 
     cross = '\N{CROSSED SWORDS}'
+    plus = '➕'
     await data.initEmbedDict[key].add_reaction(cross)
+    await data.initEmbedDict[key].add_reaction(plus)
+
+    print("Updated init")
+    print("Key" + str(key))
+    print("Old msg id: " + str(old_msg.id))
+    print("Init Dict Key: " + str(data.initEmbedDict[key].id))
+    reaction, u = await bot.wait_for('reaction_add', check=lambda r, u:str(r.emoji) == '➕' and u.id != bot.user.id and r.message.id == data.initEmbedDict[key].id, timeout=21600)
+    print(reaction.message.id)
+
+    if reaction != None:
+        print("User clicked plus sign")
+        selected_character = await data.character_selection_handler.get_selected_character(u.id)
+        print(selected_character.character_name)
+        print(selected_character.init_mod)
+        rolled_init = await data.diceRoller.parse(selected_character.init_mod, total_only=True)
+        data.initDict[key].addPlayer(selected_character.character_name, rolled_init)
+        await update_init(key)
 
 async def init_helper(ctx, args):
     """
@@ -657,9 +680,14 @@ async def init_helper(ctx, args):
 = Initiative = 
 [Round: {}]```'''.format(i.round_count)
         msg = await ctx.send(codeBlock)
+        plus = '➕'
         cross = '\N{CROSSED SWORDS}'
+
         await msg.add_reaction(cross)
+        await msg.add_reaction(plus)
+
         data.initEmbedDict[key] = msg
+        await update_init(key)
 
     elif (args.strip().startswith('reset')):
         argsStr = str(args)
@@ -724,7 +752,7 @@ async def init_helper(ctx, args):
                     name = split[0]
                     if split[1].startswith("+") or split[1].startswith("-") or split[1].startswith("/") or split[1].startswith("*"):
                         roll = random.randint(1, 20)
-                        init = aeval(str(roll) + split[1])
+                        init = data.diceRoller.parse(str(roll)+split[1], total_only=True)#aeval(str(roll) + split[1])
 
                     #name roll
                     elif split[1][0].isdigit():
@@ -1005,6 +1033,41 @@ async def bank(ctx, *, args = None):
 
 #endregion
 
+#region Character
+@bot.command()
+async def character(ctx, *, args = None):
+    contents = await data.character_selection_handler.parse_args(ctx.author.id, args = args)
+    characters = await data.character_selection_handler.get_characters(ctx.author.id)
+    msg = await ctx.send(contents)
+
+    # Add reactions for managing the character
+
+    if args == None:
+        numerals = ['1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣', '6️⃣', '7️⃣', '8️⃣', '9️⃣']
+
+        for c in characters:
+            await msg.add_reaction(numerals[c.character_id-1])
+
+        await character_helper(ctx, args, contents, msg)
+    
+
+async def character_helper(ctx, args, contents, msg):
+    numerals = ['1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣', '6️⃣', '7️⃣', '8️⃣', '9️⃣']
+
+
+    reaction, u = await bot.wait_for('reaction_add', check=lambda r, u:u.id != bot.user.id and r.message.id == msg.id, timeout=21600)
+
+    if reaction != None:
+        selected_id = numerals.index(str(reaction.emoji))+1
+        print(selected_id)
+        await data.character_selection_handler.select_character(ctx.author.id, selected_id)
+        new_contents = await data.character_selection_handler.get_characters_formatted(ctx.author.id)
+        print(new_contents)
+        await msg.edit(content=new_contents)
+        await reaction.remove(u)
+        await character_helper(ctx, args, new_contents, msg)
+            
+#endregion
 
 #region New
 @bot.command()

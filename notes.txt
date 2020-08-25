@@ -1,0 +1,2 @@
+Test Bot Invite:
+https://discord.com/oauth2/authorize?client_id=505120997658329108&permissions=124992&scope=bot
