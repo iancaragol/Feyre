@@ -11,7 +11,7 @@ from _classes.Spellbook import Sb
 # from _classes.DiceRolls import Roller
 # from _classes.Init import Initiative
 from _classes.Weapons import Weapons
-from _classes.Class_Abilities import Class_Abil
+# from _classes.Class_Abilities import Class_Abil
 from _classes.Items import ItemLookup
 # from _classes.DeckOfMany import DeckOfMany
 from _classes.ClassFeatures import ClassFeatures

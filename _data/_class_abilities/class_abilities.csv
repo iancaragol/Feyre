@@ -1,0 +1,20 @@
+Barbarian,Rage,"In battle, you fight with primal ferocity. On Your Turn, you can enter a rage as a Bonus Action.
+
+While raging, you gain the following benefits if you aren't wearing heavy armor:
+
+- You have advantage on Strength Checks and Strength Saving Throws.
+
+- When you make a melee weapon Attack using Strength, you gain a +2 bonus to the damage roll. This bonus increases as you level.
+
+- You have Resistance to bludgeoning, piercing, and slashing damage.
+
+If you are able to cast Spells, you can't cast them or concentrate on them while raging.
+
+Your rage lasts for 1 minute. It ends early if you are knocked Unconscious or if Your Turn ends and you haven't attacked a Hostile creature since your last turn or taken damage since then. You can also end your rage on Your Turn as a Bonus Action.
+
+Once you have raged the maximum number of times for your Barbarian level, you must finish a Long Rest before you can rage again. You may rage 2 times at 1st level, 3 at 3rd, 4 at 6th, 5 at 12th, and 6 at 17th."
+Barbarian,Unarmored Defense,"While you are not wearing any armor, your Armor Class equals 10 + your Dexterity modifier + your Constitution modifier. You can use a Shield and still gain this benefit."
+Barbarian,Danger Sense,"At 2nd Level, you gain an uncanny sense of when things nearby aren't as they should be, giving you an edge when you dodge away from danger. You have advantage on Dexterity Saving Throws against Effects that you can see, such as traps and Spells. To gain this benefit, you can't be Blinded, Deafened, or Incapacitated."
+Barbarian,Reckless Attack,"Starting at 2nd Level, you can throw aside all concern for Defense to Attack with fierce desperation. When you make your first Attack on Your Turn, you can decide to Attack recklessly. Doing so gives you advantage on melee weapon Attack rolls using Strength during this turn, but Attack rolls against you have advantage until your next turn."
+Barbarian,Primal Path,"At 3rd Level, you choose a path that shapes the Nature of your rage, such as the Path of the Berserker. Your choice grants you features at 3rd Level and again at 6th, 10th, and 14th levels."
+Barbarian,Ability Score Improvement,"When you reach 4th Level, and again at 8th, 12th, 16th, and 19th level, you can increase one ability score of your choice by 2, or you can increase two Ability Scores of your choice by 1. As normal, you can’t increase an ability score above 20 using this feature."

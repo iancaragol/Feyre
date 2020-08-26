@@ -20,6 +20,7 @@ from _cogs.DeckOfManyThings import DeckOfManyThings
 from _cogs.DiceRolls import DiceRoller
 from _cogs.CurrencyConversion import CurrencyConverter
 from _cogs.Administrator import Administrator
+from _cogs.ClassAbilities import ClassAbilityLookupCog
 
 import discord
 import asyncio
@@ -85,6 +86,7 @@ bot.add_cog(DeckOfManyThings(bot, data)) # Deck of Many Things
 bot.add_cog(DiceRoller(bot, data)) # Dice Rolling
 bot.add_cog(CurrencyConverter(bot, data)) # Currency Converstion
 bot.add_cog(Administrator(bot, data)) # Adminstrator Commands
+bot.add_cog(ClassAbilityLookupCog(bot, data))
 
 #COMMANDS:
 
