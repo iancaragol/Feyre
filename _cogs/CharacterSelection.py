@@ -237,20 +237,20 @@ class CharacterSelectionHandler:
         if "-a" in args_list: # Add character
             if "-i" not in args_list: # If no init is included
                 try:
-                    return await self.add_character(user_id, "".join(args_list[args_list.index("-a")+1:]).strip(), "1d20")
+                    return await self.add_character(user_id, " ".join(args_list[args_list.index("-a")+1:]).strip(), "1d20")
                 except Exception as e:
                     print(e)
                     return "```Something went wrong. Are you missing your character's name? See !help characters for more info. \n\nIf you believe this is a bug use the !request command to report it.```"
             else: # Init is included
                 try:
-                    return await self.add_character(user_id, "".join(args_list[args_list.index("-a")+1:args_list.index("-i")]).strip(), "".join(args_list[args_list.index("-i")+1:]).strip())
+                    return await self.add_character(user_id, " ".join(args_list[args_list.index("-a")+1:args_list.index("-i")]).strip(), " ".join(args_list[args_list.index("-i")+1:]).strip())
                 except Exception as e:
                     print(e)
                     return "```Something went wrong. Are you missing your character's initiative or name? See !help characters for more info. \n\nIf you believe this is a bug use the !request command to report it.```"
 
         if "-r" in args_list:
             try:
-                return await self.remove_character(user_id, int("".join(args_list[args_list.index("-r")+1:]).strip()))
+                return await self.remove_character(user_id, int(" ".join(args_list[args_list.index("-r")+1:]).strip()))
             except Exception as e:
                 print(e)
                 return "```Something went wrong. Check your character's id and try again. See !help characters for more info. \n\nIf you believe this is a bug use the !request command to report it.```"

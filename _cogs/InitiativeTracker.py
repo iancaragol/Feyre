@@ -32,7 +32,15 @@ class InitiativeTracker:
     async def add_player(self, user_id, name, init_mod):
         init_value = await self.dr.parse(init_mod, total_only=True) # Roll init_mod to get value
         new_pc = PlayerCharacter(user_id, name, init_mod, init_value)
-        self.add_order.append(new_pc)
+        updated = False
+
+        for i in range(len(self.add_order)):
+            if self.add_order[i].character_name == new_pc.character_name:
+                self.add_order[i] = new_pc
+                updated = True
+
+        if not updated:
+            self.add_order.append(new_pc)
         self.character_list = list(self.add_order)
 
         self.character_list.sort(key = attrgetter('init_value'), reverse = True)
@@ -47,7 +55,19 @@ class InitiativeTracker:
             return
 
         if name: # If name is provided then remove specific character with that name
-            self.add_order = [i for i in self.add_order if i.character_name != name] # Remove that character
+            #self.add_order = [i for i in self.add_order if i.character_name != name and i.user_id != user_id] # Remove that character
+
+            del_index = None
+            for i in range(len(self.add_order)):
+                if self.add_order[i].character_name.strip() == name.strip() and self.add_order[i].user_id == user_id:
+                    del_index = i
+                    break
+            
+            if del_index != None:
+                # print(f"Deleting {self.add_order[del_index].character_name}")
+                del self.add_order[del_index]
+
+
             self.character_list = list(self.add_order)
             self.character_list.sort(key = attrgetter('init_value'), reverse = True)
 
@@ -55,15 +75,15 @@ class InitiativeTracker:
                 self.init_messages.append(f"{name} was removed from initiative.")
 
         else: # If name is not provided then delete the most recent character added by that player
-            i = len(self.character_list) - 1
+            i = len(self.add_order) - 1
             while(i > 0):
-                if self.character_list[i].user_id == user_id:
+                if self.add_order[i].user_id == user_id:
+                    del self.add_order[i]
                     break
                 i -= 1
 
             if self.verbose:
                 self.init_messages.append(f"{self.add_order[i].character_name} was removed from initiative.")
-            del self.add_order[i]
             self.character_list = sorted(self.add_order, key=lambda x: x.init_value, reverse=True)
 
     async def update_player(self, user_id, name, init_mod):
@@ -134,7 +154,10 @@ class InitiativeTracker:
                 if total != "```I'm sorry, there was something I didnt understand about your input. See !help roll for more info```": # TODO Remove this when dice roller is rewritten. 
                     init_mod = s
             
-            name = " ".join([str(item) for item in split]).replace(init_mod, '').strip()
+            for s in split:
+                name += " " + str(s)
+
+            name = name.replace(init_mod, '').strip()
             
             if init_mod == "": # Default to 1d20
                 init_mod = "1d20"
@@ -160,6 +183,7 @@ class InitiativeCog(commands.Cog):
     swords = '⚔️'
 
     dm_error_msg = "`An initiative tracker cannot be started in DM's. Try creating one in a guild channel instead.`"
+    start_msg = "`You need to start an initiative tracker in this channel before adding a character using [!init start]`"
 
     def __init__(self, bot, data):
         self.bot = bot
@@ -177,8 +201,9 @@ class InitiativeCog(commands.Cog):
             return
 
         tracker_key = str(ctx.guild.id) + ":" + str(ctx.channel.id)
+
         if not args and tracker_key not in self.tracker_dict.keys(): # No tracker in this channel
-            await ctx.send("```asciidoc\nYou need to start an initiative tracker in this channel before adding a character using [!init start]```")
+            await ctx.send(self.start_msg)
             return 
 
         if args:
@@ -196,6 +221,9 @@ class InitiativeCog(commands.Cog):
                 await self.send_msg_helper(ctx, tracker_key, contents, None, False)
 
             else:
+                if tracker_key not in self.tracker_dict.keys():
+                    await ctx.send(self.start_msg)
+
                 added = await self.tracker_dict[tracker_key].parse_args(ctx.author.id, args)
                 await self.tracker_dict[tracker_key].update_contents()
 
