@@ -285,18 +285,19 @@ class CharacterSelector(commands.Cog):
         self.data = data
         self.character_selection_handler = CharacterSelectionHandler()
 
-    @commands.command()
+    @commands.command(aliases=['char'])
     async def character(self, ctx, *, args = None):
         contents = await self.character_selection_handler.parse_args(ctx.author.id, args = args)
         characters = await self.character_selection_handler.get_characters(ctx.author.id)
 
-        if contents:
-            msg = await ctx.send(contents)
-            return 
+        msg = await ctx.send(contents)
+
 
         # Add reactions for managing the character
 
         if args == None:
+            contents = await self.character_selection_handler.get_characters_formatted(ctx.author.id)
+            
             numerals = ['1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣', '6️⃣', '7️⃣', '8️⃣', '9️⃣']
 
             for c in characters:
@@ -315,6 +316,12 @@ class CharacterSelector(commands.Cog):
             selected_id = numerals.index(str(reaction.emoji))+1
             await self.character_selection_handler.select_character(ctx.author.id, selected_id)
             new_contents = await self.character_selection_handler.get_characters_formatted(ctx.author.id)
-            await msg.edit(content=new_contents)
-            await reaction.remove(u)
-            await self.character_helper(ctx, args, new_contents, msg)
+
+            if ctx.channel.type is discord.ChannelType.private: # If user has DM'd the bot
+                await msg.delete()
+                await self.character(ctx, args = args)
+
+            else:
+                await msg.edit(content=new_contents)
+                await reaction.remove(u)
+                await self.character_helper(ctx, args, new_contents, msg)

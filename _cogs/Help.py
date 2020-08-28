@@ -12,7 +12,7 @@ class Helper(commands.Cog):
             "item", "mm", "spell", "c",
             "currency", "bank", "dom",
             "stats", "request", "admin", 
-            "new", "vote", "ability"
+            "new", "vote", "ability", "character"
         ]
 
         self.bot = bot
@@ -28,7 +28,7 @@ class Helper(commands.Cog):
             The default prefix is !. To learn more about a command type !help [command].
             Like this: !help roll
 
-            `NEW: Lots of updates! See !new'
+            `NOTE: Lots of updates! See !new'
 
             [Commands]
             > hello - Hi!
@@ -38,6 +38,8 @@ class Helper(commands.Cog):
             > d - Simple dice rolling
             > gm - GM only dice rolling
 
+            `> char - Manage your character(s) for initiative tracking (NEW)'
+
             > feat - Feat lookup
             > condition - Condition lookup
             > weapon - Weapon lookup
@@ -45,7 +47,7 @@ class Helper(commands.Cog):
             > mm - Monster Manual lookup
             > spell - Spell lookup
             > c - Class lookup
-            > ability - Class Ability lookup
+            `> ability - Class Ability lookup (NEW)'
 
             > currency - Currency conversions
             > bank - Manage your all of your characters' wallets
@@ -117,12 +119,40 @@ class Helper(commands.Cog):
             '''
         )
 
+        self.help_str_character = textwrap.dedent(
+            '''
+            ```
+            !character is used to set your active character which is used by the initiative tracker. You can create up to 9 characters and set a character as active using emojis or the command argument [id]. Characters follow you across servers and are persistent.
+
+            This command can also be shortened to !char
+            
+            Commands:
+            !character
+                > Shows your character list and lets you select your active character using the UI
+            !character -a [Character Name] -i [Initiative Dice Expression]
+                > Adds a character with [Character Name] to your character list. [Initiative Dice Expression] will be rolled whenever this character is added to initiative. The -i tag is optional and if it is not included that character's initiative will default to rolling 1d20.
+            !character -r [ID]
+                > Removes the character with [ID] from your character list. You can find your character's ID's using !character
+            !character [ID]
+                > Sets the character with [ID] as your active character
+
+            Example:
+            !character -a Gandalf -i 1d20-5
+            !character
+            !character 1
+            !character -r 1
+            !character -a Frodo
+            ```
+            '''
+        )
+
         self.help_str_roll = textwrap.dedent(
             '''
             ```
-            !roll can be used to roll dice of any size with complicated expressions and built in skill checks.
+            !roll can be used to roll dice of any size with complicated expressions and built in skill checks. Press the reroll emoji to reroll that dice expression.
 
             Dice are represented with the standard [# of dice]d[size of dice] format. You can also use !r.
+
             Ex: !roll 4d6
             !roll 1d6*2
             !r 1d20 + 5
@@ -465,7 +495,7 @@ class Helper(commands.Cog):
 
 #endregion
 
-    @commands.command()
+    @commands.command(aliases=['Help'])
     async def help(self, ctx, *, args = None):
         if (ctx.author.id not in self.data.userSet):
             self.data.userSet.add(ctx.author.id)
@@ -477,10 +507,6 @@ class Helper(commands.Cog):
         help_str = await self.helper(args)
 
         await ctx.send(help_str)
-
-    @commands.command()
-    async def Help(self, ctx, *, args = None):
-        await self.help(ctx, args = args)
 
     async def helper(self, args):
         if not args:
@@ -551,6 +577,9 @@ class Helper(commands.Cog):
 
         elif args == "new":
             return self.help_str_new
+
+        elif args == "character" or args == "char":
+            return self.help_str_character
         
         else:
             return self.command_not_found
