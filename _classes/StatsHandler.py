@@ -75,8 +75,6 @@ class StatsHandler:
         '''
     )
 
-    
-
     async def get_stats(self, args, stats_dict, user_count, server_count):
         print(args)
         if args == None:

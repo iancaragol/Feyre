@@ -12,7 +12,7 @@ class Helper(commands.Cog):
             "item", "mm", "spell", "c",
             "currency", "bank", "dom",
             "stats", "request", "admin", 
-            "new", "vote"
+            "new", "vote", "ability"
         ]
 
         self.bot = bot
@@ -28,7 +28,7 @@ class Helper(commands.Cog):
             The default prefix is !. To learn more about a command type !help [command].
             Like this: !help roll
 
-            `NEW: Try !bank to manage your characters bank accounts'
+            `NEW: Lots of updates! See !new'
 
             [Commands]
             > hello - Hi!
@@ -45,6 +45,7 @@ class Helper(commands.Cog):
             > mm - Monster Manual lookup
             > spell - Spell lookup
             > c - Class lookup
+            > ability - Class Ability lookup
 
             > currency - Currency conversions
             > bank - Manage your all of your characters' wallets
@@ -52,7 +53,7 @@ class Helper(commands.Cog):
             > dom - Draw from the Deck of Many Things
 
             > stats - Bot usage statistics
-            > request - Request new features!
+            > request - Request new features & report bugs
             > admin - Change default command prefix
             > new - New features & updates
             > vote - Vote for Feyre on top.gg
@@ -63,8 +64,6 @@ class Helper(commands.Cog):
             ===========
             Use this link `https://top.gg/bot/500733845856059402' to add Feyre to your server!
             Also consider voting for Feyre on top.gg using the `!vote' command :)
-
-            [Please report bugs and request new features with the !request command]
             ```
             ''' 
         )
@@ -389,6 +388,21 @@ class Helper(commands.Cog):
             '''
         )
 
+        self.help_str_ability = textwrap.dedent(
+            '''
+            ```
+            !ability can be used to lookup class abilities such as Barbarian's Danger Sense. All abilities from the PHB are supported. If you think an ability is missing or incorrect please report it with the !request command.
+
+            Some classes have abilities with the same names. To specify which class you are interested in include the name of the class.
+
+            Ex:
+            !ability Danger Sense
+            !ability spellcasting wizard
+            !ability vanish
+            ```
+            '''
+        )
+
         self.help_str_bank = textwrap.dedent(
             '''
             ```
@@ -528,6 +542,9 @@ class Helper(commands.Cog):
 
         elif args == "item":
             return self.help_str_item
+
+        elif args == "ability":
+            return self.help_str_ability
 
         elif args == "bank":
             return self.help_str_bank

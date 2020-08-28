@@ -174,23 +174,33 @@ class CharacterSelectionHandler:
     async def get_characters_formatted(self, user_id):
         code_block = textwrap.dedent("""
         ```asciidoc
-        = Your Characters =
-        [ Character | ID | Init | Active]
+        ====================== Your Characters =======================
+        [           Character           |  ID |  Active |    Init    ]
         """)
 
         characters = await self.get_characters(user_id)
 
         for c in sorted(characters, key=operator.attrgetter('character_id')):
-            code_block += c.character_name
-            code_block += " | "
+            if c.selected:
+                code_block += "`"
+
+            temp_name = (c.character_name[:27] + '...') if len(c.character_name) > 29 else c.character_name
+            if c.selected:
+                code_block += f"{temp_name.ljust(30)}"
+            else:
+                code_block += f"{temp_name.ljust(31)}"
+
+            code_block += " |   "
             code_block += str(c.character_id)
             code_block += " | "
-            code_block += str(c.init_mod)
+            code_block += "  [x]  " if c.selected else "       "
             code_block += " | "
-            code_block += "x" if c.selected else ""
+            code_block += str(c.init_mod)
+            if c.selected:
+                code_block += "'"
             code_block += '\n'
 
-        code_block = code_block.strip() + "```"
+        code_block = code_block.strip() + "\n\nSee !help character for instructions.```"
         return str(code_block)
 
     async def select_character(self, user_id, character_id):
@@ -255,6 +265,20 @@ class CharacterSelectionHandler:
                 print(e)
                 return "```Something went wrong. Check your character's id and try again. See !help characters for more info. \n\nIf you believe this is a bug use the !request command to report it.```"
 
+        else:
+            # Try and treat args as int
+            if args.strip().isdigit():
+                i = int(args.strip())
+                if i <= 0 or i > 9:
+                    return f"```The provided character id ({i}) is out of range. You can have a maximum of nine characters with ids 1-9. See !help character for details.```"
+                else:
+                    await self.select_character(user_id, i)
+                    selected_character = await self.get_selected_character(user_id)
+                    return f"```{selected_character.character_name} is now your active character.```"
+            
+            else:
+                return "```I couldn't understand your input. See !help character for information on how to use this command.\n\nIf you believe this is a bug use the !request command to report it.```"
+
 class CharacterSelector(commands.Cog):
     def __init__(self, bot, data):
         self.bot = bot
@@ -265,7 +289,10 @@ class CharacterSelector(commands.Cog):
     async def character(self, ctx, *, args = None):
         contents = await self.character_selection_handler.parse_args(ctx.author.id, args = args)
         characters = await self.character_selection_handler.get_characters(ctx.author.id)
-        msg = await ctx.send(contents)
+
+        if contents:
+            msg = await ctx.send(contents)
+            return 
 
         # Add reactions for managing the character
 

@@ -86,7 +86,7 @@ bot.add_cog(DeckOfManyThings(bot, data)) # Deck of Many Things
 bot.add_cog(DiceRoller(bot, data)) # Dice Rolling
 bot.add_cog(CurrencyConverter(bot, data)) # Currency Converstion
 bot.add_cog(Administrator(bot, data)) # Adminstrator Commands
-bot.add_cog(ClassAbilityLookupCog(bot, data))
+bot.add_cog(ClassAbilityLookupCog(bot, data)) # Ability Lookup
 
 #COMMANDS:
 
@@ -379,7 +379,6 @@ async def stats(ctx, *, args = None):
     await ctx.send(await data.stats_handler.get_stats(args, data.statsDict, len(data.userSet), len(bot.guilds)))
 #endregion
 
-
 #region Developer
 @bot.command()
 async def request(ctx, *, args = None):
@@ -453,11 +452,33 @@ async def new(ctx):
     data.statsDict['!new'] += 1
 
     updateString = '''```asciidoc
-[Updates]
-> Added Feyre Bank. Use !bank to access and manage your character's purse strings!
+[Updates - see !help for more information]
+= Rewrote Initiative tracking (!init) = 
+    - Added emoji for adding a character to initiative
+    - Added emoji for removing a character from initiative
+    - Added support for characters with spaces in their names
+    - Added support for more complicated dice expressions using the -i argument
+
+= Added persistent character storage (!character)=
+    - Users can now register up to 9 characters
+    - When using the initiative tracker users can add their active character using emojis
+    - Users can change their active character using emojis
+
+    > This functionality will eventually be merged with the bank
+
+= Added ability lookup (!ability)= 
+    - Users can search for class abilities such as Rogue's Vanish
+
+= Added dice reroll emoji (!roll)= 
+    - Users can now reroll a dice using the reroll emoji. They no longer need to retype the command.
+
+= Added a ping command (!ping) = 
+    - !ping can be used to check bot latency
 
 [Bugs]
-> Fixed a few typos.
+> Fixed typos
+> Fixed initiative tracker
+> Moved most major functionality into cogs
 
 Please report bugs using the !request command```'''
     await ctx.send(updateString)

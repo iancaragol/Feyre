@@ -6,6 +6,9 @@ import csv
 import textwrap
 import discord
 import whoosh
+import bisect
+import numpy
+
 from discord.ext import commands
 from whoosh.fields import Schema, TEXT
 import os.path
@@ -43,7 +46,7 @@ class ClassAbilityLookup:
         pyDir = os.path.dirname(__file__)
         relPath = "/../_data/_class_abilities/class_abilities.csv"
         absRelPath = pyDir + relPath
-        with open(absRelPath) as abilitys:
+        with open(absRelPath, encoding='utf-8') as abilitys:
             ability_reader = csv.reader(abilitys)
             for row in ability_reader:
                 new_ability = Ability(row[0], row[1], row[2])
@@ -83,13 +86,29 @@ class ClassAbilityLookupCog(commands.Cog):
         self.data = data
         self.cal = ClassAbilityLookup()
 
+    def string_splitter(self, s, c):
+        idxs = numpy.array([pos for pos, char in enumerate(s) if char == c])
+        lower = idxs[idxs < 1950].max()
+        first = s[:lower] + "```"
+        second = "```" + s[lower:]
+
+        return first, second
+
     @commands.command()
     async def ability(self, ctx, *, args = None):
         if args:
             result = await self.cal.search(args)
             if result:
-                await ctx.send(result)
+                if len(result) > 2000:
+                    first, second = self.string_splitter(result, '\n')
+                    await ctx.send(first)
+                    await ctx.send(second)
+
+                else:
+                    await ctx.send(result)
             else:
                 await ctx.send("```I could not find what you are looking for. If it isn't in the PHB I cannot support it for copyright reasons.\n\nThink this is a bug? Please report it with the !request command.```")
         else:
             await ctx.send("`Missing command arguments. See !help ability for examples.`")
+
+    

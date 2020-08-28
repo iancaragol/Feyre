@@ -99,9 +99,9 @@ class InitiativeTracker:
         self.content += f"\n[Round: {self.round_count}]"
         for i in range(len(self.character_list)):
             if i == self.marker_pos:
-                self.content += f"\n> {self.character_list[i].character_name} [{self.character_list[i].init_value}]"
+                self.content += f"\n`> {self.character_list[i].character_name} [{self.character_list[i].init_value}]'"
             else:
-                self.content += f"\n{self.character_list[i].character_name} [{self.character_list[i].init_value}]"
+                self.content += f"\n {self.character_list[i].character_name} [{self.character_list[i].init_value}]"
 
         self.content += "\n"
         count = 0

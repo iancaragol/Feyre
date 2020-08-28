@@ -48,7 +48,7 @@ For this reason, the prefix will be pinned in the channel from which it is chang
                     return
 
                 elif (args not in possibleArgs):
-                    await ctx.send(f"<@{ctx.author.id}>\n Prefix must be /, !, ~, `, #, $, %, ^, &, *, ,, ., ;, :, <, or >")
+                    await ctx.send(f"<@{ctx.author.id}>\n Prefix must be ?, /, !, ~, `, #, $, %, ^, &, *, ,, ., ;, :, <, or >")
                     return
 
                 self.data.prefixDict[str(ctx.message.guild.id)] = args   
