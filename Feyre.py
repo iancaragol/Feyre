@@ -10,7 +10,17 @@ from ISStreamer.Streamer import Streamer
 from datetime import datetime
 
 from _classes.BotData import BotData
-from _classes.Init import Initiative
+
+from _cogs.InitiativeTracker import InitiativeCog
+from _cogs.Help import Helper
+from _cogs.SimpleDiceRoll import SimpleDiceRoller
+from _cogs.CharacterSelection import CharacterSelector
+from _cogs.Bank import Banker
+from _cogs.DeckOfManyThings import DeckOfManyThings
+from _cogs.DiceRolls import DiceRoller
+from _cogs.CurrencyConversion import CurrencyConverter
+from _cogs.Administrator import Administrator
+from _cogs.ClassAbilities import ClassAbilityLookupCog
 
 import discord
 import asyncio
@@ -61,10 +71,22 @@ async def codify(string, title = None):
 #Initalize the bot:
 
 data = BotData()
-bot = commands.Bot(command_prefix = get_pre)
-bot.remove_command('help')
 aeval = Interpreter()
 
+bot = commands.Bot(command_prefix = get_pre)
+bot.remove_command('help')
+
+# Add Cogs
+bot.add_cog(InitiativeCog(bot, data)) # Initiative
+bot.add_cog(Helper(bot, data)) # Help
+bot.add_cog(SimpleDiceRoller(bot, data)) # Simple Dice: dp, d20, d12, etc...
+bot.add_cog(CharacterSelector(bot, data)) # Character Selection
+bot.add_cog(Banker(bot, data)) # Bank
+bot.add_cog(DeckOfManyThings(bot, data)) # Deck of Many Things
+bot.add_cog(DiceRoller(bot, data)) # Dice Rolling
+bot.add_cog(CurrencyConverter(bot, data)) # Currency Converstion
+bot.add_cog(Administrator(bot, data)) # Adminstrator Commands
+bot.add_cog(ClassAbilityLookupCog(bot, data)) # Ability Lookup
 
 #COMMANDS:
 
@@ -86,76 +108,9 @@ async def hello(ctx):
     await ctx.send(embed=embed)
 #endregion
 
-#region Dice Rolls
 @bot.command()
-async def gm(ctx, *, args = None):
-    if (ctx.author.id not in data.userSet):
-        data.userSet.add(ctx.author.id)
-    data.statsDict['!gm'] += 1
-
-    if (ctx.guild == None):
-        await ctx.send("```GM rolls must be done in a channel with a dedicated gm.```")
-        return
-
-    elif (args == None):
-        data.gmDict[ctx.channel.id] = ctx.author.id
-        await ctx.send(f"```{ctx.author} was made GM of this channel.```")
-
-    elif (args != None):
-        args = args.strip()
-        if (args.startswith('roll')):
-            try:
-                expression = args.replace('roll', '').strip()
-                result = await data.diceRoller.parse(expression, gm = True)
-
-                gmUser = bot.get_user(data.gmDict[ctx.channel.id])
-                gmResult = f'''```diff
-Roll from [{ctx.author.name}]
-{result} ```'''
-
-                await gmUser.send(gmResult)
-
-                userResult = f'''```diff
-{result}```'''
-                sendUser = bot.get_user(ctx.author.id)
-                await sendUser.send(userResult)
-            except:
-                await ctx.send("```This channel does not have a dedicated GM. Type !gm to set yourself as GM.```")
-
-@bot.command()
-async def roll(ctx, *, args = None):
-    """
-    Rolls any number of dice in any format including skill checks
-        Ex: !roll 1d20+5*6>100
-    """
-    if (ctx.author.id not in data.userSet):
-        data.userSet.add(ctx.author.id)
-    data.statsDict['!roll'] += 1
-
-    if not args:
-        await ctx.send('''```Missing command arguments, see !help roll for more information.\nEx: !roll 1d20+5```''')
-        return
-
-    await ctx.send(await data.diceRoller.parse(args, gm = False))
-
-@bot.command()
-async def r(ctx, *, args = None):
-    """
-    Rolls any number of dice in any format including skill checks
-        Ex: !roll 1d20+5*6>100
-    """
-
-    #This should be rewritten...
-
-    if (ctx.author.id not in data.userSet):
-        data.userSet.add(ctx.author.id)
-    data.statsDict['!roll'] += 1
-
-    if not args:
-        await ctx.send('''```Missing command arguments, see !help roll for more information.\nEx: !roll 1d20+5```''')
-        return
-    await ctx.send(await data.diceRoller.parse(args, gm = False))
-#endregion
+async def ping(ctx):
+    await ctx.send('`Pong! {0}ms`'.format(round(bot.latency, 3)))
 
 #region Monster Manual
 @bot.command()
@@ -220,165 +175,6 @@ async def randfeat(ctx):
 
     featArr = await data.feats.randFeat()
     await createAndSendEmbeds(ctx, featArr)
-#endregion
-
-#region Shorthand dice rolls
-
-
-
-@bot.command()
-async def dp(ctx, *, args = None):
-    data.statsDict['!roll'] += 1
-
-    try:
-        roll = str(random.randint(1, 100))
-        if(args):
-            total = aeval(roll + args.strip())
-            msg = f'''```css\n{roll}{args.replace(' ', '')} = [{"%.2g" % total}%]```'''
-
-        else:
-            total = roll
-            msg = f'''```asciidoc
-[{total}%]```'''
-
-    except:
-        msg = f'''```I didn't understand something about your input. Try !roll for more complicated expressions.```'''
-
-    await ctx.send(msg)
-
-@bot.command()
-async def d20(ctx, *, args = None):
-    data.statsDict['!roll'] += 1
-
-    try:
-        roll = str(random.randint(1, 20))
-        if(args):
-            total = aeval(roll + args.strip())
-            msg = f'''```css\n{roll}{args.replace(' ', '')} = [{"%.2g" % total}]```'''
-
-        else:
-            total = roll
-            msg = f'''```asciidoc
-[{total}]```'''
-
-    except:
-        msg = f'''```I didn't understand something about your input. Try !roll for more complicated expressions.```'''
-
-    await ctx.send(msg)
-
-@bot.command()
-async def d12(ctx, *, args = None):
-    data.statsDict['!roll'] += 1
-
-    try:
-        roll = str(random.randint(1, 12))
-        if(args):
-            total = aeval(roll + args.strip())
-            msg = f'''```css\n{roll}{args.replace(' ', '')} = [{"%.2g" % total}]```'''
-
-        else:
-            total = roll
-            msg = f'''```asciidoc
-[{total}]```'''
-
-    except:
-        msg = f'''```I didn't understand something about your input. Try !roll for more complicated expressions.```'''
-
-    await ctx.send(msg)
-
-@bot.command()
-async def d10(ctx, *, args = None):
-    data.statsDict['!roll'] += 1
-
-    try:
-        roll = str(random.randint(1, 10))
-        if(args):
-            total = aeval(roll + args.strip())
-            msg = f'''```css\n{roll}{args.replace(' ', '')} = [{"%.2g" % total}]```'''
-
-        else:
-            total = roll
-            msg = f'''```asciidoc
-[{total}]```'''
-
-    except:
-        msg = f'''```I didn't understand something about your input. Try !roll for more complicated expressions.```'''
-
-    await ctx.send(msg)
-
-@bot.command()
-async def d8(ctx, *, args = None):
-    data.statsDict['!roll'] += 1
-
-    try:
-        roll = str(random.randint(1, 8))
-        if(args):
-            total = aeval(roll + args.strip())
-            msg = f'''```css\n{roll}{args.replace(' ', '')} = [{"%.2g" % total}]```'''
-
-        else:
-            total = roll
-            msg = f'''```asciidoc
-[{total}]```'''
-
-    except:
-        msg = f'''```I didn't understand something about your input. Try !roll for more complicated expressions.```'''
-
-    await ctx.send(msg)
-
-@bot.command()
-async def d6(ctx, *, args = None):
-    data.statsDict['!roll'] += 1
-
-    try:
-        roll = str(random.randint(1, 6))
-        if(args):
-            total = aeval(roll + args.strip())
-            msg = f'''```css\n{roll}{args.replace(' ', '')} = [{"%.2g" % total}]```'''
-
-        else:
-            total = roll
-            msg = f'''```asciidoc
-[{total}]```'''
-
-    except:
-        msg = f'''```I didn't understand something about your input. Try !roll for more complicated expressions.```'''
-
-    await ctx.send(msg)
-
-@bot.command()
-async def d4(ctx, *, args = None):
-    data.statsDict['!roll'] += 1
-
-    try:
-        roll = str(random.randint(1, 4))
-        if(args):
-            total = aeval(roll + args.strip())
-            msg = f'''```css\n{roll}{args.replace(' ', '')} = [{"%.2g" % total}]```'''
-
-        else:
-            total = roll
-            msg = f'''```asciidoc
-[{total}]```'''
-
-    except:
-        msg = f'''```I didn't understand something about your input. Try !roll for more complicated expressions.```'''
-
-    await ctx.send(msg)
-
-#endregion
-
-#region Ability
-# @bot.command()
-# async def ability(ctx, *, args):
-#     if (ctx.author.id not in data.userSet):
-#         data.userSet.add(ctx.author.id)
-#     #data.statsDict['!feat'] += 1
-#     abil_arr = await data.class_abilities.search(args)
-#     if (abil_arr == False):
-#         await ctx.send("```I'm sorry. I wasn't able to find the feat you are looking for.```")
-#     else:
-#         await ctx.send(await codify(abil_arr[0], abil_arr[1]))
 #endregion
 
 #region Items
@@ -516,32 +312,6 @@ async def vote(ctx,  *, args = None):
     await ctx.send(embed = embed)
 #endregion
 
-#region Currency
-
-async def currency_helper(ctx, args):
-    if (ctx.author.id not in data.userSet):
-        data.userSet.add(ctx.author.id)
-    data.statsDict['!currency'] += 1
-
-    if not args:
-        await ctx.send('''```Missing command arguments, see !help currency for more information.\nEx: !currency 10gp 55ep 5sp```''')
-        return
-    await ctx.send(await data.currency_converter.parse_input(args))
-
-@bot.command()
-async def currency(ctx, *, args = None):
-    await currency_helper(ctx, args)
-
-@bot.command()
-async def cur(ctx, *, args = None):
-    await currency_helper(ctx, args)
-
-@bot.command()
-async def convert(ctx, *, args = None):
-    await currency_helper(ctx, args)
-
-#endregion
-
 #region Weapon
 
 async def weapon_helper(ctx, args):
@@ -566,257 +336,6 @@ async def weapon(ctx, *, args = None):
 @bot.command()
 async def w(ctx, *, args = None):
     await weapon_helper(ctx, args)
-
-#endregion
-
-#region DeckOfMany
-
-async def deck_of_many_helper(ctx, args):
-    if (ctx.author.id not in data.userSet):
-        data.userSet.add(ctx.author.id)
-    data.statsDict['!dom'] += 1
-
-    if (args == None):
-        card, effect = await data.deck_of_many.draw(data.deck_of_many.default_deck)
-        await ctx.send(await data.deck_of_many.card_to_string(card, effect))
-
-    if (len(ctx.args) == 1 and args == '-i'):
-        card, effect = await data.deck_of_many.draw(data.deck_of_many.default_deck)
-        embed = discord.Embed()
-        embed.set_image(url=await data.deck_of_many.get_image(card))
-        await ctx.send(embed=embed)
-        await ctx.send(await data.deck_of_many.card_to_string(card, effect))
-
-
-@bot.command()
-async def dom(ctx, *, args = None):
-    await deck_of_many_helper(ctx, args)
-
-#endregion
-
-#region Initiative
-
-@bot.event
-async def on_raw_reaction_add(payload):
-    key = str(payload.guild_id) + ":" + str(payload.channel_id)
-    if(key in data.initDict.keys()):
-        channel = bot.get_channel(payload.channel_id)
-        msg = await channel.fetch_message(payload.message_id)
-
-        init = data.initDict[key]
-
-        reaction = get(msg.reactions, emoji=payload.emoji.name)
-        if reaction and reaction.count > 1:
-            #init.round_count += 1
-            init.marker_count += 1
-            await update_init(key)
-            
-
-async def update_init(key):
-    desc = data.initDict[key].displayInit()
-    codeBlock = '''```asciidoc
-= Initiative =
-[Round: {}]'''.format(data.initDict[key].round_count) + desc + '```'
-
-    #delete old message and send new one with updated values
-    old_msg = data.initEmbedDict[key]
-    data.initEmbedDict[key] = await  data.initEmbedDict[key].delete()
-    data.initEmbedDict[key] = await  old_msg.channel.send(codeBlock)
-
-    cross = '\N{CROSSED SWORDS}'
-    await data.initEmbedDict[key].add_reaction(cross)
-
-async def init_helper(ctx, args):
-    """
-    Starts or adds players to initiative
-    """
-    if (ctx.author.id not in data.userSet):
-        data.userSet.add(ctx.author.id)
-    data.statsDict['!init'] += 1
-
-    if (not ctx.guild):
-        await ctx.send("""```The initative tracker can only be used in a guild channel at this time. It is not supported when direct messaging Feyre. See !help init for more info.```""")
-        return 
-
-    #This command will be moved into its own class
-    if (args == 'start'):
-        key = str(ctx.guild.id) + ":" + str(ctx.channel.id)
-        i = Initiative()
-        data.initDict[key] = i
-        # await update_init(key)
-        codeBlock = '''```asciidoc
-= Initiative = 
-[Round: {}]```'''.format(i.round_count)
-        msg = await ctx.send(codeBlock)
-        cross = '\N{CROSSED SWORDS}'
-        await msg.add_reaction(cross)
-        data.initEmbedDict[key] = msg
-
-    elif (args.strip().startswith('reset')):
-        argsStr = str(args)
-        key = str(ctx.guild.id) + ":" + str(ctx.channel.id)
-
-        if(key in data.initDict):
-            name = argsStr.strip()
-            mark = data.initDict[key].changeMarker(0)
-            ret = data.initDict[key].changeRound(0)
-
-            if(ret):
-                await update_init(key)
-
-    elif (args.strip().startswith('round')):
-        argsStr = str(args)
-        argsStr = argsStr.replace('round', '').strip()
-        key = str(ctx.guild.id) + ":" + str(ctx.channel.id)
-
-        if(key in data.initDict):
-            name = argsStr.strip()
-            try:
-                ret = data.initDict[key].changeRound(int(argsStr))
-            except:
-                 await ctx.send('''```Something went wrong! Make sure the new round is a number. See !help init for more info.```''')
-            if(ret):
-                await update_init(key)
-
-
-    elif (args.strip().startswith('remove') or args.strip().startswith('-r')):
-        argsStr = str(args)
-        argsStr = argsStr.replace('remove', '').strip()
-        argsStr = argsStr.replace('-r', '').strip()
-
-        key = str(ctx.guild.id) + ":" + str(ctx.channel.id)
-
-        if(key in data.initDict):
-            name = argsStr.strip()
-            ret = data.initDict[key].removePlayer(name)
-
-            if(ret):
-                await update_init(key)
-#                 desc = data.initDict[key].displayInit()
-#                 codeBlock = '''```asciidoc
-# = Initiative =
-# [Round: {}]'''.format(data.initDict[key].round_count) + desc + '```'
-
-#                 #delete old message and send new one with updated values
-#                 data.initEmbedDict[key] = await  data.initEmbedDict[key].delete()
-#                 data.initEmbedDict[key] = await  ctx.send(codeBlock)
-
-            elif(not ret):
-                await ctx.send('''```I couldnt find the player you were looking for.```''')
-
-             
-    else:
-        argsStr = str(args)
-
-        data.statsDict['!init'] += 1
-        key = str(ctx.guild.id) + ":" + str(ctx.channel.id)
-
-       
-        if(key in data.initDict):
-            split = argsStr.split(' ')
-            name = ""
-            init = ""
-        #mod = ""        
-            if len(split) == 2:
-                try:
-                    #name mod
-                    name = split[0]
-                    if split[1].startswith("+") or split[1].startswith("-") or split[1].startswith("/") or split[1].startswith("*"):
-                        roll = random.randint(1, 20)
-                        init = aeval(str(roll) + split[1])
-
-                    #name roll
-                    elif split[1][0].isdigit():
-                        init = float(split[1])
-
-                    else:
-                        #mod name
-                        name = split[1]
-                        if split[0].startswith("+") or split[0].startswith("-") or split[0].startswith("/") or split[0].startswith("*"):
-                            roll = random.randint(1, 20)
-                            init = aeval(str(roll) + split[0])
-
-                        #roll name
-                        elif split[0][0].isdigit():
-                            init = float(split[0])
-
-                except Exception as e:
-                    print(e)
-                    await ctx.send('''```There was something I didnt understand about your input.
-Ex: !init [name] [value OR modifier]
-
-Currently I don't support inline dice rolls such as !init Gandalf +1d6```''')
-
-            elif len(split) == 1 and split[0] != '':
-
-                try:
-                    if split[0][0].isdigit():
-                        name = ctx.author.name
-                        init = float(split[0])
-
-                    elif split[0].startswith("+") or split[0].startswith("-") or split[0].startswith("/") or split[0].startswith("*"):
-                        name = ctx.author.name
-                        roll = random.randint(1, 20)
-                        init = aeval(float(roll) + split[0])
-
-                    else:
-                        name = split[0]
-                        init = random.randint(1, 20)
-
-                except Exception as e:
-                    print(e)
-                    await ctx.send('''```There was something I didnt understand about your input.
-Ex: !init [name] [value OR modifier]
-
-Currently I don't support inline dice rolls such as !init Gandalf +1d6```''')
-                    return
-          
-            elif len(split) == 1 and split[0] == '':
-                name = ctx.author.name
-                roll = random.randint(1, 20)
-                init = float(roll)
-
-            else:
-                await ctx.send('''```There was something I didnt understand about your input.
-Ex: !init [name] [value OR modifier]
-Currently I don't support inline dice rolls such as !init Gandalf +1d6```''')
-
-            try:
-                init = float(init)
-                name = str(name)
-
-                data.initDict[key].addPlayer(name, init)
-                await update_init(key)
-#                 desc = data.initDict[key].displayInit()
-#                 #newEmbed = discord.Embed(title = "|------------- **Initiative** -------------|", description = data.initDict[key].displayInit(), color=data.embedcolor)
-
-#                 codeBlock = '''```asciidoc
-# = Initiative =
-# [Round: {}]'''.format(data.initDict[key].round_count) + desc + '```'
-
-#                 #delete old message and send new one with updated values
-#                 data.initEmbedDict[key] = await  data.initEmbedDict[key].delete()
-#                 data.initEmbedDict[key] = await  ctx.send(codeBlock)
-
-            except Exception as e:
-                print(e)
-                await ctx.send('''```There was something I didnt understand about your input.
-Ex: !init [name] [value OR modifier]
-
-Currently I don't support inline dice rolls such as !init Gandalf +1d6```''')
-                return
-
-        else:
-            await ctx.send('''```Please start initiative with !init start before adding players```''')
-
-
-@bot.command()
-async def init(ctx, *, args = ""):
-    await init_helper(ctx, args)
-
-@bot.command()
-async def i(ctx, *, args = ""):
-    await init_helper(ctx, args)
 
 #endregion
 
@@ -853,466 +372,11 @@ async def stats(ctx, *, args = None):
     """
     if (ctx.author.id not in data.userSet):
         data.userSet.add(ctx.author.id)
-    #embed = discord.Embed(description = await data.displayStats(), color=data.embedcolor)
-    if not args:
-        await ctx.send(await displayStats(False))
-    elif args == 'all':
-        await ctx.send(await displayStats(True))
-    else:
-        await ctx.send("```I didnt understand your input. Try !stats or !stats all")
-        
-async def displayStats(tor):
-    if tor:
-        retStr = f'''```asciidoc
-= Lifetime Stats =
-> !help: {data.statsDict['!help']}
-> !hello: {data.statsDict['!hello']}
-> !init: {data.statsDict['!init']}
-> !roll: {data.statsDict['!roll']}
 
-[D&D 5E]
-> !feat: {data.statsDict['!feat']}
-> !mm: {data.statsDict['!mm']}   
-> !spell: {data.statsDict['!spell']}
-> !weapon: {data.statsDict['!weapon']}
-> !item: {data.statsDict['!item']}
-> !dom: {data.statsDict['!dom']}
-> !c: {data.statsDict['!c']}
-> !currency: {data.statsDict['!currency']}
-> !condtion: {data.statsDict['!condition']}
-> !bank: {data.statsDict['!bank']}
-> !randfeat: {data.statsDict['!randfeat']}
-> !randmonster: {data.statsDict['!randmonster']}
-
-
-[Book of Tor]
-> !tor horo: {data.statsDict['!tor horo']}
-> !tor randchar: {data.statsDict['!tor randchar']}
-> !tor styles: {data.statsDict['!tor styles']}
-> !tor zodiac: {data.statsDict['!tor zodiac']}
-
-[Others]
-> !new: {data.statsDict['!new']}
-> !gm: {data.statsDict['!gm']}
-> !admin: {data.statsDict['!admin']}
-> !set-prefix: {data.statsDict['!set_prefix']}
-> !request: {data.statsDict['!request']}
-> !vote: {data.statsDict['!vote']}
-> (dirty rolls): {data.statsDict['dirty_rolls']}
- 
-= Unique users: {len(data.userSet)} =
-= Server count: {len(bot.guilds)} =
-= Total command count: {sum(data.statsDict.values())} =```'''
-
-    else:
-        retStr = f'''```asciidoc
-= Lifetime Stats =
-> !help: {data.statsDict['!help']}
-> !hello: {data.statsDict['!hello']}
-> !init: {data.statsDict['!init']}
-> !roll: {data.statsDict['!roll']}
-
-[D&D 5E]
-> !feat: {data.statsDict['!feat']}
-> !mm: {data.statsDict['!mm']}   
-> !spell: {data.statsDict['!spell']}
-> !weapon: {data.statsDict['!weapon']}
-> !dom: {data.statsDict['!dom']}
-> !c: {data.statsDict['!c']}
-> !currency: {data.statsDict['!currency']}
-> !condtion: {data.statsDict['!condition']}
-> !bank: {data.statsDict['!bank']}
-> !randfeat: {data.statsDict['!randfeat']}
-> !randmonster: {data.statsDict['!randmonster']}
-
-
-= Unique users: {len(data.userSet)} =
-= Server count: {len(bot.guilds)} =
-= Total command count: {sum(data.statsDict.values())} =```'''
-    return retStr
-
-#endregion
-
-#region Help
-@bot.command()
-async def help(ctx, *, args = None):
-    if (ctx.author.id not in data.userSet):
-        data.userSet.add(ctx.author.id)
-    data.statsDict['!help'] += 1
-    helpstr = ""
-
-    if (args != None):
+    if args != None:
         args = args.lower().strip()
-
-    if (args == None):
-        helpstr = '''```asciidoc
-Hello! My name is Feyre. You can use chat or DM's to summon me. 
-===============================================================
-
-The default prefix is !. To learn more about a command type !help [command].
-Like this: !help roll
-
-`NEW: Try !bank to manage your characters bank accounts'
-
-[Commands]
-> hello - Hi!
-
-> init- Initiative tracking
-> roll - Dice rolling with complicated expressions
-> d - Simple dice rolling
-> gm - GM only dice rolling
-
-> feat - Feat lookup
-> condition - Condition lookup
-> weapon - Weapon lookup
-> item - Wondrous item lookup
-> mm - Monster Manual lookup
-> spell - Spell lookup
-> c - Class lookup
-
-> currency - Currency conversions
-> bank - Manage your all of your characters' wallets
-
-> dom - Draw from the Deck of Many Things
-
-> stats - Bot usage statistics
-> request - Request new features!
-> admin - Change default command prefix
-> new - New features & updates
-> vote - Vote for Feyre on top.gg
-
-Feyre always responds in the channel or direct message from which it was summoned.
-
-Like Feyre?
-===========
-Use this link `https://top.gg/bot/500733845856059402' to add Feyre to your server!
-Also consider voting for Feyre on top.gg using the `!vote' command :)
-
-[Please report bugs and request new features with the !request command]
-```''' 
-
-    elif (args == "init"):
-        helpstr = '''```!init is a per channel based initiative tracker. Click the Crossed Swords icon to move to the next round!
-If you need to insert a player into the middle of initative use decimals.
-
-Commands (can be shortened to !i):
-!init start
-    > Starts a new initiative tracker in the same channel, also used to create a new one
-!init
-    > Adds the player to initiative with their discord username and rolls 1d20 for them
-!init [player name]
-    > Adds a player with [player name] to initiative and rolls 1d20 for them
-!init [player name] [initiative]
-    > Adds a player with [player name] and [initiative] to iniative.
-!init remove [player name] or !init -r [player name]
-    > Removes a player from initiative. 
-!init [name] [modifier] or [modifier] [name]
-    > Adds a plyer to inititative after rolling 1d20 and applying the modifier.
-!init reset
-    > Restarts the initiative tracker with the same initiative values for each player.
-!init round [num]
-    > Changes the current round to [num]
-
-Ex:
-!init start
-!i Legolas 15
-!i Aragorn 15.1
-!i Sauron +5
-!init Gandalf 1
-!init Frodo
-!init remove Frodo
-!init -r Gandalf
-!init round 3
-
-Reset tracker but keep Legolas, Aragorn, and Sauron's rolls.
-!init reset```'''
-    elif (args == "roll"):
-        helpstr = '''```!roll can be used to roll dice of any size with complicated expressions and built in skill checks.
-
-Dice are represented with the standard [# of dice]d[size of dice] format. You can also use !r.
-Ex: !roll 4d6
-!roll 1d6*2
-!r 1d20 + 5
-!r 1d1000 + 2d2000 * 3 / 3 - 1
-
-Skill checks can be built into the dice expression using the < and > symbols.
-Ex: !roll 1d20 > 15
-
-You can roll with advantage or disadvantage using the -a and -d flags before the dice expression.
-Ex: !roll -a 1d20
-    !roll -d 1d20+5
-```'''
-
-    elif (args == "d"):
-        helpstr = '''```!d[size] [expression] can be used if you only want to roll one dice.
-This command supports standard dice sizes [4,6,8,10,12,20] and expressions. A space is neccessary between the dice and any modifiers.
-
-You can also use !dp to roll for percentile.
-
-Ex:
-!d20
-!d6 +2
-!dp
-```'''
-
-    elif (args == "stats"):
-        helpstr = '''```Feyre keeps track of the number of times each command has been used and the total user count.
-```'''
-    elif (args == "feat"):
-        helpstr = '''```!feat can be used to lookup feats from the Player's Handbook. 
-
-Commands:
-!feat [feat name] 
-    > Searches for a feat
-!randfeat
-    > Gives a random feat
-Ex:
-!feat Keen Mind```'''
-
-    elif (args == "condition"):
-        helpstr = '''```!condition can be used to conditions from the PHB 
-
-Commands:
-!condition
-    > Lists all conditions
-!condition [condition]
-    > Gives more info on the specified condition
-Ex:
-!condition Prone```'''
-    elif (args == "mm"):
-        helpstr = '''```!mm can be used to lookup monsters from the Monster Manual.
-
-Commands:
-!mm [monster name]
-    > Searches for a monster
-!randmonster
-    > Gives a random monster
-Ex:
-!mm Young Black Dragon
-!mm Tarrasque```'''
-
-    elif (args == "c" or args == "class"):
-        helpstr = '''```!c can be used to look up all of the features of a class. This can be a lot of text!
-
-Why is the command !c and not !class? Thats because class is a python keyword.
-
-Ex:
-!c wizard
-!c fighter
-```'''
-
-    elif (args == "currency" or args == "cur" or args == "convert"):
-        helpstr = '''```!currency can be used to convert any denomination of platinum, gold, electrum, silver, and copper to gold, silver and copper.
-It can also be used to evenly divide an amount of currency between any number of players by including a /x at the end where x is the number of players.
-
-pp = Platinum
-gp = Gold
-ep = Electrum
-sp = Silver
-cp = Copper
-
-When providing the amounts there is no need to worry about capitlization or spacing. See the examples below :)
-
-Commands:
-!currency [amount][abbreviation]
-!currency [amount][abbreviation] / [number of players] <- Optional
-!convert [amount][abbreviation]
-!convert [amount][abbreviation] / [number of players] <- Optional
-!cur [amount][abbreviation]
-!cur [amount][abbreviation] / [number of players] <- Optional
-
-Ex:
-!currency 10gp 55ep 5sp
-!convert 13gp55pp/4 <- Divides amongst 4 players
-!cur 11sp 333ep 4cp
-```'''
-
-    elif (args == "spell"):
-                helpstr = '''```!spell can be used to lookup spells from the Player's Handbook.
-
-!spell [spell name]
-
-Ex: 
-!spell Wish
-!spell Cure Wounds```'''
-
-    elif (args == "dom"):
-        helpstr = '''```!dom can be used to draw a card from the deck of many things. The -i flag will include an image!
-
-Commands:
-!dom
-    > Draws one card from the Deck of Many Things
-!dom -i
-    > Draws one card form the Deck of Many Things and includes an image of the card
-Ex:
-!dom
-!dom -i```'''
-
-    elif (args == "tor"):
-                helpstr = '''```!tor can be used to find character styles, horoscope, race/class combinations, and zodiac from the Book of Tor.
-
-Commands:
-!tor styles
-    > Displays character styles
-!tor horo
-    > Gives a Torian horoscope
-!tor zodiac
-    > Gives a Torian zodiac
-!tor randchar
-    > Gives a random Torian race/class combination.```'''
-
-    elif (args == "admin"):
-                helpstr = '''```!admin is for server administrators. Currently the only command available to adminstrators is !set_prefix.
-
-Commands:
-!set_prefix [prefix]
-    > Sets the server wide prefix to [prefix]. Prefix must be !, ~, `, #, $, %, ^, &, *, ,, ., ;, :, <, or >
-Note: If you forget the bot's prefix you will no longer be able to summon it and reset it's prefix (as of now).```'''
-
-    elif (args == "request"):
-        helpstr = '''```Please help improve the bot by requesting features you would like to see!
-
-!request [feature]```'''
-
-    elif (args == "vote"):
-        helpstr = '''```top.gg ranks discord bots based on the number of votes that they have. Please vote for Feyre using !vote. Thanks!```'''
-
-    elif (args == "hello"):
-                helpstr = '''```Hi?```'''
-
-    elif (args == "gm"):
-                helpstr = '''```!gm can be used to send dice rolls to the GM without other players being able to see the result.
-GM's are set on a per channel basis.
-                
-Commands:
-!gm
-    > Sets the channels GM to the user
-!gm roll [expression]
-    > Rolls dice and sends the result to the user and the GM
-
-Ex:
-!gm
-!gm roll 1d20```'''
-
-    elif (args == "weapon"):
-        helpstr = '''```!weapon or !w can be used to lookup weapons from the players handbook. 
-If you find any errors or a weapon is missing please use !request to let me know.
-
-Built in attack rolls are coming soon.
-
-Ex:
-!w Longbow```'''
-
-    elif (args == "item"):
-        helpstr = '''```!item can be used to lookup items from the Dungeon Master's Guide. 
-If you find any errors or a item is missing please use !request to let me know. Some items have a lot of text, and may be sent in multiple message blocks.
-
-Ex:
-!item Portable Hole```'''
-
-    elif (args == "bank"):
-        helpstr = textwrap.dedent("""```
-You can use Feyre to manage all of your character's wallets. Your bank is tied to your Discord ID and can be accessed from any server/channel or by direct messaging Feyre.
-
-Interacting with your bank requires the use of argument flags (-a, -r, -d, -w). If you have any suggestions on how this experience can be streamlined please use the !request command and let me know!
-
-Commands:
-!bank
-    > Shows all of your characters and their unique IDs. The character's id (a unique number representing that character) can be used instead of [character name].
-
-!bank -a [character name]
-    > Adds a new character to your bank with [character name]. This character will also be assigned a unique ID which can be used to access its account.
-
-!bank -r [character name] OR [character id]
-    > Deletes the account associated with [character name] or [character id]
-
-!bank -d [character name] [currency values] OR [character name] [currency values]
-    > Deposits the specified [currency values] into the account associated with [character name] or [character id]
-
-!bank -w [character name] [currency values] OR [character name] [currency values]
-    > Withdraws the specified [currency values] into the account associated with [character name] or [character id]
-
-[currency values] have the same format as the !currency command. For example you can represent 10 platinum, 9 gold, 8 electrum, 7 silver, and 6 copper like this: 10pp9gp8ep7sp6cp.
-
-Examples:
-!bank -a Bilbo
-    > Add a character with the name Bilbo to your bank
-
-!bank -d Bilbo 10sp5cp
-    > Deposit (-d) 10 silver and 5 copper into Bilbo's account
-
-!bank
-    > See all of your characters and their unique ids
-
-!bank -w 1 3cp
-    > Withdraw 3 copper from Bilbo's account. In this example Bilbo has been assigned the unique ID 1 because he is the first character associated with the example user
-
-!bank -r Bilbo
-    > Delete Bilbo from the bank```""")
-
-    else:
-        helpstr = '''```I could not find that command. Try !help for a list of commands.```'''
-
-    await ctx.send(str(helpstr))
-#endregion
-
-#region Admin
-@bot.command()
-async def admin(ctx):
-    if (ctx.author.id not in data.userSet):
-        data.userSet.add(ctx.author.id)
-    data.statsDict['!admin'] += 1
-
-    retstr = '''```!admin is for server administrators. Currently the only command available to adminstrators is !set_prefix.
-
-Commands:
-!set_prefix [prefix]
-    > Sets the server wide prefix to [prefix]. 
-    Prefix must be /, !, ~, `, #, $, %, ^, &, *, ,, ., ;, :, <, or >
-Note: If you forget the bot's prefix you will no longer be able to summon it and reset it's prefix.
-For this reason, the prefix will be pinned in the channel from which it is changed.```'''
-
-    await ctx.send(retstr)
-
-@bot.command()
-async def set_prefix(ctx, *, args = None):
-    #TO DO:
-    #Support pinging bot if you do not know the prefix
-    #Removing bot from server should reset bot's prefix
-    if (ctx.author.id not in data.userSet):
-        data.userSet.add(ctx.author.id)
-    data.statsDict['!set_prefix'] += 1
-
-    if(not hasattr(ctx.author, 'ctx.author.guild_permissions')):
-        await ctx.send(f"This command is for server use only.")
-
-    if args:
-        args = args.strip()
-
-        if(ctx.author.guild_permissions.administrator):
-            possibleArgs = set(['/','!','~','`','#','$','%','^','&','*',',','.',';',':','>','<'])
-
-            if(len(args) < 1):
-                await ctx.send(f"<@{ctx.author.id}>\n You must include arguments! Ex: !set_prefix &")
-                return
-
-            elif (args not in possibleArgs):
-                await ctx.send(f"<@{ctx.author.id}>\n Prefix must be /, !, ~, `, #, $, %, ^, &, *, ,, ., ;, :, <, or >")
-                return
-
-            data.prefixDict[str(ctx.message.guild.id)] = args   
-           
-            msg = await ctx.send(f"<@{ctx.author.id}>\n Prefix for this server set to: {args.strip()}")
-            await msg.pin()
-
-        else:
-                await ctx.send("Only server administrators have access to this command.")
-    else:
-        if(ctx.author.guild_permissions.administrator):
-            await ctx.send(f"<@{ctx.author.id}>\n You must include arguments! Ex: !set_prefix &")
-            return
-        else:
-            await ctx.send("Only server administrators have access to this command.")
+    
+    await ctx.send(await data.stats_handler.get_stats(args, data.statsDict, len(data.userSet), len(bot.guilds)))
 #endregion
 
 #region Developer
@@ -1376,26 +440,6 @@ async def change_presence(ctx, *, args):
 
 #endregion
 
-#region Bank
-@bot.command()
-async def bank(ctx, *, args = None):
-    """
-    Rolls any number of dice in any format including skill checks
-        Ex: !roll 1d20+5*6>100
-    """
-    if (ctx.author.id not in data.userSet):
-        data.userSet.add(ctx.author.id)
-    data.statsDict['!bank'] += 1
-
-    if not args:
-        await ctx.send(await data.bank.get_characters_formatted(ctx.author.id))
-
-    if args:
-        await ctx.send(await data.bank.parse_args(ctx.author.id, args))
-
-#endregion
-
-
 #region New
 @bot.command()
 async def new(ctx):
@@ -1408,11 +452,35 @@ async def new(ctx):
     data.statsDict['!new'] += 1
 
     updateString = '''```asciidoc
-[Updates]
-> Added Feyre Bank. Use !bank to access and manage your character's purse strings!
+[Updates - see !help for more information]
+= Rewrote Initiative tracking (!init) = 
+    - Added emoji for adding a character to initiative
+    - Added emoji for removing a character from initiative
+    - Added support for characters with spaces in their names
+    - Added support for more complicated dice expressions using the -i argument
+
+= Added persistent character storage (!character)=
+    - Users can now register up to 9 characters
+    - When using the initiative tracker users can add their active character using emojis
+    - Users can change their active character using emojis
+
+    > This functionality will eventually be merged with the bank
+
+= Added ability lookup (!ability)= 
+    - Users can search for class abilities such as Rogue's Vanish
+
+= Added dice reroll emoji (!roll)= 
+    - Users can now reroll a dice using the reroll emoji. They no longer need to retype the command.
+
+= Added a ping command (!ping) = 
+    - !ping can be used to check bot latency
+
+= Bank Command now shows abbreviated version of character accounts =
 
 [Bugs]
-> Fixed a few typos.
+> Fixed typos
+> Fixed initiative tracker
+> Moved most major functionality into cogs
 
 Please report bugs using the !request command```'''
     await ctx.send(updateString)
@@ -1460,15 +528,15 @@ async def on_command_error(ctx, error):
         result = None
         try:
             if((ctx.invoked_with[0] == 'r' and 'd' in ctx.invoked_with)): # Treat this as some attempted dice input
-                result = await data.diceRoller.parse(ctx.invoked_with[0:], gm = False)
-            elif((ctx.invoked_with[1] == 'd' or ctx.invoked_with[2] == 'd')): # Treat this as some attempted dice input
-                result = await data.diceRoller.parse(ctx.invoked_with[0:], gm = False)
-            if(result):
-                await ctx.send(result)
+                result = await bot.get_cog('DiceRoller').dice_roll.parse(ctx.invoked_with[0:], gm = False)
+            elif((ctx.invoked_with[0] == 'd' or ctx.invoked_with[1] == 'd' or ctx.invoked_with[2] == 'd')): # Treat this as some attempted dice input
+                result = await bot.get_cog('DiceRoller').dice_roll.parse(ctx.invoked_with[0:], gm = False)
+            if(result and not result.startswith("```I'm sorry")): # this is bad but ill accept it for now
+                await bot.get_cog('DiceRoller').roll(ctx, args = ctx.invoked_with[0:])
                 data.statsDict['dirty_rolls'] += 1
                 return
         except Exception as e:
-            print("Attempted dice roll failed...")
+            print("Attempted dice roll: " + ctx.invoked_with)
             print(e)
             return
     raise error
@@ -1488,6 +556,84 @@ async def on_ready():
         print("Stream argument is set to false. Skipping stream.")
     save_data.start()
 #Start the bot
+
+
+#region upper/lowercase
+@bot.command()
+async def Hello(ctx, *, args = None):
+    await hello(ctx)
+
+
+@bot.command()
+async def Mm(ctx, *, args = None):
+    await mm(ctx, args = args)
+
+@bot.command()
+async def Randmonster(ctx, *, args = None):
+    await randmonster(ctx)
+
+@bot.command()
+async def Feat(ctx, *, args = None):
+    await feat(ctx, args = args)
+
+@bot.command()
+async def Randfeat(ctx, *, args = None):
+    await randfeat(ctx)
+
+@bot.command()
+async def Item(ctx, *, args = None):
+    await item(ctx, args = args)
+
+@bot.command()
+async def Condition(ctx, *, args = None):
+    await condition(ctx, args = args)
+
+@bot.command()
+async def C(ctx, *, args = None):
+    await c(ctx, args = args)
+
+@bot.command()
+async def Spell(ctx, *, args = None):
+    await spell(ctx, args = args)
+
+@bot.command()
+async def Vote(ctx, *, args = None):
+    await vote(ctx, args = args)
+
+@bot.command()
+async def Weapon(ctx, *, args = None):
+    await weapon(ctx, args = args)
+
+@bot.command()
+async def W(ctx, *, args = None):
+    await w(ctx, args = args)
+
+@bot.command()
+async def Tor(ctx, *, args = None):
+    await tor(ctx, args = args)
+
+@bot.command()
+async def Stats(ctx, *, args = None):
+    await stats(ctx, args = args)
+
+
+@bot.command()
+async def Request(ctx, *, args = None):
+    await request(ctx, args = args)
+
+@bot.command()
+async def Quit(ctx, *, args = None):
+    await quit(ctx)
+
+@bot.command()
+async def Change_presence(ctx, *, args = None):
+    await change_presence(ctx, args = args)
+
+@bot.command()
+async def New(ctx, *, args = None):
+    await new(ctx)
+#endregion
+
 
 global bucket_key
 global access_key
@@ -1513,4 +659,3 @@ elif (sys.argv[1] == 'release'):
     with open(path.join(pyDir, 'access_key.txt'), 'r') as file:
         access_key = file.readline().strip()
     bot.run(releaseToken)
-

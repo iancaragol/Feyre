@@ -1,0 +1,5 @@
+<<<<<<< HEAD
+{"!tor horo": 208, "!tor zodiac": 200, "!hello": 780, "!tor styles": 29, "!tor randchar": 44, "!roll": 260596, "!help": 14940, "!mm": 4226, "!randmonster": 271, "!feat": 932, "!randfeat": 154, "!init": 70656, "!spell": 9141, "!weapon": 1242, "!item": 1174, "!gm": 1954, "!new": 128, "!admin": 332, "!set_prefix": 547, "!request": 79, "!dom": 2178, "!c": 961, "!currency": 229, "!vote": 67, "!condition": 173, "!bank": 809, "dirty_rolls": 20261}
+=======
+{"!tor horo": 208, "!tor zodiac": 200, "!hello": 501, "!tor styles": 29, "!tor randchar": 44, "!roll": 154043, "!help": 11803, "!mm": 3088, "!randmonster": 232, "!feat": 708, "!randfeat": 142, "!init": 42675, "!spell": 6745, "!weapon": 723, "!item": 748, "!gm": 663, "!new": 91, "!admin": 149, "!set_prefix": 228, "!request": 37, "!dom": 955, "!c": 469, "!currency": 96, "!vote": 26, "!condition": 84, "!bank": 2, "dirty_rolls": 0, "rerolls": 2, "chars_added": 0}
+>>>>>>> 9885e55f10a4bb6784917fff49cf7776d564e1b7

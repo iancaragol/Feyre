@@ -1,0 +1,267 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html4" lang="python" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Privacy &amp; Data &mdash; Feyre 0.0.1 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="Support Server" href="support.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home" alt="Documentation Home"> Feyre
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="overview.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="commands.html">Commands</a></li>
+<li class="toctree-l1"><a class="reference internal" href="support.html">Support Server</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Privacy &amp; Data</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#privacy">Privacy</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#what-can-feyre-see">What can Feyre see?</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#are-the-arguments-to-a-command-stored-anywhere">Are the arguments to a command stored anywhere?</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#any-other-questions-or-concerns">Any other questions or concerns?</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#data">Data</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#what-kind-of-data-does-feyre-store">What kind of data does Feyre store?</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#where-is-this-data-stored">Where is this data stored?</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Feyre</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>Privacy &amp; Data</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/privacy.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="privacy-data">
+<span id="id1"></span><h1>Privacy &amp; Data<a class="headerlink" href="#privacy-data" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="privacy">
+<span id="id2"></span><h2>Privacy<a class="headerlink" href="#privacy" title="Permalink to this headline">¶</a></h2>
+<p>Feyre only reads the arguments of an existing command from <a class="reference internal" href="commands.html#commands"><span class="std std-ref">Commands</span></a>. Feyre <em>can not</em> read messages in your discord server that are not on that list. It will only see and proccess messages that start with the prefix for your server and the command. Furthermore, all data feyre stores is anonymous.</p>
+<div class="section" id="what-can-feyre-see">
+<h3>What can Feyre see?<a class="headerlink" href="#what-can-feyre-see" title="Permalink to this headline">¶</a></h3>
+<p>Feyre only sees messages that start with the server prefix and a command.</p>
+<p>For example, this message will be seen and proccessed by Feyre:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>!roll Oh boy I hope I didnt put anything incriminating here
+</pre></div>
+</div>
+<p>But, this message will not be seen by Feyre:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">roll</span> <span class="n">Oh</span> <span class="n">boy</span> <span class="n">good</span> <span class="n">thing</span> <span class="n">Feyre</span> <span class="n">cant</span> <span class="n">see</span> <span class="n">this</span> <span class="n">message</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="are-the-arguments-to-a-command-stored-anywhere">
+<h3>Are the arguments to a command stored anywhere?<a class="headerlink" href="#are-the-arguments-to-a-command-stored-anywhere" title="Permalink to this headline">¶</a></h3>
+<p>No, arguments are not stored or logged anywhere. In the above example Feyre would fail to understand the input to !roll and respond with an error message.</p>
+</div>
+<div class="section" id="any-other-questions-or-concerns">
+<h3>Any other questions or concerns?<a class="headerlink" href="#any-other-questions-or-concerns" title="Permalink to this headline">¶</a></h3>
+<p>Hop in the <a class="reference external" href="https://discord.gg/zjyrtWZ">support server</a> and ask the developer!</p>
+</div>
+</div>
+<div class="section" id="data">
+<span id="id3"></span><h2>Data<a class="headerlink" href="#data" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="what-kind-of-data-does-feyre-store">
+<h3>What kind of data does Feyre store?<a class="headerlink" href="#what-kind-of-data-does-feyre-store" title="Permalink to this headline">¶</a></h3>
+<p><strong>User Id's</strong></p>
+<p>These are a unique integer that represents a discord user. You can find a user's unique id by enabling developer options in the settings, right clicking on a user, and selecting copy id. These ids are used for setting a gm on a per channel basis. When a user uses any command, their user id is stored in a list of user ids. This list is used to keep track of the number of users that the bot has and in any command that is tied to a specific user (character, gm, bank, init).</p>
+<p><strong>Channel Id's</strong></p>
+<p>These are used by init and gm rolls to keep differentiate initatiave trackers and gms by channel. They are used stored in pairs (guild id: channel id, initative) and (guild id: channel id, gm's user id)</p>
+<p><strong>Guild Ids</strong></p>
+<p>Guild Ids are a unique integer that represents a guild. They are stored in pairs (id, prefix) by the !set_prefix command. They are also used by the GM roll and initative commands in conjunction with the channel id.</p>
+<p><strong>Character Information</strong></p>
+<p>Character names, bank accounts, and initatiave are stored along with a user's id.</p>
+</div>
+<div class="section" id="where-is-this-data-stored">
+<h3>Where is this data stored?<a class="headerlink" href="#where-is-this-data-stored" title="Permalink to this headline">¶</a></h3>
+<p>Feyre runs on a VM on Microsoft's Azure. All data is stored in an SQL database also running on Azure.</p>
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+      
+        <a href="support.html" class="btn btn-neutral float-left" title="Support Server" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2020, Ian Caragol
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

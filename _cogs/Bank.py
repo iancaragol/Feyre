@@ -5,52 +5,12 @@ import asyncio
 import operator
 import re
 
+import discord
+from discord.ext import commands
+
 from itertools import count, filterfalse
 from os import path
-
-class Character():
-    def __init__(self, user_id, character_name, character_id, pp, gp, ep, sp, cp):
-        self.user_id = user_id
-        self.character_name = character_name
-        self.character_id = character_id
-        self.pp = pp
-        self.gp = gp
-        self.ep = ep
-        self.sp = sp
-        self.cp = cp
-
-    async def coalesce(self):
-        total_pp = 0
-        total_gp = 0
-        total_ep = 0
-        total_sp = 0
-        total_cp = self.pp*1000 + self.gp*100 + self.ep*50 + self.sp*10 + self.cp
-        
-        if total_cp > 0:
-            s, c = divmod(total_cp, 10)
-            total_sp += s
-            total_cp = c
-        
-        if total_sp > 0:
-            e, s = divmod(total_sp, 5)
-            total_ep += e
-            total_sp = s
-        
-        if total_ep > 0:
-            g, e = divmod(total_ep, 2)
-            total_gp += g
-            total_ep = e
-        
-        if total_gp > 0:
-            p, g = divmod(total_gp, 10)
-            total_pp += p
-            total_gp = g
-
-        self.pp = total_pp
-        self.gp = total_gp
-        self.ep = total_ep
-        self.sp = total_sp
-        self.cp = total_cp
+from _classes.Character import Character
 
 class Bank():
     def __init__(self):
@@ -420,7 +380,7 @@ class Bank():
         code_block = textwrap.dedent("""
         ```asciidoc
         = $ Feyre Bank $ =
-        [ Character | ID ]
+        [ Character | ID | $]
         """)
 
         characters = await self.get_characters(user_id)
@@ -429,6 +389,14 @@ class Bank():
             code_block += c.character_name
             code_block += " | "
             code_block += str(c.character_id)
+            code_block += " | "
+            if c.pp != 0: code_block += f"{c.pp}pp, "
+            if c.gp != 0: code_block += f"{c.gp}gp, "
+            if c.ep != 0: code_block += f"{c.ep}ep, "
+            if c.sp != 0: code_block += f"{c.sp}sp, "
+            if c.cp != 0: code_block += f"{c.cp}cp"
+            code_block = code_block.strip()
+            if code_block.endswith(','): code_block = code_block.rstrip(',')
             code_block += '\n'
 
         code_block = code_block.strip() + "\n\nSee !help bank for examples.```"
@@ -507,15 +475,25 @@ class Bank():
             elif character_name:
                 return f"""```{character_name} does not have a bank account. Try !bank to see your characters.```"""
             
-            
-        
 
-# def main():
-#     b = Bank()
-#     b.add_character(0, "Test Character")
-#     b.deposit(0, "Test Character", 0, 1, 2, 3, 4, 5)
+class Banker(commands.Cog):
+    def __init__(self, bot, data):
+        self.bot = bot
+        self.data = data
+        self.bank_class = Bank()
 
-#     b.remove_character(0, "Test Character", 0)
+    @commands.command()
+    async def bank(self, ctx, *, args = None):
+        if (ctx.author.id not in self.data.userSet):
+            self.data.userSet.add(ctx.author.id)
+        self.data.statsDict['!bank'] += 1
 
-# if __name__ == "__main__":
-#     main()
+        if not args:
+            await ctx.send(await self.bank_class.get_characters_formatted(ctx.author.id))
+
+        if args:
+            await ctx.send(await self.bank_class.parse_args(ctx.author.id, args))
+
+    @commands.command()
+    async def Bank(self, ctx, *, args = None):
+        await self.bank(ctx, args = args)

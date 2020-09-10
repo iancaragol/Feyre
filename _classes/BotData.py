@@ -8,16 +8,20 @@ from _classes.BookOfTor import BookOfTor
 from _classes.Monster import MonsterManual
 from _classes.Feat import Feats
 from _classes.Spellbook import Sb
-from _classes.DiceRolls import Roller
-from _classes.Init import Initiative
+# from _classes.DiceRolls import Roller
+# from _classes.Init import Initiative
 from _classes.Weapons import Weapons
-from _classes.Class_Abilities import Class_Abil
+# from _classes.Class_Abilities import Class_Abil
 from _classes.Items import ItemLookup
-from _classes.DeckOfMany import DeckOfMany
+# from _classes.DeckOfMany import DeckOfMany
 from _classes.ClassFeatures import ClassFeatures
-from _classes.CurrencyConversion import CurrencyConverter
+# from _classes.CurrencyConversion import CurrencyConverter
 from _classes.Conditions import ConditionLookup
-from _classes.Bank import Character, Bank
+# from _classes.Bank import Character, Bank
+
+# from _classes.HelpHandler import HelpHandler
+from _classes.StatsHandler import StatsHandler
+# from _classes.CharacterSelection import CharacterSelectionHandler
 
 class BotData():
     """
@@ -51,7 +55,7 @@ class BotData():
             JSON read error
         """
         #Main feature classes
-        self.diceRoller = Roller()
+        # self.diceRoller = Roller()
         self.spellBook = Sb()
         self.monsterManual = MonsterManual()
         self.feats = Feats()
@@ -59,16 +63,21 @@ class BotData():
         self.weapons = Weapons()
         #self.class_abilities = Class_Abil() #deprecated
         self.item_lookup = ItemLookup()
-        self.deck_of_many = DeckOfMany()
+        # self.deck_of_many = DeckOfMany()
         self.class_features = ClassFeatures()
-        self.currency_converter = CurrencyConverter()
+        # self.currency_converter = CurrencyConverter()
         self.condition_lookup = ConditionLookup()
 
-        self.bank = Bank()
+        # self.bank = Bank()
+        # self.help_handler = HelpHandler()
+        self.stats_handler = StatsHandler()
+        # self.character_selection_handler = CharacterSelectionHandler()
 
         #Initiative tracking dictionaries
-        self.initDict = {}
-        self.initEmbedDict = {}
+        # self.initDict = {}
+        # self.initEmbedDict = {}
+
+        self.roll_dict = {}
 
         self.gmDict = {}
 
