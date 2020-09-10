@@ -1,0 +1,592 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html4" lang="python" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Commands &mdash; Feyre 0.0.1 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Support Server" href="support.html" />
+    <link rel="prev" title="Getting Started" href="overview.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home" alt="Documentation Home"> Feyre
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="overview.html">Getting Started</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Commands</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#help">Help</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#dice-rolls">Dice Rolls</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#secret-dice-rolls">Secret Dice Rolls</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#initiative-tracker">Initiative Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#character-management">Character Management</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#deck-of-many-things">Deck of Many Things</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#currency-conversion">Currency Conversion</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#bank">Bank</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#feat-lookup">Feat Lookup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#condition-lookup">Condition Lookup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#weapon-lookup">Weapon Lookup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#item-lookup">Item Lookup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#monster-lookup">Monster Lookup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#spell-lookup">Spell Lookup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#class-lookup">Class Lookup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#ability-lookup">Ability Lookup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#usage-statistics">Usage Statistics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#request-new-features-bug-reports">Request New Features &amp; Bug Reports</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#new">New</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#set-feyre-s-prefix">Set Feyre's Prefix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#vote-for-feyre">Vote for Feyre</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="support.html">Support Server</a></li>
+<li class="toctree-l1"><a class="reference internal" href="privacy.html">Privacy &amp; Data</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Feyre</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>Commands</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/commands.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="commands">
+<span id="id1"></span><h1>Commands<a class="headerlink" href="#commands" title="Permalink to this headline">¶</a></h1>
+<p>Feyre has a rich set of commands to help you play role-playing games in discord.</p>
+<div class="section" id="help">
+<span id="id2"></span><h2>Help<a class="headerlink" href="#help" title="Permalink to this headline">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">!help</span></code></p>
+<p>!help lists all of Feyre's commands and any important updates or information. Instead of referring to this page you can always use the !help command.</p>
+<p><strong>Learn More About a Command</strong></p>
+<p><code class="docutils literal notranslate"><span class="pre">!help</span> <span class="pre">[command]</span></code></p>
+<p>If you need more information on how a command works you can use !help like this:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>!help init
+</pre></div>
+</div>
+</div>
+<div class="section" id="dice-rolls">
+<span id="dice-rolling"></span><h2>Dice Rolls<a class="headerlink" href="#dice-rolls" title="Permalink to this headline">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">!roll</span> <span class="pre">[dice</span> <span class="pre">expression]</span></code> <em>or</em> <code class="docutils literal notranslate"><span class="pre">!r</span> <span class="pre">[dice</span> <span class="pre">expression]</span></code></p>
+<p>!roll can be used to roll dice of any size with complicated expressions and built in skill checks.</p>
+<p>Dice are represented with the standard [# of dice]d[size of dice] format. You can also use !r:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>!roll 4d6
+!roll 1d6*2
+!r 1d20 + 5
+!r 1d1000 + 2d2000 * 3 / 3 - 1
+</pre></div>
+</div>
+<p><strong>Skill Checks</strong></p>
+<p>Skill checks can be built into the dice expression using the &lt; and &gt; symbols:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>!roll 1d20 &gt; 15
+</pre></div>
+</div>
+<p><strong>Advantage &amp; Disadvantage</strong></p>
+<p>You can roll with advantage or disadvantage using the -a and -d flags before the dice expression:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>!roll -a 1d20
+!roll -d 1d20+5
+</pre></div>
+</div>
+<p>Finally, you can reroll any dice roll by clicing the reroll emoji.</p>
+<p><strong>Rolling a single die</strong></p>
+<p><code class="docutils literal notranslate"><span class="pre">!d[size]</span> <span class="pre">[expression]</span></code></p>
+<p>!d[size] [expression] can be used if you only want to roll one dice. If you only need to roll one dice this command is quicker than typing !roll.</p>
+<p>This command supports standard dice sizes [4,6,8,10,12,20] and expressions. A space is neccessary between the dice and any modifiers.</p>
+<p>You can also use !dp to roll for percentile:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>!d20
+!d6 +2
+!dp
+</pre></div>
+</div>
+</div>
+<div class="section" id="secret-dice-rolls">
+<span id="gm-rolling"></span><h2>Secret Dice Rolls<a class="headerlink" href="#secret-dice-rolls" title="Permalink to this headline">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">!gm</span></code>
+<code class="docutils literal notranslate"><span class="pre">!gm</span> <span class="pre">roll</span> <span class="pre">[expression]</span></code></p>
+<p>!gm can be used to send dice rolls to the GM without other players being able to see the result. This is helpful in cases where a player needs to make a roll without the rest of the parties knowing.
+GM's are set on a per channel basis.</p>
+<p><strong>Setting the GM</strong></p>
+<p><code class="docutils literal notranslate"><span class="pre">!gm</span></code></p>
+<p>!gm sets the channels GM to the user. Any further rolls using the !gm command will be DM'd to the roller and the GM.</p>
+<p><code class="docutils literal notranslate"><span class="pre">!gm</span> <span class="pre">roll</span> <span class="pre">[dice</span> <span class="pre">expression]</span></code></p>
+<p>If the channel has a GM then this will roll [dice expression] and direct message the result to the user and the GM for that channel.</p>
+<p>Example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>!gm
+!gm roll 1d20-5
+</pre></div>
+</div>
+</div>
+<div class="section" id="initiative-tracker">
+<span id="id3"></span><h2>Initiative Tracker<a class="headerlink" href="#initiative-tracker" title="Permalink to this headline">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">!init</span></code> <em>or</em> <code class="docutils literal notranslate"><span class="pre">!i</span></code></p>
+<p>!init is a streamlined, per channel based initative tracker.</p>
+<p><strong>Buttons</strong></p>
+<p>To make using the tracker easier users can use these buttons instead of typing</p>
+<ul class="simple">
+<li>Crossed Swords: Moves the turn icon (&gt;).</li>
+<li>Plus Sign: Add's the user's active character to initiative, see <a class="reference internal" href="#character"><span class="std std-ref">Character Management</span></a>.</li>
+<li>Skull and Crossbones: Removes the user's most recently added character from initative.</li>
+</ul>
+<p><strong>Starting Initiative</strong></p>
+<p><code class="docutils literal notranslate"><span class="pre">!init</span> <span class="pre">start</span></code></p>
+<p>Starts an initaive tracker in the same channel, also used to reset an existing initiative tracker.</p>
+<p><code class="docutils literal notranslate"><span class="pre">!init</span> <span class="pre">start</span> <span class="pre">-v</span></code></p>
+<p>Starts an initiative tracker with verbosity.</p>
+<p><strong>Adding a Character to Initiative</strong></p>
+<p><code class="docutils literal notranslate"><span class="pre">!init</span></code></p>
+<p>Adds the user's active character to initiative. You can also press the Plus Sign instead.</p>
+<p><code class="docutils literal notranslate"><span class="pre">!init</span> <span class="pre">[character</span> <span class="pre">name]</span></code></p>
+<p>Adds a character with [character name] to initiative and rolls 1d20 for them.</p>
+<p><code class="docutils literal notranslate"><span class="pre">!init</span> <span class="pre">[character</span> <span class="pre">name]</span> <span class="pre">[initiative]</span></code></p>
+<p>Adds a character with [character name] to initiative with an initiative of [initiative]. Including a decimal can be used to easily insert a character anywhere in the turn order.</p>
+<p>If a character with [character name] already exists, their initiative value will be updated instead.</p>
+<p><code class="docutils literal notranslate"><span class="pre">!init</span> <span class="pre">[character</span> <span class="pre">name]</span> <span class="pre">-i</span> <span class="pre">[dice</span> <span class="pre">expression]</span></code></p>
+<p>Adds a character with [character name] to initiative and rolls [dice expression] for them.</p>
+<p>If a character with [character name] already exists, their initiative value will be updated instead.</p>
+<p><strong>Removing a Character from Initiative</strong></p>
+<p><code class="docutils literal notranslate"><span class="pre">!init</span> <span class="pre">-r</span></code></p>
+<p>Removes the most recent character added by the user from initiative. You can press the Skull and Crossbones isntead.</p>
+<p><code class="docutils literal notranslate"><span class="pre">!init</span> <span class="pre">-r</span> <span class="pre">[character</span> <span class="pre">name]</span></code></p>
+<p>Removes [character name] from initiative.</p>
+<p><strong>Example</strong></p>
+<p>The GM starts initiative:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>!init start
+</pre></div>
+</div>
+<p>Player A adds their active character to initiative:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>!init
+</pre></div>
+</div>
+<p>Player B adds a character to initiative and rolls 1d20+5:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>!init Frodo -i 1d20+5
+</pre></div>
+</div>
+<p>Player C rolls a physical set of dice and adds their character to initiative manually:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>!init Legolas 17
+</pre></div>
+</div>
+<p>Player B removes Frodo from initiative:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>!init -r Frodo
+</pre></div>
+</div>
+<p>At the end of combat, the GM resets the tracker:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>!init start
+</pre></div>
+</div>
+</div>
+<div class="section" id="character-management">
+<span id="character"></span><h2>Character Management<a class="headerlink" href="#character-management" title="Permalink to this headline">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">!character</span></code> <em>or</em> <code class="docutils literal notranslate"><span class="pre">!char</span></code></p>
+<p>!character is used to set your active character which is used by the initiative tracker. You can create up to 9 characters and set a character as active using emojis or the command argument [id]. Characters follow you across servers and are persistent.</p>
+<p>This command can also be shortened to !char</p>
+<p><strong>Select Your Active Character</strong></p>
+<p><code class="docutils literal notranslate"><span class="pre">!character</span></code></p>
+<p>Shows your character list and lets you select your active character using the emoji buttons.</p>
+<p><code class="docutils literal notranslate"><span class="pre">character</span> <span class="pre">[ID]</span></code></p>
+<p>Sets your active character to the character with an id of [ID].</p>
+<p><strong>Create a New Character</strong></p>
+<p><code class="docutils literal notranslate"><span class="pre">!character</span> <span class="pre">-a</span> <span class="pre">[character</span> <span class="pre">name]</span> <span class="pre">-i</span> <span class="pre">[initiative</span> <span class="pre">dice</span> <span class="pre">expression]</span></code></p>
+<p>Adds a character with [character name] to your character list. [initiative dice expression] will be rolled whenever this charater is added to initiative.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">-i</span> <span class="pre">[initiative</span> <span class="pre">dice</span> <span class="pre">expression]</span></code> tag is optional. If it is not inlucded that character's default to rolling 1d20.</p>
+<p><strong>Removing a Character</strong></p>
+<p><code class="docutils literal notranslate"><span class="pre">!character</span> <span class="pre">-r</span> <span class="pre">[ID]</span></code></p>
+<p>Removes the character with [ID] from your character list. You can find your character's IDs using <code class="docutils literal notranslate"><span class="pre">!character</span></code>.</p>
+<p><strong>Example</strong></p>
+<p>Player A's last character died a tragic death so they create a new one:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>!character -a Galloway the Snail -i 1d2-1
+</pre></div>
+</div>
+<p>Player A removes their dead character from their character list:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>!character -r 1
+</pre></div>
+</div>
+<p>Player B creates a generic character with a default initiative of 1d20:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>!character -a Generic Character No1
+</pre></div>
+</div>
+<p>Player B doesn't like their character so they set their active character to someone else:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>!character 7
+</pre></div>
+</div>
+</div>
+<div class="section" id="deck-of-many-things">
+<span id="dom"></span><h2>Deck of Many Things<a class="headerlink" href="#deck-of-many-things" title="Permalink to this headline">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">!dom</span></code></p>
+<p>!dom can be used to draw a card from the deck of many things. The -i flag will include an image!</p>
+<p>Draw one card from the Deck of Many Things:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>!dom
+</pre></div>
+</div>
+<p>Draw one card from the Deck of Many Things and include an image of the card:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>!dom -i
+</pre></div>
+</div>
+</div>
+<div class="section" id="currency-conversion">
+<span id="currency"></span><h2>Currency Conversion<a class="headerlink" href="#currency-conversion" title="Permalink to this headline">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">!currency</span></code> <em>or</em> <code class="docutils literal notranslate"><span class="pre">!convert</span></code> <em>or</em> <code class="docutils literal notranslate"><span class="pre">!cur</span></code></p>
+<p>!currency can be used to convert any denomination of platinum, gold, electrum, silver, and copper to gold, silver and copper.
+It can also be used to evenly divide an amount of currency between any number of players by including a /x at the end where x is the number of players.</p>
+<ul class="simple">
+<li>pp = Platinum</li>
+<li>gp = Gold</li>
+<li>ep = Electrum</li>
+<li>sp = Silver</li>
+<li>cp = Copper</li>
+</ul>
+<p>When providing the amounts there is no need to worry about capitlization or spacing.</p>
+<p><strong>Convert Currency to GP, SP, CP</strong></p>
+<p><code class="docutils literal notranslate"><span class="pre">!currency</span> <span class="pre">[amount][abbreviation]</span></code></p>
+<p>For example, convert 177 ep, 112 sp, 43 cp to gp, sp, cp:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>!currency 117ep112sp43cp
+</pre></div>
+</div>
+<p><strong>Divide Currency Amongst Players</strong></p>
+<p><code class="docutils literal notranslate"><span class="pre">!currency</span> <span class="pre">[amount][abbreviation]</span> <span class="pre">/</span> <span class="pre">[number</span> <span class="pre">of</span> <span class="pre">players]</span></code></p>
+<p>For example, divide 111 gp, 37 sp, 4 cp amongst 4 players:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>!currency 111gp37sp4cp/4
+</pre></div>
+</div>
+</div>
+<div class="section" id="bank">
+<span id="id4"></span><h2>Bank<a class="headerlink" href="#bank" title="Permalink to this headline">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">!bank</span></code></p>
+<p>You can use Feyre to manage all of your character's wallets. Your bank is tied to your Discord ID and can be accessed from any server/channel or by direct messaging Feyre.</p>
+<p>Interacting with your bank requires the use of argument flags (-a, -r, -d, -w). If you have any suggestions on how this experience can be streamlined please use the !request command and let me know!</p>
+<p>[currency values] have the same format as the <a class="reference internal" href="#currency"><span class="std std-ref">Currency Conversion</span></a> command. For example you can represent 10 platinum, 9 gold, 8 electrum, 7 silver, and 6 copper like this: 10pp9gp8ep7sp6cp</p>
+<p><em>This feature will eventually be combined with</em> <a class="reference internal" href="#character"><span class="std std-ref">Character Management</span></a>.</p>
+<p><strong>See Your Characters</strong></p>
+<p><code class="docutils literal notranslate"><span class="pre">!bank</span></code></p>
+<p>Shows all of your characters and their unique IDs. The character's id (a unique number representing that character) can be used instead of [character name].</p>
+<p><strong>Add a Character</strong></p>
+<p><code class="docutils literal notranslate"><span class="pre">!bank</span> <span class="pre">-a</span> <span class="pre">[character</span> <span class="pre">name]</span></code></p>
+<p>Adds a new character to your bank with [character name]. This character will also be assigned a unique ID which can be used to access its account.</p>
+<p><strong>Remove a Character</strong></p>
+<p><code class="docutils literal notranslate"><span class="pre">!bank</span> <span class="pre">-r</span> <span class="pre">[character</span> <span class="pre">name]</span></code> <em>or</em> <code class="docutils literal notranslate"><span class="pre">!bank</span> <span class="pre">-r</span> <span class="pre">[character</span> <span class="pre">id]</span></code></p>
+<p>Deletes the account associated with [character name] or [character id]</p>
+<p><strong>Make a Deposit</strong></p>
+<p><code class="docutils literal notranslate"><span class="pre">!bank</span> <span class="pre">-d</span> <span class="pre">[character</span> <span class="pre">name]</span> <span class="pre">[currency</span> <span class="pre">values]</span></code></p>
+<p>Deposits the specified [currency values] into the account associated with [character name] or [character id]</p>
+<p><strong>Make a Withdrawal</strong></p>
+<p><code class="docutils literal notranslate"><span class="pre">!bank</span> <span class="pre">-w</span> <span class="pre">[character</span> <span class="pre">name]</span> <span class="pre">[currency</span> <span class="pre">values]</span></code></p>
+<p>Withdraws the specified [currency values] into the account associated with [character name] or [character id]</p>
+<p><strong>Example</strong></p>
+<p>Add a character with the name Bilbo to your bank:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>!bank -a Bilbo
+</pre></div>
+</div>
+<p>Deposit (-d) 10 silver and 5 copper into Bilbo's account:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>!bank -d Bilbo 10sp5cp
+</pre></div>
+</div>
+<p>See all of your characters and their unique IDs:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>!bank
+</pre></div>
+</div>
+<p>Withdraw 3 copper from Bilbo's account. In this example Bilbo has been assigned the unique ID 1 because he is the first character associated with the example user:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>!bank -w 1 3cp
+</pre></div>
+</div>
+<p>Delete Bilbo's bank account:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>!bank -r Bilbo
+</pre></div>
+</div>
+</div>
+<div class="section" id="feat-lookup">
+<span id="id5"></span><h2>Feat Lookup<a class="headerlink" href="#feat-lookup" title="Permalink to this headline">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">!feat</span> <span class="pre">[feat</span> <span class="pre">name]</span></code></p>
+<p>!feat can be used to lookup feats from the Player's Handbook:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>!feat Keen Mind
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">!randfeat</span></code></p>
+<p>Gives a random feat</p>
+</div>
+<div class="section" id="condition-lookup">
+<span id="id6"></span><h2>Condition Lookup<a class="headerlink" href="#condition-lookup" title="Permalink to this headline">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">!condition</span></code></p>
+<p>!condition lists all of the conditions from the Player's Handbook:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>!condition
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">!condition</span> <span class="pre">[condition</span> <span class="pre">name]</span></code></p>
+<p>!condition [condition name] gives more information on the specified condition:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>!condition prone
+</pre></div>
+</div>
+</div>
+<div class="section" id="weapon-lookup">
+<span id="id7"></span><h2>Weapon Lookup<a class="headerlink" href="#weapon-lookup" title="Permalink to this headline">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">!weapon</span> <span class="pre">[weapon</span> <span class="pre">name]</span></code> <em>or</em> <code class="docutils literal notranslate"><span class="pre">!w</span> <span class="pre">[weapon</span> <span class="pre">name]</span></code></p>
+<p>!weapon is used to look up the stats on a weapon:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>!w Longsword
+</pre></div>
+</div>
+</div>
+<div class="section" id="item-lookup">
+<span id="id8"></span><h2>Item Lookup<a class="headerlink" href="#item-lookup" title="Permalink to this headline">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">!item</span> <span class="pre">[item</span> <span class="pre">name]</span></code></p>
+<p>!item is used to lookup items from the Dungeon Master's Guide:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>!item Portable Hole
+</pre></div>
+</div>
+</div>
+<div class="section" id="monster-lookup">
+<span id="id9"></span><h2>Monster Lookup<a class="headerlink" href="#monster-lookup" title="Permalink to this headline">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">!mm</span> <span class="pre">[monster</span> <span class="pre">name]</span></code></p>
+<p>!mm is used to lookup monsters from the Monster Manual:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>!mm Young Black Dragon
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">!randmonster</span></code></p>
+<p>Gives a random monster.</p>
+</div>
+<div class="section" id="spell-lookup">
+<span id="id10"></span><h2>Spell Lookup<a class="headerlink" href="#spell-lookup" title="Permalink to this headline">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">!spell</span> <span class="pre">[spell</span> <span class="pre">name]</span></code></p>
+<p>!spell is used to lookup spells from the Player's Handbook:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>!spell Firebolt
+</pre></div>
+</div>
+</div>
+<div class="section" id="class-lookup">
+<span id="id11"></span><h2>Class Lookup<a class="headerlink" href="#class-lookup" title="Permalink to this headline">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">!c</span> <span class="pre">[class</span> <span class="pre">name]</span></code></p>
+<p>!c is used to look up all of the features of a class. This can be a lot of text:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>!c wizard
+</pre></div>
+</div>
+<p>Why is the command !c and not !class? Thats because class is a python keyword.</p>
+</div>
+<div class="section" id="ability-lookup">
+<span id="id12"></span><h2>Ability Lookup<a class="headerlink" href="#ability-lookup" title="Permalink to this headline">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">!ability</span> <span class="pre">[ability</span> <span class="pre">name]</span></code></p>
+<p>!ability can be used to lookup class abilities such as Barbarian's Danger Sense. All abilities from the PHB are supported. If you think an ability is missing or incorrect please report it with the !request command.</p>
+<p>Some classes have abilities with the same names. To specify which class you are interested in include the name of the class.</p>
+<p>Example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>!ability Danger Sense
+!ability spellcasting wizard
+</pre></div>
+</div>
+</div>
+<div class="section" id="usage-statistics">
+<span id="stats"></span><h2>Usage Statistics<a class="headerlink" href="#usage-statistics" title="Permalink to this headline">¶</a></h2>
+<p><cite>!stats</cite></p>
+<p>Shows command usage statistics the most popular commands. Feyre keeps track of the number of times each command has been used and the total user count.</p>
+<p><cite>!stats all</cite></p>
+<p>Shows command usage statistics for all commands.</p>
+</div>
+<div class="section" id="request-new-features-bug-reports">
+<span id="request"></span><h2>Request New Features &amp; Bug Reports<a class="headerlink" href="#request-new-features-bug-reports" title="Permalink to this headline">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">!request</span> <span class="pre">[feature</span> <span class="pre">or</span> <span class="pre">bug]</span></code></p>
+<p>Please help improve the bot by request features you would find useful! This is also used to report bugs</p>
+<p>For example, a user recently requested ability lookup because they found it cumbersome to use the !c command:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>!request Ability lookup for class abilities
+</pre></div>
+</div>
+</div>
+<div class="section" id="new">
+<h2>New<a class="headerlink" href="#new" title="Permalink to this headline">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">!new</span></code></p>
+<p>!new shows any new features, bug fixes, etc...</p>
+</div>
+<div class="section" id="set-feyre-s-prefix">
+<h2>Set Feyre's Prefix<a class="headerlink" href="#set-feyre-s-prefix" title="Permalink to this headline">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">!admin</span></code></p>
+<p>!admin is for server administrators. Currently the only command available to adminstrators is !set_prefix.</p>
+<p><strong>Set Prefix</strong></p>
+<p><code class="docutils literal notranslate"><span class="pre">!set_prefix</span> <span class="pre">[prefix]</span></code></p>
+<p>Sets the server wide prefix to [prefix]. Prefix must be ?, !, ~, <a href="#id13"><span class="problematic" id="id14">`</span></a>, #, $, %, ^, &amp;, <a href="#id15"><span class="problematic" id="id16">*</span></a>, ,, ., ;, :, &lt;, or &gt;:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>!set_prefix ?
+</pre></div>
+</div>
+<p><em>NOTE: If you forget the prefix you will no longer be able to summon Feyre! (For now)</em></p>
+</div>
+<div class="section" id="vote-for-feyre">
+<h2>Vote for Feyre<a class="headerlink" href="#vote-for-feyre" title="Permalink to this headline">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">!vote</span></code></p>
+<p>top.gg ranks discord bots based on the number of votes that they have. Please vote for Feyre using !vote. Thanks!</p>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="support.html" class="btn btn-neutral float-right" title="Support Server" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="overview.html" class="btn btn-neutral float-left" title="Getting Started" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2020, Ian Caragol
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

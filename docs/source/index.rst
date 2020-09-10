@@ -1,20 +1,22 @@
-.. Feyre documentation master file, created by
-   sphinx-quickstart on Thu Sep 10 11:45:05 2020.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
+.. Feyre documentation master file
 
 Welcome to Feyre's documentation!
 =================================
 
+Feyre is a streamlined and intuitive discord bot that helps you and your friends play Dungeons and Dragons
+or other role-playing games in discord. It is designed to be as unintrusive as possible so that you can
+focus on the game.
+
 .. toctree::
    :maxdepth: 2
-   :caption: Contents:
 
+   overview.rst
+   commands.rst
+   support.rst
+   privacy.rst
 
 
 Indices and tables
 ==================
 
-* :ref:`genindex`
-* :ref:`modindex`
 * :ref:`search`
