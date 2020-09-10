@@ -475,6 +475,8 @@ async def new(ctx):
 = Added a ping command (!ping) = 
     - !ping can be used to check bot latency
 
+= Bank Command now shows abbreviated version of character accounts =
+
 [Bugs]
 > Fixed typos
 > Fixed initiative tracker

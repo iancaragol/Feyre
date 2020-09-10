@@ -380,7 +380,7 @@ class Bank():
         code_block = textwrap.dedent("""
         ```asciidoc
         = $ Feyre Bank $ =
-        [ Character | ID ]
+        [ Character | ID | $]
         """)
 
         characters = await self.get_characters(user_id)
@@ -389,6 +389,14 @@ class Bank():
             code_block += c.character_name
             code_block += " | "
             code_block += str(c.character_id)
+            code_block += " | "
+            if c.pp != 0: code_block += f"{c.pp}pp, "
+            if c.gp != 0: code_block += f"{c.gp}gp, "
+            if c.ep != 0: code_block += f"{c.ep}ep, "
+            if c.sp != 0: code_block += f"{c.sp}sp, "
+            if c.cp != 0: code_block += f"{c.cp}cp"
+            code_block = code_block.strip()
+            if code_block.endswith(','): code_block = code_block.rstrip(',')
             code_block += '\n'
 
         code_block = code_block.strip() + "\n\nSee !help bank for examples.```"

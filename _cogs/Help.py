@@ -25,6 +25,9 @@ class Helper(commands.Cog):
             Hello! My name is Feyre. You can use chat or DM's to summon me. 
             ===============================================================
 
+            [Read the Documentation]
+            feyre.readthedocs.io
+
             The default prefix is !. To learn more about a command type !help [command].
             Like this: !help roll
 
