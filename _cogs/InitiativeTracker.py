@@ -315,7 +315,7 @@ class InitiativeCog(commands.Cog):
         await self.tracker_dict[tracker_key].reset_footer()
            
         try:           
-            reaction, user = await self.bot.wait_for('reaction_add', check=lambda r, u:u.id != self.bot.user.id and r.message.id == msg.id, timeout=30)#259200) # Times out after 3 days
+            reaction, user = await self.bot.wait_for('reaction_add', check=lambda r, u:u.id != self.bot.user.id and r.message.id == msg.id, timeout=259200) # Times out after 3 days
 
             if reaction != None:
                 if str(reaction.emoji) == self.plus:
