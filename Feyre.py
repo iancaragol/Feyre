@@ -517,7 +517,7 @@ async def on_ready():
     print ("I am running as: " + bot.user.name)
     print ("With the ID: " + str(bot.user.id))
 
-    await bot.change_presence(activity = discord.Game(name="!help (chat or DM)"))
+    await bot.change_presence(activity = discord.Game(name="feyre.io | !help"))
     if(sys.argv[2] == 'true'):
         print("Starting stream to initial state...")
         send_data.start()
