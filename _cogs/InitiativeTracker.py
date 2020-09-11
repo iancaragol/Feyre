@@ -76,7 +76,7 @@ class InitiativeTracker:
 
         else: # If name is not provided then delete the most recent character added by that player
             i = len(self.add_order) - 1
-            while(i > 0):
+            while(i >= 0):
                 if self.add_order[i].user_id == user_id:
                     del self.add_order[i]
                     break
@@ -181,9 +181,10 @@ class InitiativeCog(commands.Cog):
     plus = '➕'
     skull = '☠️'
     swords = '⚔️'
+    down_arrow = '⬇️'
 
-    dm_error_msg = "`An initiative tracker cannot be started in DM's. Try creating one in a guild channel instead.`"
-    start_msg = "`You need to start an initiative tracker in this channel before adding a character using [!init start]`"
+    dm_error_msg = "```An initiative tracker cannot be started in DM's. Try creating one in a guild channel instead.```"
+    start_msg = "```You need to start an initiative tracker in this channel before adding a character using [!init start]```"
 
     def __init__(self, bot, data):
         self.bot = bot
@@ -218,7 +219,24 @@ class InitiativeCog(commands.Cog):
                 # Dont update contents here, otherwise the init start will be changed
 
                 contents = await self.tracker_dict[tracker_key].get_contents()
-                await self.send_msg_helper(ctx, tracker_key, contents, None, False)
+                timeout = await self.send_msg_helper(ctx, tracker_key, contents, None, False)
+
+                if timeout:
+                    return
+                
+
+            if 'bottom' in args or '-b' in args:
+                # self.tracker_dict[tracker_key] = tracker
+                # Dont update contents here, otherwise the init start will be changed
+
+                if tracker_key not in self.tracker_dict.keys(): # No tracker in this channel
+                    await ctx.send(self.start_msg)
+                    return 
+
+                contents = await self.tracker_dict[tracker_key].get_contents()
+                timeout = await self.send_msg_helper(ctx, tracker_key, contents, None, True)
+                if timeout:
+                    return
 
             else:
                 if tracker_key not in self.tracker_dict.keys():
@@ -232,7 +250,9 @@ class InitiativeCog(commands.Cog):
                     
 
                 contents = await self.tracker_dict[tracker_key].get_contents()
-                await self.send_msg_helper(ctx, tracker_key, contents, None, True)
+                timeout = await self.send_msg_helper(ctx, tracker_key, contents, None, True)
+                if timeout:
+                    return
 
             
         else:
@@ -248,7 +268,9 @@ class InitiativeCog(commands.Cog):
                 self.data.statsDict['chars_added'] += 1
 
             contents = await self.tracker_dict[tracker_key].get_contents()
-            await self.send_msg_helper(ctx, tracker_key, contents, None, True)
+            timeout = await self.send_msg_helper(ctx, tracker_key, contents, None, True)
+            if timeout:
+                return
 
     @commands.command()
     async def i(self, ctx, *, args = None):
@@ -266,11 +288,13 @@ class InitiativeCog(commands.Cog):
         await msg.add_reaction(self.swords)
         await msg.add_reaction(self.plus)
         await msg.add_reaction(self.skull)
+        await msg.add_reaction(self.down_arrow)
 
     async def remove_reactions_helper(self, msg):
         await msg.clear_reaction(self.skull)
         await msg.clear_reaction(self.plus)
         await msg.clear_reaction(self.swords)
+        await msg.clear_reaction(self.down_arrow)
 
     async def send_msg_helper(self, ctx, tracker_key, contents, msg, repost):
         if not msg and not repost: # If this was called through a command and not through a reaction
@@ -291,7 +315,7 @@ class InitiativeCog(commands.Cog):
         await self.tracker_dict[tracker_key].reset_footer()
            
         try:           
-            reaction, user = await self.bot.wait_for('reaction_add', check=lambda r, u:u.id != self.bot.user.id and r.message.id == msg.id, timeout=259200) # Times out after 3 days
+            reaction, user = await self.bot.wait_for('reaction_add', check=lambda r, u:u.id != self.bot.user.id and r.message.id == msg.id, timeout=30)#259200) # Times out after 3 days
 
             if reaction != None:
                 if str(reaction.emoji) == self.plus:
@@ -328,8 +352,14 @@ class InitiativeCog(commands.Cog):
 
                     await reaction.remove(user)
                     await self.send_msg_helper(ctx, tracker_key, content, msg, False)
+
+                elif str(reaction.emoji) == self.down_arrow:
+                    content = await self.tracker_dict[tracker_key].get_contents()
+                    # await msg.delete()
+                    await self.send_msg_helper(ctx, tracker_key, content, None, True)
+
             
-        except asyncio.exceptions.TimeoutError:
+        except asyncio.TimeoutError:
             await self.tracker_dict[tracker_key].timeout_tracker()
             await self.tracker_dict[tracker_key].update_contents()
             content = await self.tracker_dict[tracker_key].get_contents()
@@ -337,4 +367,4 @@ class InitiativeCog(commands.Cog):
             await self.remove_reactions_helper(msg)
             del self.tracker_dict[tracker_key]
             del self.msg_dict[tracker_key]
-            return # Now that this has timed out there is no need to wait on it
+            return True# Now that this has timed out there is no need to wait on it

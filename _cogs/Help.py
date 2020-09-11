@@ -89,7 +89,9 @@ class Helper(commands.Cog):
             !init start
                 > Starts a new initiative tracker in the same channel, also used to create a new one
             !init start -v
-                > Starts a new initative trcker with verbosity.
+                > Starts a new initiative tracker with verbosity.
+            !init bottom OR !init -b
+                > Brings the initiative tracker to the bottom of the channel
             !init
                 > Adds the player to initiative with their active character and that characters initiative modifier.
             !init [player name]

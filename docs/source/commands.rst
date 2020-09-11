@@ -114,6 +114,7 @@ To make using the tracker easier users can use these buttons instead of typing
 * Crossed Swords: Moves the turn icon (>).
 * Plus Sign: Add's the user's active character to initiative, see :ref:`Character`.
 * Skull and Crossbones: Removes the user's most recently added character from initative. 
+* Down Arrow: Brings the initiative tracker to the bottom of the channel
 
 **Starting Initiative**
 
@@ -156,6 +157,12 @@ Removes the most recent character added by the user from initiative. You can pre
 ``!init -r [character name]``
 
 Removes [character name] from initiative.
+
+**Moving the Initiative Tracker to the Bottom of the Channel**
+
+``!init bottom`` *or* ``!init -b``
+
+Moves the initiative tracker to the bottom of the channel in case it gets lost in users' messages.
 
 **Example**
 

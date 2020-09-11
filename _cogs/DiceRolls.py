@@ -290,7 +290,7 @@ class DiceRoller(commands.Cog):
                     await reaction.remove(u)
                 await self.reroll_helper(ctx, args, roll_msg, msg)
         
-        except asyncio.exceptions.TimeoutError as e:
+        except asyncio.TimeoutError as e:
             if ctx.channel.type is discord.ChannelType.private:
                     contents = msg.content
                     await msg.delete()
