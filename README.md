@@ -2,7 +2,7 @@
 
 Feyre is an easy to use discord bot that helps you and your friends play Dungeons and Dragons or other role-playing games in discord. It is designed to be as unintrusive as possible so that you can focus on the game.
 
-#### Read the documentation [here]((https://feyre.readthedocs.io/en/latest/#)
+#### Read the documentation [here](https://feyre.readthedocs.io/en/latest/#)
 
 ### Features
 #### Initiative Tracker
