@@ -6,7 +6,7 @@ from datetime import datetime
 
 from _classes.BookOfTor import BookOfTor
 from _classes.Monster import MonsterManual
-from _classes.Feat import Feats
+# from _classes.Feat import Feats
 from _classes.Spellbook import Sb
 # from _classes.DiceRolls import Roller
 # from _classes.Init import Initiative
@@ -58,7 +58,7 @@ class BotData():
         # self.diceRoller = Roller()
         self.spellBook = Sb()
         self.monsterManual = MonsterManual()
-        self.feats = Feats()
+        # self.feats = Feats()
         self.bookOfTor = BookOfTor()
         self.weapons = Weapons()
         #self.class_abilities = Class_Abil() #deprecated

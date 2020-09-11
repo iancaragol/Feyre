@@ -375,7 +375,7 @@ Feat Lookup
 
 ``!feat [feat name]``
 
-!feat can be used to lookup feats from the Player's Handbook::
+!feat can be used to lookup feats. Because their are no feats in the SRD it links to D&D Beyond::
 
     !feat Keen Mind
 

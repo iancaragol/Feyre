@@ -76,7 +76,7 @@ class StatsHandler:
     )
 
     async def get_stats(self, args, stats_dict, user_count, server_count):
-        print(args)
+        # print(args)
         if args == None:
             return self.stats_str.format(
                 help_count = stats_dict['!help'],

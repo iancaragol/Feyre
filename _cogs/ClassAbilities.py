@@ -55,11 +55,11 @@ class ClassAbilityLookup:
 
         # Fancy searching
         schema = Schema(title=TEXT(stored=True))
-        if not os.path.exists("_index"):
-            os.mkdir("_index")
-        self.ix = create_in("_index", schema)
+        if not os.path.exists("_index/abilities"):
+            os.mkdir("_index/abilities")
+        self.ix = create_in("_index/abilities", schema)
 
-        self.ix = open_dir("_index")
+        self.ix = open_dir("_index/abilities")
         writer = self.ix.writer()
         for v in self.ability_dictionary.values():
             title = f"{v.character_class} - {v.ability_name}"
@@ -107,7 +107,7 @@ class ClassAbilityLookupCog(commands.Cog):
                 else:
                     await ctx.send(result)
             else:
-                await ctx.send("```I could not find what you are looking for. If it isn't in the PHB I cannot support it for copyright reasons.\n\nThink this is a bug? Please report it with the !request command.```")
+                await ctx.send("```I could not find what you are looking for. If it isn't in the Standard Referende Document I cannot support it for copyright reasons.\n\nThink this is a bug? Please report it with the !request command.```")
         else:
             await ctx.send("`Missing command arguments. See !help ability for examples.`")
 

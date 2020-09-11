@@ -162,7 +162,7 @@ Removes [character name] from initiative.
 
 ``!init bottom`` *or* ``!init -b``
 
-Moves the initiative tracker to the bottom of the channel in case it gets lost in user's messages.
+Moves the initiative tracker to the bottom of the channel in case it gets lost in users' messages.
 
 **Example**
 
@@ -375,7 +375,7 @@ Feat Lookup
 
 ``!feat [feat name]``
 
-!feat can be used to lookup feats from the Player's Handbook::
+!feat can be used to lookup feats. Because their are no feats in the SRD it links to D&D Beyond::
 
     !feat Keen Mind
 

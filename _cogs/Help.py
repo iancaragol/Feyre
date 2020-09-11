@@ -28,6 +28,9 @@ class Helper(commands.Cog):
             [Read the Documentation]
             feyre.readthedocs.io
 
+            [Join the Support Server]
+            !support
+
             The default prefix is !. To learn more about a command type !help [command].
             Like this: !help roll
 
@@ -200,7 +203,9 @@ class Helper(commands.Cog):
         self.help_str_feat = textwrap.dedent(
             '''
             ```
-            !feat can be used to lookup feats from the Player's Handbook. 
+            !feat can be used to lookup feats from the Standard Reference Document.
+
+            Why does !feat link to D&D Beyond? Feats are not part of the Standard Reference Document so I cannot display them here.
 
             Commands:
             !feat [feat name] 
@@ -293,7 +298,7 @@ class Helper(commands.Cog):
         self.help_str_spell = textwrap.dedent(
             '''
             ```
-            !spell can be used to lookup spells from the Player's Handbook.
+            !spell can be used to lookup spells from the Standard Reference Document.
 
             !spell [spell name]
 
@@ -499,6 +504,10 @@ class Helper(commands.Cog):
         )
 
 #endregion
+
+    @commands.command()
+    async def support(self, ctx, *, args = None):
+        await ctx.send("https://discord.gg/zjyrtWZ")
 
     @commands.command(aliases=['Help'])
     async def help(self, ctx, *, args = None):

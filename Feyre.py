@@ -21,6 +21,7 @@ from _cogs.DiceRolls import DiceRoller
 from _cogs.CurrencyConversion import CurrencyConverter
 from _cogs.Administrator import Administrator
 from _cogs.ClassAbilities import ClassAbilityLookupCog
+from _cogs.Feat import FeatLookupCog
 
 import discord
 import asyncio
@@ -87,6 +88,7 @@ bot.add_cog(DiceRoller(bot, data)) # Dice Rolling
 bot.add_cog(CurrencyConverter(bot, data)) # Currency Converstion
 bot.add_cog(Administrator(bot, data)) # Adminstrator Commands
 bot.add_cog(ClassAbilityLookupCog(bot, data)) # Ability Lookup
+bot.add_cog(FeatLookupCog(bot, data))
 
 #COMMANDS:
 
@@ -142,39 +144,6 @@ async def randmonster(ctx):
     data.statsDict['!randmonster'] += 1
     mmArr = await data.monsterManual.randMonster()
     await createAndSendEmbeds(ctx, mmArr)
-#endregion
-
-#region Feats
-@bot.command()
-async def feat(ctx, *, args = None):
-    """
-    Searches the Player's Handbook for a feat
-    """
-    if (ctx.author.id not in data.userSet):
-        data.userSet.add(ctx.author.id)
-    data.statsDict['!feat'] += 1
-
-    if not args:
-        await ctx.send('''```Missing command arguments, see !help feat for more information.\nEx: !feat Lucky```''')
-        return
-
-    featArr = await data.feats.search(args)
-    if (featArr == False):
-        await ctx.send("```I'm sorry. I wasn't able to find the feat you are looking for.```")
-    else:
-        await createAndSendEmbeds(ctx, featArr)
-            
-@bot.command()
-async def randfeat(ctx):
-    """
-    Gives a random feat from the Player's Handbook
-    """
-    if (ctx.author.id not in data.userSet):
-        data.userSet.add(ctx.author.id)
-    data.statsDict['!randfeat'] += 1
-
-    featArr = await data.feats.randFeat()
-    await createAndSendEmbeds(ctx, featArr)
 #endregion
 
 #region Items
@@ -394,7 +363,7 @@ async def request(ctx, *, args = None):
 
         requestStr = f"**Feature Request**\nFrom: {ctx.author}\n\n{args}"
         await User.send(requestStr)
-        await ctx.send("```Thank you for submitting a request! Your request has been forwarded to the developer, kittysaurus.```")
+        await ctx.send("```Thank you for submitting a request! Your request has been forwarded to the developer, kittysaurus.\n\nYou can also visit the support server and chat with the developer directly by using the !support command.```")
 
 async def save_to_disk():
     pyDir = path.dirname(__file__)
@@ -571,14 +540,6 @@ async def Mm(ctx, *, args = None):
 @bot.command()
 async def Randmonster(ctx, *, args = None):
     await randmonster(ctx)
-
-@bot.command()
-async def Feat(ctx, *, args = None):
-    await feat(ctx, args = args)
-
-@bot.command()
-async def Randfeat(ctx, *, args = None):
-    await randfeat(ctx)
 
 @bot.command()
 async def Item(ctx, *, args = None):
