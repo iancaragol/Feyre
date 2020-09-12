@@ -65,12 +65,14 @@ class Helper(commands.Cog):
             > admin - Change default command prefix
             > new - New features & updates
             > vote - Vote for Feyre on top.gg
+            > permissions - See Feyre's required permissions
+            > invite - Get an invite link for Feyre
 
             Feyre always responds in the channel or direct message from which it was summoned.
 
             Like Feyre?
             ===========
-            Use this link `https://top.gg/bot/500733845856059402' to add Feyre to your server!
+            Use !invite to add Feyre to your server!
             Also consider voting for Feyre on top.gg using the `!vote' command :)
             ```
             ''' 

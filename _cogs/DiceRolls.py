@@ -290,13 +290,20 @@ class DiceRoller(commands.Cog):
                     await reaction.remove(u)
                 await self.reroll_helper(ctx, args, roll_msg, msg)
         
-        except asyncio.TimeoutError as e:
-            if ctx.channel.type is discord.ChannelType.private:
-                    contents = msg.content
-                    await msg.delete()
-                    await ctx.send(contents)
-            else:
-                await msg.clear_reaction('🔁')
+        except Exception as e:
+            if type(e) is asyncio.TimeoutError:
+                if ctx.channel.type is discord.ChannelType.private:
+                        contents = msg.content
+                        await msg.delete()
+                        await ctx.send(contents)
+                else:
+                    await msg.clear_reaction('🔁')
+
+            elif type(e) is discord.errors.Forbidden:
+                contents = msg.content
+                contents = contents.rstrip("```")
+                contents += "\n\nThe Manage Messages Permission is needed to use the reroll emoji. See !permissions for help.```"
+                await msg.edit(content=contents)
             
 
     @commands.command()

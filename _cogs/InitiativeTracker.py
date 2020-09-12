@@ -27,7 +27,7 @@ class InitiativeTracker:
         self.marker_pos = 0
         self.verbose = False
 
-        self.content = self.header + f"\n[Round: {self.round_count}]\n\nAdd characters to the tracker by pressing the + icon or using the !init command.\n\nEx: !init Gandalf -i 1d20+5```"
+        self.content = self.header + f"\n[Round: {self.round_count}]\n\n[You will need to update Feyre's permissions to use all of the initiative tracker's features]\nUse !permissions to learn more.\n\nAdd characters to the tracker by pressing the + icon or using the !init command.\n\nEx: !init Gandalf -i 1d20+5```"
 
     async def add_player(self, user_id, name, init_mod):
         init_value = await self.dr.parse(init_mod, total_only=True) # Roll init_mod to get value
@@ -52,6 +52,7 @@ class InitiativeTracker:
 
     async def remove_player(self, user_id, name = None):
         if len(self.add_order) == 0:
+            self.marker_pos = 0
             return
 
         if name: # If name is provided then remove specific character with that name
@@ -67,6 +68,11 @@ class InitiativeTracker:
                 # print(f"Deleting {self.add_order[del_index].character_name}")
                 del self.add_order[del_index]
 
+                if del_index > 0: # Move the marker up one 
+                    self.marker_pos = del_index - 1
+                else:
+                    self.marker_pos = 0
+
 
             self.character_list = list(self.add_order)
             self.character_list.sort(key = attrgetter('init_value'), reverse = True)
@@ -79,12 +85,18 @@ class InitiativeTracker:
             while(i >= 0):
                 if self.add_order[i].user_id == user_id:
                     del self.add_order[i]
+                    if i > 0: # Move the marker up one 
+                        self.marker_pos = del_index - 1
+                    else:
+                        self.marker_pos = 0
                     break
                 i -= 1
 
             if self.verbose:
                 self.init_messages.append(f"{self.add_order[i].character_name} was removed from initiative.")
             self.character_list = sorted(self.add_order, key=lambda x: x.init_value, reverse=True)
+
+        await self.update_contents()
 
     async def update_player(self, user_id, name, init_mod):
         init_value = await self.dr.parse(init_mod, total_only=True)
@@ -319,6 +331,8 @@ class InitiativeCog(commands.Cog):
 
             if reaction != None:
                 if str(reaction.emoji) == self.plus:
+                    await reaction.remove(user) # Remove users reaction
+
                     # Get users active character, add it to tracker, then update tracker contents for display
                     new_character = await self.character_selector.get_selected_character(user.id)
 
@@ -333,24 +347,25 @@ class InitiativeCog(commands.Cog):
 
                     content = await self.tracker_dict[tracker_key].get_contents()
 
-                    await reaction.remove(user) # Remove users reaction
                     await self.send_msg_helper(ctx, tracker_key, content, msg, False)
 
                 elif str(reaction.emoji) == self.skull:
+                    await reaction.remove(user) # Remove users reaction
+
                     # Get users active character, add it to tracker, then update tracker contents for display
                     await self.tracker_dict[tracker_key].remove_player(user.id)
                     await self.tracker_dict[tracker_key].update_contents()
                     content = await self.tracker_dict[tracker_key].get_contents()
 
-                    await reaction.remove(user) # Remove users reaction
                     await self.send_msg_helper(ctx, tracker_key, content, msg, False)
 
                 elif str(reaction.emoji) == self.swords:
+                    await reaction.remove(user)
+
                     await self.tracker_dict[tracker_key].move_marker()
                     await self.tracker_dict[tracker_key].update_contents()
                     content = await self.tracker_dict[tracker_key].get_contents()
 
-                    await reaction.remove(user)
                     await self.send_msg_helper(ctx, tracker_key, content, msg, False)
 
                 elif str(reaction.emoji) == self.down_arrow:
@@ -359,12 +374,21 @@ class InitiativeCog(commands.Cog):
                     await self.send_msg_helper(ctx, tracker_key, content, None, True)
 
             
-        except asyncio.TimeoutError:
-            await self.tracker_dict[tracker_key].timeout_tracker()
-            await self.tracker_dict[tracker_key].update_contents()
-            content = await self.tracker_dict[tracker_key].get_contents()
-            await self.msg_dict[tracker_key].edit(content=content)
-            await self.remove_reactions_helper(msg)
-            del self.tracker_dict[tracker_key]
-            del self.msg_dict[tracker_key]
-            return True# Now that this has timed out there is no need to wait on it
+        except Exception as e:
+            if type(e) is asyncio.TimeoutError:
+                await self.tracker_dict[tracker_key].timeout_tracker()
+                await self.tracker_dict[tracker_key].update_contents()
+                content = await self.tracker_dict[tracker_key].get_contents()
+                await self.msg_dict[tracker_key].edit(content=content)
+                await self.remove_reactions_helper(msg)
+                del self.tracker_dict[tracker_key]
+                del self.msg_dict[tracker_key]
+                return True# Now that this has timed out there is no need to wait on it
+
+            elif type(e) is discord.errors.Forbidden:
+                await self.tracker_dict[tracker_key].add_error_msg("Feyre now requires the Manage Messages permission to use emojis as buttons. See !permissions for details on how to do this. You can still use the commands such as !init Gandalf to use the initiative tracker but button functionality is limited. Once you have added the required permissions restart the initiative tracker with !init start.")
+                await self.tracker_dict[tracker_key].update_contents()
+                content = await self.tracker_dict[tracker_key].get_contents()
+                await self.msg_dict[tracker_key].edit(content=content)
+                await self.remove_reactions_helper(msg)
+                return True

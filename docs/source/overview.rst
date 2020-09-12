@@ -9,7 +9,7 @@ Getting Started
 Add Feyre to your server
 ========================
 
-You can add Feyre to your server by clicking `here <https://discord.com/oauth2/authorize?client_id=500733845856059402&scope=bot&permissions=67648>`_. You will need the Manage Server permission in order to do so.
+You can add Feyre to your server by clicking `here <https://discord.com/oauth2/authorize?client_id=500733845856059402&scope=bot&permissions=75840>`_. You will need the Manage Server permission in order to do so.
 
 .. _Set-Prefix:
 

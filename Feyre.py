@@ -281,6 +281,11 @@ async def vote(ctx,  *, args = None):
     await ctx.send(embed = embed)
 #endregion
 
+@bot.command()
+async def invite(ctx,  *, args = None):
+    embed = discord.Embed(title="Invite Feyre to your Server", description="Share Feyre with your friends!\n\nhttps://discord.com/oauth2/authorize?client_id=500733845856059402&scope=bot&permissions=75840")
+    await ctx.send(embed = embed)
+
 #region Weapon
 
 async def weapon_helper(ctx, args):
@@ -364,6 +369,33 @@ async def request(ctx, *, args = None):
         requestStr = f"**Feature Request**\nFrom: {ctx.author}\n\n{args}"
         await User.send(requestStr)
         await ctx.send("```Thank you for submitting a request! Your request has been forwarded to the developer, kittysaurus.\n\nYou can also visit the support server and chat with the developer directly by using the !support command.```")
+
+@bot.command()
+async def permissions(ctx, *, args = None):
+    s = textwrap.dedent("""
+    ```asciidoc
+    Permissions
+    ===========
+
+    [NOTE]
+    Manage Messages is now required for the initiative tracker to function properly!
+
+    Feyre requires four permissions:
+        - Send Messages
+        - Read Message History
+        - Manage Messages
+        - Add Reactions
+
+    How to update permissions:
+
+    1) If you are an admin, navigate to Server Settings.
+    2) Click on Roles and find the role that Feyre has been assigned.
+    3) Under text permissions enable Send Messages, Read Message History, Manage Messages, and Add Reactions.    
+    ```
+    """)
+
+    await ctx.send(s)
+
 
 async def save_to_disk():
     pyDir = path.dirname(__file__)

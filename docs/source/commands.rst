@@ -532,6 +532,24 @@ Sets the server wide prefix to [prefix]. Prefix must be ?, !, ~, `, #, $, %, ^, 
 
 *NOTE: If you forget the prefix you will no longer be able to summon Feyre! (For now)*
 
+.. _Invite
+
+Invite Feyre
+============
+
+``!invite``
+
+Gives Feyre's invite link you can add it to your own server!
+
+.. _Permissions
+
+Permissions
+===========
+
+``!permissions``
+
+Shows what permissions Feyre requires and explains how to add them.
+
 .. _Vote
 
 Vote for Feyre
