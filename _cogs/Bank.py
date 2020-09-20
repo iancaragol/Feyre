@@ -482,10 +482,9 @@ class Banker(commands.Cog):
         self.data = data
         self.bank_class = Bank()
 
-    @commands.command()
+    @commands.command(aliases = ['Bank', 'B', 'b'])
     async def bank(self, ctx, *, args = None):
-        if (ctx.author.id not in self.data.userSet):
-            self.data.userSet.add(ctx.author.id)
+        self.data.userSet.add(ctx.author.id)
         self.data.statsDict['!bank'] += 1
 
         if not args:
@@ -493,7 +492,3 @@ class Banker(commands.Cog):
 
         if args:
             await ctx.send(await self.bank_class.parse_args(ctx.author.id, args))
-
-    @commands.command()
-    async def Bank(self, ctx, *, args = None):
-        await self.bank(ctx, args = args)

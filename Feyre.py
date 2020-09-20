@@ -22,6 +22,10 @@ from _cogs.CurrencyConversion import CurrencyConverter
 from _cogs.Administrator import Administrator
 from _cogs.ClassAbilities import ClassAbilityLookupCog
 from _cogs.Feat import FeatLookupCog
+from _cogs.Spellbook import SpellbookCog
+from _cogs.Monster import MonsterManualCog
+from _cogs.ClassFeatures import ClassFeaturesCog
+from _cogs.Conditions import ConditionLookupCog
 
 import discord
 import asyncio
@@ -88,7 +92,12 @@ bot.add_cog(DiceRoller(bot, data)) # Dice Rolling
 bot.add_cog(CurrencyConverter(bot, data)) # Currency Converstion
 bot.add_cog(Administrator(bot, data)) # Adminstrator Commands
 bot.add_cog(ClassAbilityLookupCog(bot, data)) # Ability Lookup
-bot.add_cog(FeatLookupCog(bot, data))
+bot.add_cog(FeatLookupCog(bot, data)) # Feat
+bot.add_cog(SpellbookCog(bot, data)) # Spellbook
+bot.add_cog(MonsterManualCog(bot, data)) # Monsters
+bot.add_cog(ClassFeaturesCog(bot, data)) # Class Lookup
+bot.add_cog(ConditionLookupCog(bot, data)) # Conditions
+
 
 #COMMANDS:
 
@@ -115,42 +124,13 @@ async def ping(ctx):
     await ctx.send('`Pong! {0}ms`'.format(round(bot.latency, 3)))
 
 #region Monster Manual
-@bot.command()
-async def mm(ctx, *, args = None):
-    """
-    Searches the Monster Manual for a monster
-    """
-    if (ctx.author.id not in data.userSet):
-        data.userSet.add(ctx.author.id)
-    data.statsDict['!mm'] += 1
 
-    if not args:
-        await ctx.send('''```Missing command arguments, see !help mm for more information.\nEx: !mm Tarrasque```''')
-        return
-
-    mmArr = await data.monsterManual.search(args)
-    if (mmArr == False):
-        await ctx.send("```I'm sorry. I wasn't able to find the monster you are looking for.```")
-    else:
-        await createAndSendEmbeds(ctx, mmArr)
-     
-@bot.command()
-async def randmonster(ctx):
-    """
-    Gives a random monster from the Monster Manual
-    """
-    if (ctx.author.id not in data.userSet):
-        data.userSet.add(ctx.author.id)
-    data.statsDict['!randmonster'] += 1
-    mmArr = await data.monsterManual.randMonster()
-    await createAndSendEmbeds(ctx, mmArr)
 #endregion
 
 #region Items
 @bot.command()
 async def item(ctx, *, args = None):
-    if (ctx.author.id not in data.userSet):
-        data.userSet.add(ctx.author.id)
+    data.userSet.add(ctx.author.id)
     data.statsDict['!item'] += 1
 
     if not args:
@@ -188,92 +168,17 @@ async def item(ctx, *, args = None):
 #endregion
 
 #region Conditions
-@bot.command()
-async def condition(ctx, *, args = None):
-    if (ctx.author.id not in data.userSet):
-        data.userSet.add(ctx.author.id)
-    data.statsDict['!condition'] += 1
 
-    if not args:
-        await ctx.send('''```asciidoc
-[Conditions]
-
-- Blinded
-- Charmed
-- Deafened
-- Fatigued
-- Exhaustion
-- Frightened
-- Grappled
-- Incapacitated
-- Invisible
-- Paralyzed
-- Petrified
-- Poisoned
-- Prone
-- Restrained
-- Stunned 
-- Unconscious
-
-Try !condition [condition] for more info!
-Ex: !condition Prone
-```''')
-        return
-
-
-    condition = await data.condition_lookup.search(args)
-    await ctx.send(condition)
-#endregion
-
-#region ClassFeatures
-@bot.command()
-async def c(ctx, *, args = None):
-    """
-    Searches the Player's Handbook for a spell
-    """
-    if (ctx.author.id not in data.userSet):
-        data.userSet.add(ctx.author.id)
-    data.statsDict['!c'] += 1
-
-    if not args:
-        await ctx.send('''```Missing command arguments, see !help class for more information.\nEx: !c Wizard```''')
-        return
-
-    classArr = await data.class_features.search(args)
-
-    if (classArr == False):
-        await ctx.send("```I'm sorry. I wasn't able to find the class you are looking for.```")
-    else:
-        await createAndSendEmbeds(ctx, classArr)
 #endregion
 
 #region Spell
-@bot.command()
-async def spell(ctx, *, args = None):
-    """
-    Searches the Player's Handbook for a spell
-    """
-    if (ctx.author.id not in data.userSet):
-        data.userSet.add(ctx.author.id)
-    data.statsDict['!spell'] += 1
 
-    if not args:
-        await ctx.send('''```Missing command arguments, see !help spell for more information.\nEx: !spell Wish```''')
-        return
-
-    spellArr = await data.spellBook.search(args)
-
-    if (spellArr == False):
-        await ctx.send("```I'm sorry. I wasn't able to find the spell you are looking for.```")
-    else:
-        await createAndSendEmbeds(ctx, spellArr)
 #endregion
 
 #region Voting
 @bot.command()
 async def vote(ctx,  *, args = None):
-    if (ctx.author.id not in data.userSet):
-        data.userSet.add(ctx.author.id)
+    data.userSet.add(ctx.author.id)
     data.statsDict['!vote'] += 1
 
     embed = discord.Embed(description="If you have a moment, please [vote](https://top.gg/bot/500733845856059402) for Feyre on top.gg! This helps more people find the bot. Thanks :)")
@@ -285,12 +190,10 @@ async def vote(ctx,  *, args = None):
 async def invite(ctx,  *, args = None):
     embed = discord.Embed(title="Invite Feyre to your Server", description="Share Feyre with your friends!\n\nhttps://discord.com/oauth2/authorize?client_id=500733845856059402&scope=bot&permissions=75840")
     await ctx.send(embed = embed)
-
 #region Weapon
 
 async def weapon_helper(ctx, args):
-    if (ctx.author.id not in data.userSet):
-        data.userSet.add(ctx.author.id)
+    data.userSet.add(ctx.author.id)
     data.statsDict['!weapon'] += 1
 
     if not args:
@@ -344,8 +247,7 @@ async def stats(ctx, *, args = None):
     Shows the lifetime stats of the bot
 
     """
-    if (ctx.author.id not in data.userSet):
-        data.userSet.add(ctx.author.id)
+    data.userSet.add(ctx.author.id)
 
     if args != None:
         args = args.lower().strip()
@@ -356,8 +258,7 @@ async def stats(ctx, *, args = None):
 #region Developer
 @bot.command()
 async def request(ctx, *, args = None):
-    if (ctx.author.id not in data.userSet):
-        data.userSet.add(ctx.author.id)
+    data.userSet.add(ctx.author.id)
     data.statsDict['!request'] += 1
 
     if (args == None):
@@ -564,30 +465,9 @@ async def on_ready():
 async def Hello(ctx, *, args = None):
     await hello(ctx)
 
-
-@bot.command()
-async def Mm(ctx, *, args = None):
-    await mm(ctx, args = args)
-
-@bot.command()
-async def Randmonster(ctx, *, args = None):
-    await randmonster(ctx)
-
 @bot.command()
 async def Item(ctx, *, args = None):
     await item(ctx, args = args)
-
-@bot.command()
-async def Condition(ctx, *, args = None):
-    await condition(ctx, args = args)
-
-@bot.command()
-async def C(ctx, *, args = None):
-    await c(ctx, args = args)
-
-@bot.command()
-async def Spell(ctx, *, args = None):
-    await spell(ctx, args = args)
 
 @bot.command()
 async def Vote(ctx, *, args = None):

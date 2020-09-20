@@ -15,8 +15,9 @@ class StatsHandler:
         > !mm: {mm_count}   
         > !spell: {spell_count}
         > !weapon: {weapon_count}
+        > !item {item_count}
         > !dom: {dom_count}
-        > !c: {c_count}
+        > !class: {c_count}
         > !currency: {currency_count}
         > !condtion: {condition_count}
         > !bank: {bank_count}
@@ -45,8 +46,9 @@ class StatsHandler:
         > !mm: {mm_count}   
         > !spell: {spell_count}
         > !weapon: {weapon_count}
+        > !item {item_count}
         > !dom: {dom_count}
-        > !c: {c_count}
+        > !class: {c_count}
         > !currency: {currency_count}
         > !condtion: {condition_count}
         > !bank: {bank_count}
@@ -87,6 +89,7 @@ class StatsHandler:
                 mm_count = stats_dict['!mm'],
                 spell_count = stats_dict['!spell'],
                 weapon_count = stats_dict['!weapon'],
+                item_count = stats_dict['!item'],
                 dom_count = stats_dict['!dom'],
                 c_count = stats_dict['!c'],
                 currency_count = stats_dict['!currency'],
@@ -109,6 +112,7 @@ class StatsHandler:
                 mm_count = stats_dict['!mm'],
                 spell_count = stats_dict['!spell'],
                 weapon_count = stats_dict['!weapon'],
+                item_count = stats_dict['!item'],
                 dom_count = stats_dict['!dom'],
                 c_count = stats_dict['!c'],
                 currency_count = stats_dict['!currency'],

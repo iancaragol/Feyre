@@ -10,7 +10,7 @@ class SimpleDiceRoller(commands.Cog):
         self.data = data
         self.aeval = Interpreter()
 
-    @commands.command()
+    @commands.command(aliases = ['Dp'])
     async def dp(self, ctx, *, args = None):
         self.data.statsDict['!roll'] += 1
 
@@ -29,7 +29,7 @@ class SimpleDiceRoller(commands.Cog):
 
         await ctx.send(msg)
 
-    @commands.command()
+    @commands.command(aliases = ['D20'])
     async def d20(self, ctx, *, args = None):
         self.data.statsDict['!roll'] += 1
 
@@ -48,7 +48,7 @@ class SimpleDiceRoller(commands.Cog):
 
         await ctx.send(msg)
 
-    @commands.command()
+    @commands.command(aliases = ['D12'])
     async def d12(self, ctx, *, args = None):
         self.data.statsDict['!roll'] += 1
 
@@ -67,7 +67,7 @@ class SimpleDiceRoller(commands.Cog):
 
         await ctx.send(msg)
 
-    @commands.command()
+    @commands.command(aliases = ['D10'])
     async def d10(self, ctx, *, args = None):
         self.data.statsDict['!roll'] += 1
 
@@ -86,7 +86,7 @@ class SimpleDiceRoller(commands.Cog):
 
         await ctx.send(msg)
 
-    @commands.command()
+    @commands.command(aliases = ['D8'])
     async def d8(self, ctx, *, args = None):
         self.data.statsDict['!roll'] += 1
 
@@ -105,7 +105,7 @@ class SimpleDiceRoller(commands.Cog):
 
         await ctx.send(msg)
 
-    @commands.command()
+    @commands.command(aliases = ['D6'])
     async def d6(self, ctx, *, args = None):
         self.data.statsDict['!roll'] += 1
 
@@ -124,7 +124,7 @@ class SimpleDiceRoller(commands.Cog):
 
         await ctx.send(msg)
 
-    @commands.command()
+    @commands.command(aliases = ['D4'])
     async def d4(self, ctx, *, args = None):
         self.data.statsDict['!roll'] += 1
 
@@ -142,31 +142,3 @@ class SimpleDiceRoller(commands.Cog):
             msg = f'''```I didn't understand something about your input. Try !roll for more complicated expressions.```'''
 
         await ctx.send(msg)
-
-    @commands.command()
-    async def Dp(self, ctx, *, args = None):
-        await self.dp(ctx, args = args)
-
-    @commands.command()
-    async def D20(self, ctx, *, args = None):
-        await self.d20(ctx, args = args)
-
-    @commands.command()
-    async def D12(self, ctx, *, args = None):
-        await self.d12(ctx, args = args)
-
-    @commands.command()
-    async def D10(self, ctx, *, args = None):
-        await self.d10(ctx, args = args)
-
-    @commands.command()
-    async def D8(self, ctx, *, args = None):
-        await self.d8(ctx, args = args)
-
-    @commands.command()
-    async def D6(self, ctx, *, args = None):
-        await self.d6(ctx, args = args)
-
-    @commands.command()
-    async def D4(self, ctx, *, args = None):
-        await self.d4(ctx, args = args)

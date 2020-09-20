@@ -30,6 +30,7 @@ class InitiativeTracker:
         self.content = self.header + f"\n[Round: {self.round_count}]\n\n[You will need to update Feyre's permissions to use all of the initiative tracker's features]\nUse !permissions to learn more.\n\nAdd characters to the tracker by pressing the + icon or using the !init command.\n\nEx: !init Gandalf -i 1d20+5```"
 
     async def add_player(self, user_id, name, init_mod):
+        print("Adding player: " + name)
         init_value = await self.dr.parse(init_mod, total_only=True) # Roll init_mod to get value
         new_pc = PlayerCharacter(user_id, name, init_mod, init_value)
         updated = False
@@ -86,7 +87,7 @@ class InitiativeTracker:
                 if self.add_order[i].user_id == user_id:
                     del self.add_order[i]
                     if i > 0: # Move the marker up one 
-                        self.marker_pos = del_index - 1
+                        self.marker_pos = i - 1
                     else:
                         self.marker_pos = 0
                     break
@@ -99,6 +100,7 @@ class InitiativeTracker:
         await self.update_contents()
 
     async def update_player(self, user_id, name, init_mod):
+        print("Update Player")
         init_value = await self.dr.parse(init_mod, total_only=True)
         for c in self.character_list:
             if c.user_id == user_id and c.character_name == name:
@@ -106,6 +108,7 @@ class InitiativeTracker:
                 c.init_value = init_value
 
     async def update_contents(self):
+        print("Update Contents")
         self.content = ""
         self.content += self.header
         self.content += f"\n[Round: {self.round_count}]"
@@ -180,6 +183,7 @@ class InitiativeTracker:
                 return added
 
     async def move_marker(self):
+        print("Move Marker")
         self.marker_pos += 1
         if self.marker_pos == len(self.character_list):
             self.round_count += 1
@@ -203,10 +207,9 @@ class InitiativeCog(commands.Cog):
         self.character_selector = CharacterSelectionHandler()
         self.data = data
 
-    @commands.command()
+    @commands.command(aliases = ['Init', 'I', 'i'])
     async def init(self, ctx, *, args = None):
-        if (ctx.author.id not in self.data.userSet):
-            self.data.userSet.add(ctx.author.id)
+        self.data.userSet.add(ctx.author.id)
         self.data.statsDict['!init'] += 1
 
         if ctx.channel.type is discord.ChannelType.private: # If user has DM'd the bot
@@ -237,7 +240,7 @@ class InitiativeCog(commands.Cog):
                     return
                 
 
-            if 'bottom' in args or '-b' in args:
+            elif 'bottom' in args or '-b' in args:
                 # self.tracker_dict[tracker_key] = tracker
                 # Dont update contents here, otherwise the init start will be changed
 
@@ -250,7 +253,7 @@ class InitiativeCog(commands.Cog):
                 if timeout:
                     return
 
-            else:
+            elif 'start' not in args and 'bottom' not in args and '-b' not in args:
                 if tracker_key not in self.tracker_dict.keys():
                     await ctx.send(self.start_msg)
 
@@ -284,18 +287,6 @@ class InitiativeCog(commands.Cog):
             if timeout:
                 return
 
-    @commands.command()
-    async def i(self, ctx, *, args = None):
-        await self.init(ctx, args = args)
-    
-    @commands.command()
-    async def Init(self, ctx, *, args = None):
-        await self.init(ctx, args = args)
-
-    @commands.command()
-    async def I(self, ctx, *, args = None):
-        await self.init(ctx, args = args)
-
     async def add_reactions_helper(self, msg):     
         await msg.add_reaction(self.swords)
         await msg.add_reaction(self.plus)
@@ -309,6 +300,8 @@ class InitiativeCog(commands.Cog):
         await msg.clear_reaction(self.down_arrow)
 
     async def send_msg_helper(self, ctx, tracker_key, contents, msg, repost):
+        print("Entering send message helper")
+
         if not msg and not repost: # If this was called through a command and not through a reaction
             msg = await ctx.send(contents)
             self.msg_dict[tracker_key] = msg
@@ -316,6 +309,7 @@ class InitiativeCog(commands.Cog):
 
         elif msg and not repost:
             await msg.edit(content=contents)
+            msg = await ctx.channel.fetch_message(msg.id)
             self.msg_dict[tracker_key] = msg
 
         elif not msg and repost:
@@ -327,11 +321,28 @@ class InitiativeCog(commands.Cog):
         await self.tracker_dict[tracker_key].reset_footer()
            
         try:           
-            reaction, user = await self.bot.wait_for('reaction_add', check=lambda r, u:u.id != self.bot.user.id and r.message.id == msg.id, timeout=259200) # Times out after 3 days
+            reaction = None
+            user = None
+            reactions = [r for r in msg.reactions if r.count > 1]
+            print("Reactions: " + str(reactions))
 
-            if reaction != None:
+            if len(reactions) > 0:
+                reaction = reactions.pop(0)
+                print(str(reaction))
+                user = None
+                async for u in reaction.users():
+                    if u.id != self.bot.user.id:
+                        user = u
+                print(str(user))
+            else:
+                reaction, user = await self.bot.wait_for('reaction_add', check=lambda r, u:u.id != self.bot.user.id and r.message.id == msg.id, timeout=259200) # Times out after 3 days
+
+            print("Why is this being skipped?")
+            print(reaction)
+            if reaction != None and user != None:
+                print("Entering reaction: " + str(reaction.emoji))
+
                 if str(reaction.emoji) == self.plus:
-                    await reaction.remove(user) # Remove users reaction
 
                     # Get users active character, add it to tracker, then update tracker contents for display
                     new_character = await self.character_selector.get_selected_character(user.id)
@@ -346,26 +357,25 @@ class InitiativeCog(commands.Cog):
                         self.data.statsDict['chars_added'] += 1
 
                     content = await self.tracker_dict[tracker_key].get_contents()
-
+                    await reaction.remove(user) # Remove users reaction
                     await self.send_msg_helper(ctx, tracker_key, content, msg, False)
 
                 elif str(reaction.emoji) == self.skull:
-                    await reaction.remove(user) # Remove users reaction
 
                     # Get users active character, add it to tracker, then update tracker contents for display
                     await self.tracker_dict[tracker_key].remove_player(user.id)
                     await self.tracker_dict[tracker_key].update_contents()
                     content = await self.tracker_dict[tracker_key].get_contents()
-
+                    await reaction.remove(user) # Remove users reaction
                     await self.send_msg_helper(ctx, tracker_key, content, msg, False)
 
                 elif str(reaction.emoji) == self.swords:
-                    await reaction.remove(user)
-
+                    print("If Swords")
                     await self.tracker_dict[tracker_key].move_marker()
                     await self.tracker_dict[tracker_key].update_contents()
                     content = await self.tracker_dict[tracker_key].get_contents()
 
+                    await reaction.remove(user)
                     await self.send_msg_helper(ctx, tracker_key, content, msg, False)
 
                 elif str(reaction.emoji) == self.down_arrow:
@@ -375,7 +385,9 @@ class InitiativeCog(commands.Cog):
 
             
         except Exception as e:
+            print(e)
             if type(e) is asyncio.TimeoutError:
+                print("Time out")
                 await self.tracker_dict[tracker_key].timeout_tracker()
                 await self.tracker_dict[tracker_key].update_contents()
                 content = await self.tracker_dict[tracker_key].get_contents()
@@ -386,6 +398,7 @@ class InitiativeCog(commands.Cog):
                 return True# Now that this has timed out there is no need to wait on it
 
             elif type(e) is discord.errors.Forbidden:
+                print("Missing permissions")
                 await self.tracker_dict[tracker_key].add_error_msg("Feyre now requires the Manage Messages permission to use emojis as buttons. See !permissions for details on how to do this. You can still use the commands such as !init Gandalf to use the initiative tracker but button functionality is limited. Once you have added the required permissions restart the initiative tracker with !init start.")
                 await self.tracker_dict[tracker_key].update_contents()
                 content = await self.tracker_dict[tracker_key].get_contents()

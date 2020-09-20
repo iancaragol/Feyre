@@ -285,8 +285,11 @@ class CharacterSelector(commands.Cog):
         self.data = data
         self.character_selection_handler = CharacterSelectionHandler()
 
-    @commands.command(aliases=['char'])
+    @commands.command(aliases=['char', 'Character', 'Char'])
     async def character(self, ctx, *, args = None):
+        self.data.userSet.add(ctx.author.id)
+        self.data.statsDict['!character'] += 1
+
         contents = await self.character_selection_handler.parse_args(ctx.author.id, args = args)
         characters = await self.character_selection_handler.get_characters(ctx.author.id)
 
@@ -310,7 +313,7 @@ class CharacterSelector(commands.Cog):
         numerals = ['1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣', '6️⃣', '7️⃣', '8️⃣', '9️⃣']
 
 
-        reaction, u = await self.bot.wait_for('reaction_add', check=lambda r, u:u.id != self.bot.user.id and r.message.id == msg.id, timeout=21600)
+        reaction, u = await self.bot.wait_for('reaction_add', check=lambda r, u:u.id != self.bot.user.id and u.id == ctx.author.id and r.message.id == msg.id, timeout=21600)
 
         if reaction != None:
             selected_id = numerals.index(str(reaction.emoji))+1

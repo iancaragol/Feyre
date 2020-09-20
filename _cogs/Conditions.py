@@ -3,6 +3,11 @@ import difflib
 import random
 import asyncio
 import csv
+import textwrap
+
+import discord
+from discord.ext import commands
+
 
 class ConditionLookup():
     def __init__(self):
@@ -55,3 +60,48 @@ class Condition():
 Did you mean {}?```'''.format(self.name, self.description,  second_closest)
 
         return code_block
+
+class ConditionLookupCog(commands.Cog):
+    def __init__(self, bot, data):
+        self.bot = bot
+        self.data = data
+        self.condition_lookup = ConditionLookup()
+
+    @commands.command(aliases=['Condition', 'Cond', 'cond'])
+    async def condition(self, ctx, *, args = None):
+        self.data.userSet.add(ctx.author.id)
+        self.data.statsDict['!condition'] += 1
+
+        if not args:
+            await ctx.send(textwrap.dedent(
+            '''
+            ```asciidoc
+            [Conditions]
+
+            - Blinded
+            - Charmed
+            - Deafened
+            - Fatigued
+            - Exhaustion
+            - Frightened
+            - Grappled
+            - Incapacitated
+            - Invisible
+            - Paralyzed
+            - Petrified
+            - Poisoned
+            - Prone
+            - Restrained
+            - Stunned 
+            - Unconscious
+
+            Try !condition [condition] for more info!
+            Ex: !condition Prone
+            ```
+            '''))
+            
+            return
+
+
+        condition = await self.condition_lookup.search(args)
+        await ctx.send(condition)

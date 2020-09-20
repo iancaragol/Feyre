@@ -3,6 +3,9 @@ import difflib
 import random
 import asyncio
 
+import discord
+from discord.ext import commands
+
 class MonsterManual():
     """
     Class for searching and getting random monsters from the monster manual. All monsters are stored as
@@ -34,7 +37,6 @@ class MonsterManual():
         monster = message
         monster.replace(' ', '-')
         closeMatches = difflib.get_close_matches(monster, list(self.monsterDictionary.keys()))
-        otherMatches = ""
 
         if(len(closeMatches) == 0):
             return False
@@ -102,3 +104,56 @@ class MonsterManual():
                     os.remove(os.path.join(absRelPath, new_file_name))
                     os.rename(os.path.join(absRelPath, filename), os.path.join(absRelPath, new_file_name)) 
 
+
+class MonsterManualCog(commands.Cog):
+    def __init__(self, bot, data):
+        self.bot = bot
+        self.data = data
+        self.monster_manual = MonsterManual()
+
+    @commands.command(aliases=['monster', 'Monster', 'MM', 'Mm'])
+    async def mm(self, ctx, *, args = None):
+        """
+        Searches the Player's Handbook for a spell
+        """
+        # if (ctx.author.id not in self.bot.data.userSet):
+        self.data.userSet.add(ctx.author.id)
+        self.data.statsDict['!mm'] += 1
+
+        if not args:
+            await ctx.send('''```Missing command arguments, see !help mm for more information.\nEx: !mm Tarrasque```''')
+            return
+
+        mmArr = await self.monster_manual.search(args)
+        if (mmArr == False):
+            await ctx.send("```I'm sorry. I wasn't able to find the monster you are looking for. I can only support monsters from the Standard Reference Document for copyright reasons.```")
+        else:
+            await self.send_monster(ctx, mmArr)
+        
+     
+    @commands.command()
+    async def randmonster(self, ctx, args = None):
+        """
+        Gives a random monster from the Monster Manual
+        """
+        self.data.userSet.add(ctx.author.id)
+        self.data.statsDict['!randmonster'] += 1
+        mmArr = await self.monster_manual.randMonster()
+        await self.send_monster(ctx, mmArr)
+
+    async def send_monster(self, ctx, monster_tup):
+        if(len(monster_tup[1]) < 2048): # Discord Character Limit is 2048
+            embed = discord.Embed(title = monster_tup[0], description = monster_tup[1])#, color=data.embedcolor)
+            await ctx.send(embed = embed)
+
+        #discord has a 2048 character limit so this is needed to split the message into chunks
+        else:
+            s = monster_tup[1]
+            parts = await self.data.string_splitter(s, '\n', 10) # Helper function from BotData
+                        
+            for i in range(len(parts)):
+                if(i == 0):
+                    embed = discord.Embed(title = monster_tup[0], description = parts[i])#, color=data.embedcolor)
+                else:
+                    embed = discord.Embed(title = monster_tup[0].strip() + " *- Continued*", description = parts[i])#, color=data.embedcolor)
+                await ctx.send(embed = embed)

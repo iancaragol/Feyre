@@ -8,10 +8,9 @@ class Administrator(commands.Cog):
         self.bot = bot
         self.data = data
 
-    @commands.command()
+    @commands.command(aliases = ['Admin'])
     async def admin(self, ctx):
-        if (ctx.author.id not in self.data.userSet):
-            self.data.userSet.add(ctx.author.id)
+        self.data.userSet.add(ctx.author.id)
         self.data.statsDict['!admin'] += 1
 
         retstr = '''```!admin is for server administrators. Currently the only command available to adminstrators is !set_prefix.
@@ -25,13 +24,12 @@ For this reason, the prefix will be pinned in the channel from which it is chang
 
         await ctx.send(retstr)
 
-    @commands.command()
+    @commands.command(aliases = ['Set_prefix'])
     async def set_prefix(self, ctx, *, args = None):
         #TO DO:
         #Support pinging bot if you do not know the prefix
         #Removing bot from server should reset bot's prefix
-        if (ctx.author.id not in self.data.userSet):
-            self.data.userSet.add(ctx.author.id)
+        self.data.userSet.add(ctx.author.id)
         self.data.statsDict['!set_prefix'] += 1
 
         if(not hasattr(ctx.author, 'ctx.author.guild_permissions')):
@@ -64,12 +62,3 @@ For this reason, the prefix will be pinned in the channel from which it is chang
                 return
             else:
                 await ctx.send("Only server administrators have access to this command.")
-
-    
-    @commands.command()
-    async def Admin(self, ctx, *, args = None):
-        await self.admin(ctx)
-
-    @commands.command()
-    async def Set_prefix(self, ctx, *, args = None):
-        await self.set_prefix(ctx, args = args)

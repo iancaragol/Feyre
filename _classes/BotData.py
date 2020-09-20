@@ -1,22 +1,23 @@
 import discord
+import numpy
 
 from os import path
 from json import load, dumps
 from datetime import datetime
 
 from _classes.BookOfTor import BookOfTor
-from _classes.Monster import MonsterManual
+# from _classes.Monster import MonsterManual
 # from _classes.Feat import Feats
-from _classes.Spellbook import Sb
+# from _classes.Spellbook import Sb
 # from _classes.DiceRolls import Roller
 # from _classes.Init import Initiative
 from _classes.Weapons import Weapons
 # from _classes.Class_Abilities import Class_Abil
 from _classes.Items import ItemLookup
 # from _classes.DeckOfMany import DeckOfMany
-from _classes.ClassFeatures import ClassFeatures
+# from _classes.ClassFeatures import ClassFeatures
 # from _classes.CurrencyConversion import CurrencyConverter
-from _classes.Conditions import ConditionLookup
+# from _classes.Conditions import ConditionLookup
 # from _classes.Bank import Character, Bank
 
 # from _classes.HelpHandler import HelpHandler
@@ -56,17 +57,17 @@ class BotData():
         """
         #Main feature classes
         # self.diceRoller = Roller()
-        self.spellBook = Sb()
-        self.monsterManual = MonsterManual()
+        # self.spellBook = Sb()
+        # self.monsterManual = MonsterManual()
         # self.feats = Feats()
         self.bookOfTor = BookOfTor()
         self.weapons = Weapons()
         #self.class_abilities = Class_Abil() #deprecated
         self.item_lookup = ItemLookup()
         # self.deck_of_many = DeckOfMany()
-        self.class_features = ClassFeatures()
+        # self.class_features = ClassFeatures()
         # self.currency_converter = CurrencyConverter()
-        self.condition_lookup = ConditionLookup()
+        # self.condition_lookup = ConditionLookup()
 
         # self.bank = Bank()
         # self.help_handler = HelpHandler()
@@ -131,5 +132,24 @@ class BotData():
             print(f"Error loading users: {e}")
 
         print("\nTime: " + str(datetime.now()))
+
+    async def string_splitter(self, string, char, max_splits):
+        idxs = numpy.array([pos for pos, c in enumerate(string) if char == c])
+
+        split_arr = []
+        char_constant = 1800 # Maximum number of chars we will send
+        prev_lower = 0
+
+        for i in range(max_splits):
+            leq = char_constant * (i+1)
+            lower = idxs[idxs < leq].max()
+            
+            split_arr.append(string[prev_lower:lower])
+            prev_lower = lower
+
+            if leq > len(string):
+                break
+
+        return split_arr
 
     

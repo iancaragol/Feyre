@@ -216,10 +216,9 @@ class DiceRoller(commands.Cog):
         self.data = data
         self.dice_roll = DiceRoll()
 
-    @commands.command()
+    @commands.command(aliases = ['Gm'])
     async def gm(self, ctx, *, args = None):
-        if (ctx.author.id not in self.data.userSet):
-            self.data.userSet.add(ctx.author.id)
+        self.data.userSet.add(ctx.author.id)
         self.data.statsDict['!gm'] += 1
 
         if (ctx.guild == None):
@@ -251,7 +250,7 @@ class DiceRoller(commands.Cog):
                 except:
                     await ctx.send("```This channel does not have a dedicated GM. Type !gm to set yourself as GM.```")
 
-    @commands.command()
+    @commands.command(aliases = ['Roll', 'r', 'R'])
     async def roll(self, ctx, *, args = None):
         """
         Rolls any number of dice in any format including skill checks
@@ -304,25 +303,3 @@ class DiceRoller(commands.Cog):
                 contents = contents.rstrip("```")
                 contents += "\n\nThe Manage Messages Permission is needed to use the reroll emoji. See !permissions for help.```"
                 await msg.edit(content=contents)
-            
-
-    @commands.command()
-    async def r(self, ctx, *, args = None):
-        """
-        Rolls any number of dice in any format including skill checks
-            Ex: !roll 1d20+5*6>100
-        """
-
-        await self.roll(ctx, args = args)
-
-    @commands.command()
-    async def Gm(self, ctx, *, args = None):
-        await self.gm(ctx, args = args)
-
-    @commands.command()
-    async def Roll(self, ctx, *, args = None):
-        await self.roll(ctx, args = args)
-
-    @commands.command()
-    async def R(self, ctx, *, args = None):
-        await self.r(ctx, args = args)

@@ -52,7 +52,7 @@ class Helper(commands.Cog):
             > item - Wondrous item lookup
             > mm - Monster Manual lookup
             > spell - Spell lookup
-            > c - Class lookup
+            > class - Class lookup
             `> ability - Class Ability lookup (NEW)'
 
             > currency - Currency conversions
@@ -249,6 +249,7 @@ class Helper(commands.Cog):
             Ex:
             !mm Young Black Dragon
             !mm Tarrasque
+            !monster Goblin
             ```
             '''
         )
@@ -256,13 +257,12 @@ class Helper(commands.Cog):
         self.help_str_class = textwrap.dedent(
             '''
             ```
-            !c can be used to look up all of the features of a class. This can be a lot of text!
+            !class can be used to look up all of the features of a class. This can be a lot of text!
 
-            Why is the command !c and not !class? Thats because class is a python keyword.
 
             Ex:
             !c wizard
-            !c fighter
+            !class fighter
             ```
             ''' 
         )

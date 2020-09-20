@@ -94,8 +94,11 @@ class ClassAbilityLookupCog(commands.Cog):
 
         return first, second
 
-    @commands.command()
+    @commands.command(aliases = ['Ability', 'abil', 'Abil'])
     async def ability(self, ctx, *, args = None):
+        self.data.userSet.add(ctx.author.id)
+        self.data.statsDict['!ability'] += 1
+
         if args:
             result = await self.cal.search(args)
             if result:
@@ -109,6 +112,6 @@ class ClassAbilityLookupCog(commands.Cog):
             else:
                 await ctx.send("```I could not find what you are looking for. If it isn't in the Standard Referende Document I cannot support it for copyright reasons.\n\nThink this is a bug? Please report it with the !request command.```")
         else:
-            await ctx.send("`Missing command arguments. See !help ability for examples.`")
+            await ctx.send("```Missing command arguments. See !help ability for examples.```")
 
     

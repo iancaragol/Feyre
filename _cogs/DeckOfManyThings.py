@@ -78,8 +78,7 @@ class DeckOfManyThings(commands.Cog):
         self.dom_handler = DeckOfManyThingsHandler()
 
     async def deck_of_many_helper(self, ctx, args):
-        if (ctx.author.id not in self.data.userSet):
-            self.data.userSet.add(ctx.author.id)
+        self.data.userSet.add(ctx.author.id)
         self.data.statsDict['!dom'] += 1
 
         if (args == None):
@@ -94,10 +93,6 @@ class DeckOfManyThings(commands.Cog):
             await ctx.send(await self.dom_handler.card_to_string(card, effect))
 
 
-    @commands.command()
+    @commands.command(aliases = ['Dom'])
     async def dom(self, ctx, *, args = None):
         await self.deck_of_many_helper(ctx, args)
-
-    @commands.command()
-    async def Dom(self, ctx, *, args = None):
-        await self.dom(ctx, args = args)

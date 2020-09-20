@@ -174,8 +174,7 @@ class CurrencyConverter(commands.Cog):
         self.currency_convert = CurrencyConvert()
 
     async def currency_helper(self, ctx, args):
-        if (ctx.author.id not in self.data.userSet):
-            self.data.userSet.add(ctx.author.id)
+        self.data.userSet.add(ctx.author.id)
         self.data.statsDict['!currency'] += 1
 
         if not args:
@@ -183,26 +182,6 @@ class CurrencyConverter(commands.Cog):
             return
         await ctx.send(await self.currency_convert.parse_input(args))
 
-    @commands.command()
+    @commands.command(aliases = ['cur', 'convert', 'Currency', 'Cur', 'Convert'])
     async def currency(self, ctx, *, args = None):
-        await self.currency_helper(ctx, args)
-
-    @commands.command()
-    async def cur(self, ctx, *, args = None):
-        await self.currency_helper(ctx, args)
-
-    @commands.command()
-    async def convert(self, ctx, *, args = None):
-        await self.currency_helper(ctx, args)
-
-    @commands.command()
-    async def Currency(self, ctx, *, args = None):
-        await self.currency_helper(ctx, args)
-
-    @commands.command()
-    async def Cur(self, ctx, *, args = None):
-        await self.currency_helper(ctx, args)
-
-    @commands.command()
-    async def Convert(self, ctx, *, args = None):
         await self.currency_helper(ctx, args)

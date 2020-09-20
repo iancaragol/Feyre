@@ -77,10 +77,9 @@ class FeatLookupCog(commands.Cog):
         self.data = data
         self.cfl = FeatLookup()
 
-    @commands.command()
+    @commands.command(aliases = ['Feat'])
     async def feat(self, ctx, *, args = None):
-        if (ctx.author.id not in self.data.userSet):
-            self.data.userSet.add(ctx.author.id)
+        self.data.userSet.add(ctx.author.id)
         self.data.statsDict['!feat'] += 1
 
         if args:
