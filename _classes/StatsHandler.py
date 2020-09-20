@@ -18,12 +18,12 @@ class StatsHandler:
         > !item {item_count}
         > !dom: {dom_count}
         > !class: {c_count}
+        > !ability: {ability_count}
         > !currency: {currency_count}
         > !condtion: {condition_count}
         > !bank: {bank_count}
         > !randfeat: {randfeat_count}
         > !randmonster: {randmonster_count}
-
 
         = Unique users: {user_count} =
         = Server count: {server_count} =
@@ -46,9 +46,10 @@ class StatsHandler:
         > !mm: {mm_count}   
         > !spell: {spell_count}
         > !weapon: {weapon_count}
-        > !item {item_count}
+        > !item: {item_count}
         > !dom: {dom_count}
         > !class: {c_count}
+        > !ability: {ability_count}
         > !currency: {currency_count}
         > !condtion: {condition_count}
         > !bank: {bank_count}
@@ -62,6 +63,7 @@ class StatsHandler:
         > !tor zodiac: {tor_zodiac_count}
 
         [Others]
+        > !char: {char_count}
         > !new: {new_count}
         > !gm: {gm_count}
         > !admin: {admin_count}
@@ -92,6 +94,7 @@ class StatsHandler:
                 item_count = stats_dict['!item'],
                 dom_count = stats_dict['!dom'],
                 c_count = stats_dict['!c'],
+                ability_count = stats_dict['!ability'],
                 currency_count = stats_dict['!currency'],
                 condition_count = stats_dict['!condition'],
                 bank_count = stats_dict['!bank'],
@@ -115,6 +118,7 @@ class StatsHandler:
                 item_count = stats_dict['!item'],
                 dom_count = stats_dict['!dom'],
                 c_count = stats_dict['!c'],
+                ability_count = stats_dict['!ability'],
                 currency_count = stats_dict['!currency'],
                 condition_count = stats_dict['!condition'],
                 bank_count = stats_dict['!bank'],
@@ -124,6 +128,7 @@ class StatsHandler:
                 tor_randchar_count = stats_dict['!tor randchar'],
                 tor_styles_count = stats_dict['!tor styles'],
                 tor_zodiac_count = stats_dict['!tor zodiac'],
+                char_count = stats_dict['!character'],
                 new_count = stats_dict['!new'],
                 gm_count = stats_dict['!gm'],
                 admin_count = stats_dict['!admin'],
