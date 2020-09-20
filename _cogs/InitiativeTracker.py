@@ -30,7 +30,6 @@ class InitiativeTracker:
         self.content = self.header + f"\n[Round: {self.round_count}]\n\n[You will need to update Feyre's permissions to use all of the initiative tracker's features]\nUse !permissions to learn more.\n\nAdd characters to the tracker by pressing the + icon or using the !init command.\n\nEx: !init Gandalf -i 1d20+5```"
 
     async def add_player(self, user_id, name, init_mod):
-        print("Adding player: " + name)
         init_value = await self.dr.parse(init_mod, total_only=True) # Roll init_mod to get value
         new_pc = PlayerCharacter(user_id, name, init_mod, init_value)
         updated = False
@@ -100,7 +99,7 @@ class InitiativeTracker:
         await self.update_contents()
 
     async def update_player(self, user_id, name, init_mod):
-        print("Update Player")
+        # print("Update Player")
         init_value = await self.dr.parse(init_mod, total_only=True)
         for c in self.character_list:
             if c.user_id == user_id and c.character_name == name:
@@ -108,7 +107,7 @@ class InitiativeTracker:
                 c.init_value = init_value
 
     async def update_contents(self):
-        print("Update Contents")
+        # print("Update Contents")
         self.content = ""
         self.content += self.header
         self.content += f"\n[Round: {self.round_count}]"
@@ -183,7 +182,7 @@ class InitiativeTracker:
                 return added
 
     async def move_marker(self):
-        print("Move Marker")
+        # print("Move Marker")
         self.marker_pos += 1
         if self.marker_pos == len(self.character_list):
             self.round_count += 1
@@ -300,8 +299,6 @@ class InitiativeCog(commands.Cog):
         await msg.clear_reaction(self.down_arrow)
 
     async def send_msg_helper(self, ctx, tracker_key, contents, msg, repost):
-        print("Entering send message helper")
-
         if not msg and not repost: # If this was called through a command and not through a reaction
             msg = await ctx.send(contents)
             self.msg_dict[tracker_key] = msg
@@ -324,24 +321,17 @@ class InitiativeCog(commands.Cog):
             reaction = None
             user = None
             reactions = [r for r in msg.reactions if r.count > 1]
-            print("Reactions: " + str(reactions))
 
             if len(reactions) > 0:
                 reaction = reactions.pop(0)
-                print(str(reaction))
                 user = None
                 async for u in reaction.users():
                     if u.id != self.bot.user.id:
                         user = u
-                print(str(user))
             else:
                 reaction, user = await self.bot.wait_for('reaction_add', check=lambda r, u:u.id != self.bot.user.id and r.message.id == msg.id, timeout=259200) # Times out after 3 days
 
-            print("Why is this being skipped?")
-            print(reaction)
             if reaction != None and user != None:
-                print("Entering reaction: " + str(reaction.emoji))
-
                 if str(reaction.emoji) == self.plus:
 
                     # Get users active character, add it to tracker, then update tracker contents for display
@@ -370,7 +360,6 @@ class InitiativeCog(commands.Cog):
                     await self.send_msg_helper(ctx, tracker_key, content, msg, False)
 
                 elif str(reaction.emoji) == self.swords:
-                    print("If Swords")
                     await self.tracker_dict[tracker_key].move_marker()
                     await self.tracker_dict[tracker_key].update_contents()
                     content = await self.tracker_dict[tracker_key].get_contents()
