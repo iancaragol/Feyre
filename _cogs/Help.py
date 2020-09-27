@@ -5,16 +5,6 @@ from discord.ext import commands
 
 class Helper(commands.Cog):
     def __init__(self, bot, data):
-        self.command_list = [
-            "help", "hello", "init", 
-            "roll", "d", "gm",
-            "feat", "condition", "weapon",
-            "item", "mm", "spell", "c",
-            "currency", "bank", "dom",
-            "stats", "request", "admin", 
-            "new", "vote", "ability", "character"
-        ]
-
         self.bot = bot
         self.data = data
 

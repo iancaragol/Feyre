@@ -4,3 +4,10 @@ https://discord.com/oauth2/authorize?client_id=505120997658329108&permissions=12
 Test permissions: 67648
 
 https://discord.com/oauth2/authorize?client_id=505120997658329108&permissions=75840&scope=bot
+
+
+https://docs.microsoft.com/en-us/azure/developer/python/configure-local-development-environment?tabs=bash#configure-authentication
+
+#KV Setup
+
+https://medium.com/analytics-vidhya/keep-your-secrets-safe-with-azure-key-vault-in-python-9848be3230db

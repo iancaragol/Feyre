@@ -1,7 +1,12 @@
 import textwrap
+import discord
+from discord.ext import commands
 
-class StatsHandler:
-    stats_str = textwrap.dedent(
+class StatsCog(commands.Cog):
+    def __init__(self, bot, data):
+        self.bot = bot
+        self.data = data
+        self.stats_str = textwrap.dedent(
         '''
         ```asciidoc
         = Lifetime Stats =
@@ -30,9 +35,9 @@ class StatsHandler:
         = Total command count: {total_count} =
         ```
         '''
-    )
+        )
 
-    stats_str_all = textwrap.dedent(
+        self.stats_str_all = textwrap.dedent(
         '''
         ```asciidoc
         = Lifetime Stats =
@@ -77,7 +82,19 @@ class StatsHandler:
         = Total command count: {total_count} =
         ```
         '''
-    )
+        )
+
+        # When creating the command counts we want to exclude some items
+        # Put those keys here
+        self.count_exclusion = ['user_count',
+                               'server_count', 
+                               'total_command_count',
+                               'date']
+
+    
+    async def get_total_helper(self, stats_dict):
+        return sum([v for k,v in stats_dict.items() if k not in self.count_exclusion])
+
 
     async def get_stats(self, args, stats_dict, user_count, server_count):
         # print(args)
@@ -102,7 +119,7 @@ class StatsHandler:
                 randmonster_count = stats_dict['!randmonster'],
                 user_count = user_count,
                 server_count = server_count,
-                total_count = sum(stats_dict.values())
+                total_count = await self.get_total_helper(stats_dict)
             )
 
         elif args == "all":
@@ -138,7 +155,7 @@ class StatsHandler:
                 dirty_roll_count = stats_dict['dirty_rolls'],
                 user_count = user_count,
                 server_count = server_count,
-                total_count = sum(stats_dict.values())
+                total_count = await self.get_total_helper(stats_dict)
             )
 
         else:
@@ -149,5 +166,18 @@ class StatsHandler:
                 ```
                 '''
             )
+
+    @commands.command(aliases=['Stats'])
+    async def stats(self, ctx, *, args = None):
+        """
+        Shows the lifetime stats of the bot
+
+        """
+        self.data.userSet.add(ctx.author.id)
+
+        if args != None:
+            args = args.lower().strip()
+        
+        await ctx.send(await self.get_stats(args, self.data.statsDict, len(self.data.userSet), len(self.bot.guilds)))
 
 

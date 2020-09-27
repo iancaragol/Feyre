@@ -8,8 +8,13 @@ from discord.ext.commands import CommandNotFound
 from asteval import Interpreter
 from ISStreamer.Streamer import Streamer
 from datetime import datetime
+from copy import deepcopy
+
 
 from _classes.BotData import BotData
+
+from _backend.UserManager import UserManager
+from _backend.StatsManager import StatsManager
 
 from _cogs.InitiativeTracker import InitiativeCog
 from _cogs.Help import Helper
@@ -26,13 +31,14 @@ from _cogs.Spellbook import SpellbookCog
 from _cogs.Monster import MonsterManualCog
 from _cogs.ClassFeatures import ClassFeaturesCog
 from _cogs.Conditions import ConditionLookupCog
+from _cogs.Stats import StatsCog
+from _cogs.Developer import DeveloperCog
 
 import discord
 import asyncio
 import sys
 import random
 import os
-import copy
 import time
 import textwrap
 
@@ -97,7 +103,8 @@ bot.add_cog(SpellbookCog(bot, data)) # Spellbook
 bot.add_cog(MonsterManualCog(bot, data)) # Monsters
 bot.add_cog(ClassFeaturesCog(bot, data)) # Class Lookup
 bot.add_cog(ConditionLookupCog(bot, data)) # Conditions
-
+bot.add_cog(StatsCog(bot, data)) # Conditions
+bot.add_cog(DeveloperCog(bot, data, StatsCog))
 
 #COMMANDS:
 
@@ -119,13 +126,8 @@ async def hello(ctx):
     await ctx.send(embed=embed)
 #endregion
 
-@bot.command()
-async def ping(ctx):
-    await ctx.send('`Pong! {0}ms`'.format(round(bot.latency, 3)))
 
-#region Monster Manual
 
-#endregion
 
 #region Items
 @bot.command()
@@ -165,14 +167,6 @@ async def item(ctx, *, args = None):
     
     else:
         await ctx.send(item)
-#endregion
-
-#region Conditions
-
-#endregion
-
-#region Spell
-
 #endregion
 
 #region Voting
@@ -241,18 +235,7 @@ async def tor(ctx, *, args):
 #endregion
 
 #region Stats
-@bot.command()
-async def stats(ctx, *, args = None):
-    """
-    Shows the lifetime stats of the bot
 
-    """
-    data.userSet.add(ctx.author.id)
-
-    if args != None:
-        args = args.lower().strip()
-    
-    await ctx.send(await data.stats_handler.get_stats(args, data.statsDict, len(data.userSet), len(bot.guilds)))
 #endregion
 
 #region Developer
@@ -297,48 +280,6 @@ async def permissions(ctx, *, args = None):
 
     await ctx.send(s)
 
-
-async def save_to_disk():
-    pyDir = path.dirname(__file__)
-    relPath = "_data//stats.txt"
-    absRelPath = path.join(pyDir, relPath)
-    with open(absRelPath, 'w') as file:
-        file.write(dumps(data.statsDict))
-
-    relPath = "_data//prefixes.txt"
-    absRelPath = path.join(pyDir, relPath)
-    with open(absRelPath, 'w') as file:
-        file.write(dumps(data.prefixDict))
-
-    relPath = "_data//users.txt"
-    absRelPath = path.join(pyDir, relPath)
-    with open(absRelPath, 'w') as file:
-        file.write(dumps(list(data.userSet)))
-
-    pyDir = path.dirname(__file__)
-    relPath = "_data//gms.txt"
-    absRelPath = path.join(pyDir, relPath)
-    with open(absRelPath, 'w') as file:
-        file.write(dumps(data.gmDict))
-
-
-
-
-@bot.command()
-async def quit(ctx):
-    if(ctx.author.id == 112041042894655488):
-        print("Saving to disk...")
-        await save_to_disk()
-        User = bot.get_user(112041042894655488)
-        requestStr = "Shutting down..."
-        await User.send(requestStr)
-        sys.exit()
-
-@bot.command()
-async def change_presence(ctx, *, args):
-    if(ctx.author.id == 112041042894655488):
-        await ctx.send("Changing presence to: " + args)
-        await bot.change_presence(activity = discord.Game(name=args))
 
 #endregion
 
@@ -389,6 +330,67 @@ Please report bugs using the !request command```'''
 #endregion
     
 #region Usage Statistics
+
+#endregion
+
+async def save_to_disk():
+    pyDir = path.dirname(__file__)
+    relPath = "_data//stats.txt"
+    absRelPath = path.join(pyDir, relPath)
+    with open(absRelPath, 'w') as file:
+        file.write(dumps(data.statsDict))
+
+    relPath = "_data//prefixes.txt"
+    absRelPath = path.join(pyDir, relPath)
+    with open(absRelPath, 'w') as file:
+        file.write(dumps(data.prefixDict))
+
+    relPath = "_data//users.txt"
+    absRelPath = path.join(pyDir, relPath)
+    with open(absRelPath, 'w') as file:
+        file.write(dumps(list(data.userSet)))
+
+    pyDir = path.dirname(__file__)
+    relPath = "_data//gms.txt"
+    absRelPath = path.join(pyDir, relPath)
+    with open(absRelPath, 'w') as file:
+        file.write(dumps(data.gmDict))
+
+async def save_to_mongo():
+    um = UserManager(data.mongo_uri)
+    um.dump_user_set(data.userSet)
+    print("User set saved!")
+
+    sm = StatsManager(data.mongo_uri)
+
+    save_stats = deepcopy(data.statsDict)
+    save_stats['user_count'] = len(data.userSet)
+    save_stats['server_count'] = len(bot.guilds)
+    save_stats['total_command_count'] = await bot.cogs.get('StatsCog').get_total_helper(data.statsDict)
+
+    sm.dump_stats_dict(save_stats)
+    print("Stats dictionary saved!")
+
+#@loop(seconds=10)
+@loop(hours=12)
+async def save_data():
+    print("Saving data to disk...")
+    await save_to_disk()
+    print("Saved!")
+    print("Saving data in cloud...")
+    await save_to_mongo()
+    print("Saved!")
+
+@bot.command()
+async def quit(ctx):
+    if(ctx.author.id == 112041042894655488):
+        print("Saving to disk...")
+        await save_to_disk()
+        User = bot.get_user(112041042894655488)
+        requestStr = "Shutting down..."
+        await User.send(requestStr)
+        sys.exit()
+
 @bot.command()
 async def start_stream(ctx):
     if(ctx.author.id == 112041042894655488):
@@ -403,26 +405,16 @@ async def stop_stream(ctx):
 
 @loop(seconds=300)
 async def send_data():
-    # print("Constructing stream data...")
-    stream_data = copy.deepcopy(data.statsDict)
+    stream_data = deepcopy(data.statsDict)
     stream_data['user_count'] = len(data.userSet)
     stream_data['server_count'] = len(bot.guilds)
-    stream_data['total_command_count'] = sum(data.statsDict.values())
+    stream_data['total_command_count'] = await bot.cogs.get('StatsCog').get_total_helper(data.statsDict)
 
-    # print("Streaming data to intial state...")
     streamer = Streamer(bucket_name="Feyre", bucket_key=bucket_key, access_key=access_key, buffer_size=200)
     streamer.log_object(stream_data)
 
     streamer.flush()
     streamer.close()
-    # print("Done!")
-#endregion
-
-@loop(hours=12)
-async def save_data():
-    print("Saving data to disk...")
-    await save_to_disk()
-
 
 @bot.event
 async def on_command_error(ctx, error):
@@ -441,8 +433,10 @@ async def on_command_error(ctx, error):
             print("Attempted dice roll: " + ctx.invoked_with)
             print(e)
             return
-    raise error
+    # CommandNotFound errors are suppressed
+    # print(error.args[0])
 
+# Bot has started, is ready to receive messages
 @bot.event
 async def on_ready():
     print()
@@ -456,8 +450,9 @@ async def on_ready():
         send_data.start()
     elif (sys.argv[2] == 'false'):
         print("Stream argument is set to false. Skipping stream.")
-    save_data.start()
-#Start the bot
+
+    if(sys.argv[1] == 'release'):
+        save_data.start()
 
 
 #region upper/lowercase
@@ -486,21 +481,8 @@ async def Tor(ctx, *, args = None):
     await tor(ctx, args = args)
 
 @bot.command()
-async def Stats(ctx, *, args = None):
-    await stats(ctx, args = args)
-
-
-@bot.command()
 async def Request(ctx, *, args = None):
     await request(ctx, args = args)
-
-@bot.command()
-async def Quit(ctx, *, args = None):
-    await quit(ctx)
-
-@bot.command()
-async def Change_presence(ctx, *, args = None):
-    await change_presence(ctx, args = args)
 
 @bot.command()
 async def New(ctx, *, args = None):
