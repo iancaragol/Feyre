@@ -15,7 +15,7 @@ class PlayerCharacter:
 
 
 class InitiativeTracker:
-    def __init__(self): 
+    def __init__(self, character_selector): 
         self.add_order = []
         self.character_list = []
         self.init_messages = []
@@ -26,6 +26,8 @@ class InitiativeTracker:
         self.round_count = 0
         self.marker_pos = 0
         self.verbose = False
+
+        self.character_selector = character_selector
 
         self.content = self.header + f"\n[Round: {self.round_count}]\n\n[You will need to update Feyre's permissions to use all of the initiative tracker's features]\nUse !permissions to learn more.\n\nAdd characters to the tracker by pressing the + icon or using the !init command.\n\nEx: !init Gandalf -i 1d20+5```"
 
@@ -142,8 +144,9 @@ class InitiativeTracker:
         name = ""
         init_mod = ""
 
+        split_args = args.strip().lower().split()
         # Ex: !init Gandalf -i 1d20
-        if '-i' in args.strip().lower():
+        if '-i' in split_args:
             name = args[:args.index('-i')].strip()
             init_mod = args[args.index('-i') + 2:].strip()
             added = await self.add_player(user_id, name, init_mod)
@@ -152,7 +155,7 @@ class InitiativeTracker:
                 return added
 
 
-        elif '-r' in args.strip().lower():
+        elif '-r' in split_args:
             name = args[args.index('-r') + 2:].strip()
 
             if len(name) > 0:
@@ -163,20 +166,36 @@ class InitiativeTracker:
             split = args.strip().split(' ')
             name = ""
             init_mod = ""
+            remove_substring = ""
             for s in split:
-                total = await self.dr.parse(s, total_only=True)
-                if total != "```I'm sorry, there was something I didnt understand about your input. See !help roll for more info```": # TODO Remove this when dice roller is rewritten. 
-                    init_mod = s
+                if s == '-b' or s == '-a': # Special case. Parser will parse these because they are dice roll flags
+                    break
+
+                total = await self.dr.parse(s, total_only=True) # Try and parse either part of the message. If it parses correctly treat it as an init mod
+                if total != "```I'm sorry, there was something I didnt understand about your input. See !help roll for more info```": # TODO Remove this when dice roller is rewritten.
+                    # Dice parser will accept things like -, +, /, * as a valid init mod so we need to make sure its not one of these
+                    try:
+                        float(total)
+                        init_mod = s
+                        remove_substring = init_mod
+                    except:
+                        remove_substring = s
+                        init_mod = ""
             
             for s in split:
                 name += " " + str(s)
 
-            name = name.replace(init_mod, '').strip()
+            name = name.replace(remove_substring, '').strip()
             
             if init_mod == "": # Default to 1d20
                 init_mod = "1d20"
             
-            added = await self.add_player(user_id, name, init_mod)
+
+            if len(name) == 0: # If name is empty then we need to get it from their active character
+                active_character = await self.character_selector.get_selected_character(user_id)
+                added = await self.add_player(user_id, active_character.character_name, init_mod)
+            else:
+                added = await self.add_player(user_id, name, init_mod)
 
             if added:
                 return added
@@ -222,9 +241,10 @@ class InitiativeCog(commands.Cog):
             return 
 
         if args:
-            if 'start' in args:
+            split_args = args.split(' ')
+            if 'start' in split_args:
                 # Create initative tracker
-                tracker = InitiativeTracker()
+                tracker = InitiativeTracker(self.character_selector)
 
                 if '-v' in args or '--verbose'  in args:
                     tracker.verbose = True
@@ -239,7 +259,7 @@ class InitiativeCog(commands.Cog):
                     return
                 
 
-            elif 'bottom' in args or '-b' in args:
+            elif 'bottom' in split_args or '-b' in split_args:
                 # self.tracker_dict[tracker_key] = tracker
                 # Dont update contents here, otherwise the init start will be changed
 
@@ -252,7 +272,7 @@ class InitiativeCog(commands.Cog):
                 if timeout:
                     return
 
-            elif 'start' not in args and 'bottom' not in args and '-b' not in args:
+            elif 'start' not in split_args and 'bottom' not in split_args and '-b' not in split_args:
                 if tracker_key not in self.tracker_dict.keys():
                     await ctx.send(self.start_msg)
 

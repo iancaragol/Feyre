@@ -1,9 +1,13 @@
 import discord
 import numpy
+import os
 
 from os import path
 from json import load, dumps
 from datetime import datetime
+
+from azure.keyvault.secrets import SecretClient
+from azure.identity import DefaultAzureCredential
 
 from _classes.BookOfTor import BookOfTor
 # from _classes.Monster import MonsterManual
@@ -21,8 +25,11 @@ from _classes.Items import ItemLookup
 # from _classes.Bank import Character, Bank
 
 # from _classes.HelpHandler import HelpHandler
-from _classes.StatsHandler import StatsHandler
+# from _classes.StatsHandler import StatsHandler
 # from _classes.CharacterSelection import CharacterSelectionHandler
+
+from _backend.StatsManager import StatsManager
+from _backend.UserManager import UserManager
 
 class BotData():
     """
@@ -71,7 +78,7 @@ class BotData():
 
         # self.bank = Bank()
         # self.help_handler = HelpHandler()
-        self.stats_handler = StatsHandler()
+        # self.stats_handler = StatsHandler()
         # self.character_selection_handler = CharacterSelectionHandler()
 
         #Initiative tracking dictionaries
@@ -89,17 +96,23 @@ class BotData():
 
         self.userSet = set()
 
-        try:
-            pyDir = path.dirname(__file__)
-            relPath = "..//_data//stats.txt"
-            absRelPath = path.join(pyDir, relPath)
-            self.statsDict = load(open(absRelPath))
-            print("Stats loaded succesfully")
 
-        except Exception as e:
-            print(f"Error loading stats: {e}")
-            self.statsDict = {'!tor horo':0, '!tor zodiac':0, '!hello':0, '!tor styles':0, '!tor randchar':0, '!roll':0,
-                          '!help':0, '!mm':0, '!randmonster':0, '!feat':0, '!randfeat':0, '!init':0, '!spell':0, '!weapon':0}
+
+        # Get secrets from KeyVault
+        keyVaultName = os.environ["KEY_VAULT_NAME"]
+        KVUri = f"https://{keyVaultName}.vault.azure.net"
+
+        credential = DefaultAzureCredential()
+        client = SecretClient(vault_url=KVUri, credential=credential)
+
+        self.mongo_uri = client.get_secret('feyre-mongo-uri').value
+
+        sm = StatsManager(self.mongo_uri)
+        self.statsDict = sm.get_stats()
+        print("Stats loaded succesfully")
+
+        um = UserManager(self.mongo_uri)
+        self.userSet = um.get_user_set()
 
         try:
             pyDir = path.dirname(__file__)
@@ -120,16 +133,6 @@ class BotData():
 
         except Exception as e:
             print(f"Error loading prefixes: {e}")
-
-        try:
-            pyDir = path.dirname(__file__)
-            relPath = "..//_data//users.txt"
-            absRelPath = path.join(pyDir, relPath)
-            self.userSet = set(load(open(absRelPath)))
-            print("Users loaded succesfully")
-
-        except Exception as e:
-            print(f"Error loading users: {e}")
 
         print("\nTime: " + str(datetime.now()))
 
