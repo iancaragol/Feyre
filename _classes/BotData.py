@@ -107,9 +107,9 @@ class BotData():
 
         self.mongo_uri = client.get_secret('feyre-mongo-uri').value
 
-        sm = StatsManager(self.mongo_uri)
-        self.statsDict = sm.get_stats()
-        print("Stats loaded succesfully")
+        # sm = StatsManager(self.mongo_uri)
+        # self.statsDict = sm.get_stats()
+        # print("Stats loaded succesfully")
 
         um = UserManager(self.mongo_uri)
         self.userSet = um.get_user_set()
