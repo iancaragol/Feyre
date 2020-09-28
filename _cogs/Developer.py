@@ -18,26 +18,26 @@ class DeveloperCog(commands.Cog):
     @commands.command()
     async def dump_user_mongo(self, ctx):
         if(ctx.author.id == 112041042894655488):
-            um = UserManager()
+            um = UserManager(self.data.mongo_uri)
             um.dump_user_set(self.data.userSet)
             await ctx.send("```Dumped!```")
 
     @commands.command()
     async def load_user_mongo(self, ctx):
         if(ctx.author.id == 112041042894655488):
-            um = UserManager()
+            um = UserManager(self.data.mongo_uri)
             self.data.userSet = um.get_user_set()
             await ctx.send("```Got!```")
 
     @commands.command()
     async def dump_stats_mongo(self, ctx):
         if(ctx.author.id == 112041042894655488):
-            sm = StatsManager()
+            sm = StatsManager(self.data.mongo_uri)
 
             save_stats = deepcopy(self.data.statsDict)
             save_stats['user_count'] = len(self.data.userSet)
             save_stats['server_count'] = len(self.bot.guilds)
-            save_stats['total_command_count'] = self.bot.cogs.get('StatsCog').get_total_helper(self.data.userSet)
+            save_stats['total_command_count'] = await self.bot.cogs.get('StatsCog').get_total_helper(self.data.userSet)
 
             sm.dump_stats_dict(save_stats)
             await ctx.send("```Dumped!```")
@@ -45,7 +45,7 @@ class DeveloperCog(commands.Cog):
     @commands.command()
     async def load_stats_mongo(self, ctx):
         if(ctx.author.id == 112041042894655488):
-            sm = StatsManager()
+            sm = StatsManager(self.data.mongo_uri)
             temp = sm.get_stats()
             self.data.statsDict = temp
             await ctx.send("```Got!```")

@@ -378,7 +378,7 @@ async def save_data():
     await save_to_disk()
     print("Saved!")
     print("Saving data in cloud...")
-    await save_to_mongo()
+    # await save_to_mongo()
     print("Saved!")
 
 @bot.command()
@@ -433,8 +433,9 @@ async def on_command_error(ctx, error):
             print("Attempted dice roll: " + ctx.invoked_with)
             print(e)
             return
+    raise error
     # CommandNotFound errors are suppressed
-    # print(error.args[0])
+    #print(error.args[0])
 
 # Bot has started, is ready to receive messages
 @bot.event

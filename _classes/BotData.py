@@ -99,20 +99,40 @@ class BotData():
 
 
         # Get secrets from KeyVault
-        keyVaultName = os.environ["KEY_VAULT_NAME"]
-        KVUri = f"https://{keyVaultName}.vault.azure.net"
+        # keyVaultName = os.environ["KEY_VAULT_NAME"]
+        # KVUri = f"https://{keyVaultName}.vault.azure.net"
 
-        credential = DefaultAzureCredential()
-        client = SecretClient(vault_url=KVUri, credential=credential)
+        # # credential = DefaultAzureCredential()
+        # # client = SecretClient(vault_url=KVUri, credential=credential)
 
-        self.mongo_uri = client.get_secret('feyre-mongo-uri').value
+        # # self.mongo_uri = client.get_secret('feyre-mongo-uri').value
 
-        # sm = StatsManager(self.mongo_uri)
-        # self.statsDict = sm.get_stats()
-        # print("Stats loaded succesfully")
+        # # # sm = StatsManager(self.mongo_uri)
+        # # # self.statsDict = sm.get_stats()
+        # # # print("Stats loaded succesfully")
 
-        um = UserManager(self.mongo_uri)
-        self.userSet = um.get_user_set()
+        # # um = UserManager(self.mongo_uri)
+        # # self.userSet = um.get_user_set()
+
+        try:
+            pyDir = path.dirname(__file__)
+            relPath = "..//_data//stats.txt"
+            absRelPath = path.join(pyDir, relPath)
+            self.statsDict = load(open(absRelPath))
+            print("stats loaded succesfully")
+
+        except Exception as e:
+            print(f"Error loading stats: {e}")
+
+        try:
+            pyDir = path.dirname(__file__)
+            relPath = "..//_data//users.txt"
+            absRelPath = path.join(pyDir, relPath)
+            self.userSet = set(load(open(absRelPath)))
+            print("Users loaded succesfully")
+
+        except Exception as e:
+            print(f"Error loading GM's: {e}")
 
         try:
             pyDir = path.dirname(__file__)
