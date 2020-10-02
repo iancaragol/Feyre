@@ -18,7 +18,7 @@ class ItemLookup():
             for row in item_reader:
                 new_item = Item(row[0], row[1], row[2], row[3], row[4], row[5])
                 self.item_dictionary[new_item.name.lower()] = new_item
-        print("Items loaded in Items.py")
+        # print("Items loaded in Items.py")
 
     async def search(self, args):
         matches = difflib.get_close_matches(args.strip().lower(), self.item_dictionary.keys())

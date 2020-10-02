@@ -57,7 +57,7 @@ class FeatLookup:
             writer.add_document(title=title)
         writer.commit()
 
-        print("Setup indexer.")
+        print("Setup indexer in Feat.py")
 
     async def search(self, args):
         qp = QueryParser('title', schema=self.ix.schema)
