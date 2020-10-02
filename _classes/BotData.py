@@ -1,6 +1,7 @@
 import discord
 import numpy
 import os
+import asyncio
 
 from os import path
 from json import load, dumps
@@ -30,6 +31,7 @@ from _classes.Items import ItemLookup
 
 from _backend.StatsManager import StatsManager
 from _backend.UserManager import UserManager
+from _backend.PrefixesManager import PrefixManager
 
 class BotData():
     """
@@ -96,7 +98,7 @@ class BotData():
 
         self.userSet = set()
 
-
+        self.mongo_uri = ""
 
         # Get secrets from KeyVault
         # keyVaultName = os.environ["KEY_VAULT_NAME"]
@@ -107,52 +109,90 @@ class BotData():
 
         # # self.mongo_uri = client.get_secret('feyre-mongo-uri').value
 
-        # # # sm = StatsManager(self.mongo_uri)
-        # # # self.statsDict = sm.get_stats()
-        # # # print("Stats loaded succesfully")
-
-        # # um = UserManager(self.mongo_uri)
-        # # self.userSet = um.get_user_set()
-
         try:
             pyDir = path.dirname(__file__)
-            relPath = "..//_data//stats.txt"
+            relPath = "..//mongo_uri.txt"
             absRelPath = path.join(pyDir, relPath)
-            self.statsDict = load(open(absRelPath))
-            print("stats loaded succesfully")
+            with open(absRelPath, 'r') as file:
+                self.mongo_uri = file.readline().strip()
+            print("Mongo Uri loaded successfully.")
 
         except Exception as e:
-            print(f"Error loading stats: {e}")
+            print("Error loading mongo uri: {}".format(e))
 
         try:
-            pyDir = path.dirname(__file__)
-            relPath = "..//_data//users.txt"
-            absRelPath = path.join(pyDir, relPath)
-            self.userSet = set(load(open(absRelPath)))
+            print("Loading stats from mongo db...")
+            sm = StatsManager(self.mongo_uri)
+            self.statsDict = sm.get_stats_sync()
+            print("Stats loaded succesfully")
+
+        except Exception as e:
+            try:
+                print(f"Error loading stats: {e}")
+                print("Loading stats from disk...")
+                pyDir = path.dirname(__file__)
+                relPath = "..//_data//stats.txt"
+                absRelPath = path.join(pyDir, relPath)
+                self.statsDict = load(open(absRelPath))
+                print("Stats loaded succesfully")
+
+            except Exception as e:
+                print("Error loading stats: {}".format(e))
+
+        try:
+            print("Loading users from mongo db...")
+            um = UserManager(self.mongo_uri)
+            self.userSet = um.get_user_set_sync()
             print("Users loaded succesfully")
 
         except Exception as e:
-            print(f"Error loading GM's: {e}")
+            try:
+                print(f"Error loading users: {e}")
+                print("Loading users from disk...")
+                pyDir = path.dirname(__file__)
+                relPath = "..//_data//users.txt"
+                absRelPath = path.join(pyDir, relPath)
+                self.userSet = set(load(open(absRelPath)))
+                print("Users loaded succesfully")
+
+            except Exception as e:
+                print(f"Error loading GM's: {e}")
 
         try:
-            pyDir = path.dirname(__file__)
-            relPath = "..//_data//gms.txt"
-            absRelPath = path.join(pyDir, relPath)
-            self.gmDict = load(open(absRelPath))
-            print("GM's loaded succesfully")
-
+            print("Loading gms from mongo db...")
+            gm = GmManager(self.mongo_uri, sync=True)
+            self.gmDict = gm.get_gm_dict_sync()
+            print("Gms loaded succesfully")
+        
         except Exception as e:
-            print(f"Error loading GM's: {e}")
+            try:
+                pyDir = path.dirname(__file__)
+                relPath = "..//_data//gms.txt"
+                absRelPath = path.join(pyDir, relPath)
+                self.gmDict = load(open(absRelPath))
+                print("GM's loaded succesfully")
+
+            except Exception as e:
+                print(f"Error loading GM's: {e}")
  
         try:
-            pyDir = path.dirname(__file__)
-            relPath = "..//_data//prefixes.txt"
-            absRelPath = path.join(pyDir, relPath)
-            self.prefixDict = load(open(absRelPath))
+            print("Loading prefixes from mongo db...")
+            pm = PrefixManager(self.mongo_uri, sync=True)
+            self.prefixDict = pm.get_prefix_dict_sync()
             print("Prefixes loaded succesfully")
-
+        
         except Exception as e:
-            print(f"Error loading prefixes: {e}")
+            try:
+                print(f"Error loading prefixes: {e}")
+                print("Loading prefixes from disk...")
+                pyDir = path.dirname(__file__)
+                relPath = "..//_data//prefixes.txt"
+                absRelPath = path.join(pyDir, relPath)
+                self.prefixDict = load(open(absRelPath))
+                print("Prefixes loaded succesfully")
+
+            except Exception as e:
+                print(f"Error loading prefixes: {e}")
 
         print("\nTime: " + str(datetime.now()))
 

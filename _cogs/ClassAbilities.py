@@ -66,7 +66,7 @@ class ClassAbilityLookup:
             writer.add_document(title=title)
         writer.commit()
 
-        print("Setup indexer.")
+        print("Setup indexer in ClassAbilities.py")
 
     async def search(self, args):
         qp = QueryParser('title', schema=self.ix.schema)
