@@ -84,7 +84,7 @@ async def codify(string, title = None):
 data = BotData()
 aeval = Interpreter()
 
-bot = commands.Bot(command_prefix = get_pre)
+bot = commands.AutoShardedBot(command_prefix = get_pre)
 bot.remove_command('help')
 
 # Add Cogs
