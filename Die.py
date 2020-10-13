@@ -1,5 +1,6 @@
 # 1d20>15 then 1d8 count 12
 import sys
+import re
 from asteval import Interpreter
 from random import randint
 
@@ -53,7 +54,7 @@ class Die:
 
 class DiceExpressionEvaluator:
     def __init__(self, expression):
-        self.expression = expression.lower().strip() # The string input
+        self.expression = expression.lower().strip().replace(' ', '') # The string input
         self.eval_expression = None # The expression to be evaluated, this is constructed and passed to eval function
 
         self.expression_list = None # 1d20 -> ['1', 'd', '20']
@@ -61,6 +62,8 @@ class DiceExpressionEvaluator:
 
         self.type = None
         self.result = None
+
+        self.left_side = None # Left side of equality, if this expression is an equality
 
     def seperate_string_number(self):
         """
@@ -208,10 +211,76 @@ class DiceExpressionEvaluator:
         else:
             return True
 
+
+class ExpressionEvaluator():
+    def __init__(self, expression):
+        self.expression = expression.lower().strip().replace(' ', '').replace('then', 't').replace('count', 'c')
+        self.sub_expression_list = []
+        self.failures = []
+        self.results = []
+
+    def evaluate(self):
+        # Split on instances of t for THEN and c for COUNT
+        self.sub_expression_list = re.split('(t|c)', self.expression)
+
+        count = 1 # Default count to 1 (meaning count is not included)
+
+        # Get count
+        if self.sub_expression_list.count('c') == 1:
+            count_index = self.sub_expression_list.index('c')
+            if count_index == len(self.sub_expression_list):
+                raise DiceParseError(self.expression, "Invalid count statement", "A count statement must be followed by an integer.")
+            else:
+                try:
+                    count = int(self.sub_expression_list[count_index + 1])
+                except:
+                    raise DiceParseError(self.expression, "Invalid count statement", f"A count statement must be followed by an integer. {self.sub_expression_list[count_index + 1]} is not an integer.")
+        elif self.sub_expression_list.count('c') > 1:
+            raise DiceParseError(self.expression, "Invalid count statement", f"Only one instance of count (c) is supported.")
+                            
+        for j in range(0, count):
+            # Evaluate dice rolls 
+            temp_sub_expression_list = list(self.sub_expression_list) # Temp list is needed to keep counts independent                  
+            for i in range(len(temp_sub_expression_list)):
+                print(temp_sub_expression_list[i])
+                if 'd' in temp_sub_expression_list[i]: # First evaluate all dice rolls
+                    de = DiceExpressionEvaluator(temp_sub_expression_list[i]).evaluate()
+                    temp_sub_expression_list[i] = de
+
+            # Evaluate then expressions
+            if 't' in temp_sub_expression_list:            
+                for i in range(len(temp_sub_expression_list)):
+                    if temp_sub_expression_list[i] == 't':
+                        if isinstance(temp_sub_expression_list[i - 1], bool):
+                            if temp_sub_expression_list[i - 1]: # If the check was successful
+                                if i + 1 >= len(temp_sub_expression_list):
+                                    raise DiceParseError(self.expression, "Invalid then statement", "A then statement must be followed by a dice expression.")
+                                else:
+                                    # If check was successful and the then statement is followed by a valid dice roll, add it
+                                    try:
+                                        self.results.append(int(temp_sub_expression_list[i+1])) 
+                                    except:
+                                        raise DiceParseError(self.expression, "Invalid then statement", "A then statement must be followed by a dice expression.")
+                            else: # Check was unsuccessful
+                                if i - 1 < 0:
+                                    raise DiceParseError(self.expression, "Invalid then statement", "A then statement must be followed by a dice expression.")
+                                else:
+                                    # If check was successful and the then statement is followed by a valid dice roll, add it
+                                    try:
+                                        self.failures.append(int(temp_sub_expression_list[i-1])) 
+                                    except:
+                                        raise DiceParseError(self.expression, "Invalid then statement", "A then statement must be followed by a dice expression.")
+                        else:
+                            raise DiceParseError(self.expression, "Invalid then statement", "A then statement must follow a skill check or other roll that results in True or False.")
+
+        return self.results, self.failures
+
+
 def main():
-    test_die = DiceExpressionEvaluator("5d20k1>15")
-    print(test_die.evaluate())
-    print()
+    ee = ExpressionEvaluator("1d20>15t5d8c10")
+    r, s = ee.evaluate()
+    print(r)
+    print(s)
 
 if __name__ == "__main__":
     main()
