@@ -93,7 +93,21 @@ class DiceExpressionEvaluator:
                 groups.append(newword)
                 newword = ''
 
+        groups = self.replace_equals(groups)
         self.expression_list = groups
+
+    def replace_equals(self, groups):
+        """
+        Replaces = with == for aeval
+        """
+        if '=' not in groups:
+            return groups
+        else:
+            idx = groups.index('=')
+            if groups[idx - 1] != '<' or groups[idx - 1] != '>':
+                groups[idx] = '=='
+        return groups
+
 
     def create_dice_list(self):
         """
@@ -193,15 +207,32 @@ class DiceExpressionEvaluator:
         aeval = Interpreter()
         self.result = aeval.eval(self.eval_expression)
 
-        return self.result
-
     def evaluate(self):
         """
         Calls all helper functions and returns the result of the dice roll
         """
         self.seperate_string_number()
         self.create_dice_list()
-        return self.evaluate_dice_list()
+        self.evaluate_dice_list()
+        self.set_left_side()
+
+        return self.result, self.left_side
+
+    def set_left_side(self):
+        eq_index = -1
+        if '<' in self.dice_list:
+            eq_index = self.dice_list.index('<')
+        elif '>' in self.dice_list:
+            eq_index = self.dice_list.index('>')
+        elif '<=' in self.dice_list:
+            eq_index = self.dice_list.index('<=')
+        elif '>=' in self.dice_list:
+            eq_index = self.dice_list.index('>=')
+        if '==' in self.dice_list:
+            eq_index = self.dice_list.index('==')
+        
+        if eq_index != -1:
+            self.left_side = self.dice_list[eq_index - 1]
 
     def is_integer(self, n):
         try:
@@ -242,23 +273,23 @@ class ExpressionEvaluator():
             # Evaluate dice rolls 
             temp_sub_expression_list = list(self.sub_expression_list) # Temp list is needed to keep counts independent                  
             for i in range(len(temp_sub_expression_list)):
-                print(temp_sub_expression_list[i])
+                # print(temp_sub_expression_list[i])
                 if 'd' in temp_sub_expression_list[i]: # First evaluate all dice rolls
                     de = DiceExpressionEvaluator(temp_sub_expression_list[i]).evaluate()
-                    temp_sub_expression_list[i] = de
+                    temp_sub_expression_list[i] = de # Result, Left Side of Ineq
 
             # Evaluate then expressions
             if 't' in temp_sub_expression_list:            
                 for i in range(len(temp_sub_expression_list)):
                     if temp_sub_expression_list[i] == 't':
-                        if isinstance(temp_sub_expression_list[i - 1], bool):
+                        if isinstance(temp_sub_expression_list[i - 1][0], bool):
                             if temp_sub_expression_list[i - 1]: # If the check was successful
                                 if i + 1 >= len(temp_sub_expression_list):
                                     raise DiceParseError(self.expression, "Invalid then statement", "A then statement must be followed by a dice expression.")
                                 else:
                                     # If check was successful and the then statement is followed by a valid dice roll, add it
                                     try:
-                                        self.results.append(int(temp_sub_expression_list[i+1])) 
+                                        self.results.append(int(temp_sub_expression_list[i+1][0])) 
                                     except:
                                         raise DiceParseError(self.expression, "Invalid then statement", "A then statement must be followed by a dice expression.")
                             else: # Check was unsuccessful
@@ -267,20 +298,21 @@ class ExpressionEvaluator():
                                 else:
                                     # If check was successful and the then statement is followed by a valid dice roll, add it
                                     try:
-                                        self.failures.append(int(temp_sub_expression_list[i-1])) 
+                                        self.failures.append(int(temp_sub_expression_list[i-1][1]))
                                     except:
                                         raise DiceParseError(self.expression, "Invalid then statement", "A then statement must be followed by a dice expression.")
                         else:
                             raise DiceParseError(self.expression, "Invalid then statement", "A then statement must follow a skill check or other roll that results in True or False.")
 
-        return self.results, self.failures
+        return self.results, self.failures # TODO Failures returns nothing right now
 
 
 def main():
-    ee = ExpressionEvaluator("1d20>15t5d8c10")
-    r, s = ee.evaluate()
+    ee = ExpressionEvaluator("1d20>15t1d8c10")
+    r, f = ee.evaluate()
     print(r)
-    print(s)
+    print(f)
+
 
 if __name__ == "__main__":
     main()
