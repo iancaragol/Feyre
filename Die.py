@@ -19,9 +19,10 @@ class DiceParseError(Exception):
         super().__init__(self.message)
 
 class Die:
-    def __init__(self, number, size):
+    def __init__(self, number, size, verbosity):
         self.size = size
         self.number = number
+        self.verbosity = verbosity
         self.modifiers = []
 
         self.rolls = []
@@ -32,6 +33,9 @@ class Die:
 
     def evaluate(self):
         # First do all dice rolls
+        if self.verbosity:
+            print(f"---> evaluate")
+            print(f"Rolling {self.number} dice of size {self.size}")
         for i in range(0, self.number):
             roll = randint(1, self.size)
 
@@ -43,18 +47,36 @@ class Die:
 
             self.rolls.append(roll)
 
+        if self.verbosity:
+            print(f"Premodifier rolls: {self.rolls}, failures: {self.failures}, ciriticals: {self.criticals}")
+
         # Then apply modifiers
+        if self.verbosity:
+            print(f"Applying modifiers from {self.modifiers}")
         for mod in self.modifiers:
             if mod[0] == 'keep': # If this is a keep modifier
+                if self.verbosity:
+                        print(f"Applying keep modifier: {mod}")
                 for i in range(len(self.rolls) - mod[1]):
-                    self.dropped.append(self.rolls.pop(self.rolls.index(min(self.rolls))))
+                    drop_die = self.rolls.pop(self.rolls.index(min(self.rolls)))
+                    if self.verbosity:
+                        print(f"Dropped {drop_die}")
+                    self.dropped.append(drop_die)
+                if self.verbosity:
+                    print(f"Dropped the following dice: {self.dropped}")
+                
                 
         self.result = sum(self.rolls)
+
+        if self.verbosity:
+            print(f"Evaulation result: {self.modifiers}")
+
         return self.result
 
 class DiceExpressionEvaluator:
-    def __init__(self, expression):
+    def __init__(self, expression, verbosity):
         self.expression = expression.lower().strip().replace(' ', '') # The string input
+        self.verbosity = verbosity
         self.eval_expression = None # The expression to be evaluated, this is constructed and passed to eval function
 
         self.expression_list = None # 1d20 -> ['1', 'd', '20']
@@ -71,6 +93,8 @@ class DiceExpressionEvaluator:
 
         1d20+5 -> ['1', 'd', '20', '+' '5']
         """
+        if self.verbosity:
+            print(f"---> seperate_string_number")
         # https://stackoverflow.com/questions/430079/how-to-split-strings-into-text-and-number
         previous_character = self.expression[0]
         groups = []
@@ -95,11 +119,15 @@ class DiceExpressionEvaluator:
 
         groups = self.replace_equals(groups)
         self.expression_list = groups
+        if self.verbosity:
+            print(f"expression_list: {self.expression_list}")
 
     def replace_equals(self, groups):
         """
         Replaces = with == for aeval
         """
+        if self.verbosity:
+            print(f"---> replace_equals")
         if '=' not in groups:
             return groups
         else:
@@ -113,6 +141,8 @@ class DiceExpressionEvaluator:
         """
         ['1', 'd', '20', '+' '5'] -> [('dice', 1, 20), +, '5']
         """
+        if self.verbosity:
+            print(f"---> create_dice_list")
         dice_list = [] 
         i = 0
         for j in range(len(self.expression_list)): # Because pyhton is weird, our iterator is actually i
@@ -123,6 +153,8 @@ class DiceExpressionEvaluator:
 
             # DICE
             if self.expression_list[i] == 'd':
+                if self.verbosity:
+                    print(f"processing a dice")
                 size = 0
                 number = 0
                 
@@ -152,15 +184,23 @@ class DiceExpressionEvaluator:
                         if type(number) is float:
                             raise DiceParseError(self.expression, "Invalid number of dice", f"{number} is not a valid number of dice because it is not an integer. \n\n{self.expression_list}")
 
+                if self.verbosity:
+                    print(f"size: {size}, number: {number}")
+
                 if i > 0:            
                     if len(dice_list) > 0 and delete_previous_char:
                         del dice_list[len(dice_list)-1]
 
                 i += 1 # Skip over next value
-                dice_list.append(Die(number, size)) # This tuple is a die
+                dice_list.append(Die(number, size, self.verbosity)) # This tuple is a die
+                if self.verbosity:
+                    print(f"dice_list: {dice_list}")
+
 
             # KEEP Modifier
             elif self.expression_list[i] == 'k':
+                if self.verbosity:
+                    print(f"processing keep modifier")
                 keep_count = sys.maxsize # By default, keep all dice
                 
                 # Expression ends with a k
@@ -182,6 +222,9 @@ class DiceExpressionEvaluator:
                 else:
                     raise DiceParseError(self.expression, "Invalid keep position", f"A dice expression cannot start with a keep flag.\n\n{self.expression_list}")
 
+                if self.verbosity:
+                    print(f"keep_count: {keep_count}")
+                    print(f"dice_list: {dice_list}")
             #OTHER MODIFIERS GO HERE
 
             else:
@@ -189,23 +232,36 @@ class DiceExpressionEvaluator:
                 # if not self.is_integer(self.expression_list[i]) and self.expression_list[i] not in ['d', 'k']: # If its not an integer and its not a flag
             i += 1
 
+        if self.verbosity:
+            print(f"dice_list: {dice_list}")
         self.dice_list = dice_list
 
     def evaluate_dice_list(self):
         """
         Evaluates each dice in the dice list, constructs and evaluates final string
         """
+        if self.verbosity:
+            print(f"--> evaluate_dice_list")
+
         self.eval_expression = ""
         for i in range(len(self.dice_list)):
             if isinstance(self.dice_list[i], Die):
+                if self.verbosity:
+                    print(f"dice_list[{i}] is Die")
                 roll_result = self.dice_list[i].evaluate()
+                if self.verbosity:
+                    print(f"roll_result: {roll_result}")
                 self.eval_expression += str(roll_result)
             else:
+                if self.verbosity:
+                   print(f"dice_list[{i}] is not Die")
                 self.eval_expression += self.dice_list[i]
 
         # Evaluate the constructed string
         aeval = Interpreter()
         self.result = aeval.eval(self.eval_expression)
+        if self.verbosity:
+            print(f"result: {self.result}")
 
     def evaluate(self):
         """
@@ -244,21 +300,30 @@ class DiceExpressionEvaluator:
 
 
 class ExpressionEvaluator():
-    def __init__(self, expression):
-        self.expression = expression.lower().strip().replace(' ', '').replace('then', 't').replace('count', 'c')
+    def __init__(self, expression, verbosity):
+        self.expression = expression.lower().strip().replace(' ', '').replace('then', 't').replace('count', 'c').replace('keep', 'k')
+        self.verbosity = verbosity
         self.sub_expression_list = []
         self.failures = []
         self.results = []
-
+        
     def evaluate(self):
         # Split on instances of t for THEN and c for COUNT
+        if self.verbosity:
+            print(f"--> evaluate")
+            print(f"Expression: {self.expression}")
+            
         self.sub_expression_list = re.split('(t|c)', self.expression)
-
         count = 1 # Default count to 1 (meaning count is not included)
+
+        if self.verbosity:
+            print(f"sub_expression_list: {self.sub_expression_list}")
 
         # Get count
         if self.sub_expression_list.count('c') == 1:
             count_index = self.sub_expression_list.index('c')
+            if self.verbosity:
+                print(f"sub_expression_list contains a count at index {count_index}")
             if count_index == len(self.sub_expression_list):
                 raise DiceParseError(self.expression, "Invalid count statement", "A count statement must be followed by an integer.")
             else:
@@ -268,37 +333,54 @@ class ExpressionEvaluator():
                     raise DiceParseError(self.expression, "Invalid count statement", f"A count statement must be followed by an integer. {self.sub_expression_list[count_index + 1]} is not an integer.")
         elif self.sub_expression_list.count('c') > 1:
             raise DiceParseError(self.expression, "Invalid count statement", f"Only one instance of count (c) is supported.")
-                            
+
+        if self.verbosity:
+            print(f"count: {count}")
+
         for j in range(0, count):
             # Evaluate dice rolls 
             temp_sub_expression_list = list(self.sub_expression_list) # Temp list is needed to keep counts independent                  
             for i in range(len(temp_sub_expression_list)):
                 # print(temp_sub_expression_list[i])
                 if 'd' in temp_sub_expression_list[i]: # First evaluate all dice rolls
-                    de = DiceExpressionEvaluator(temp_sub_expression_list[i]).evaluate()
+                    if self.verbosity:
+                        print(f"dice expression found in {temp_sub_expression_list[i]}")
+                    de = DiceExpressionEvaluator(temp_sub_expression_list[i], self.verbosity).evaluate()
                     temp_sub_expression_list[i] = de # Result, Left Side of Ineq
+                    if self.verbosity:
+                        print(f"temp_sub_expression_list: {temp_sub_expression_list[i]}")
 
             # Evaluate then expressions
-            if 't' in temp_sub_expression_list:            
+            if 't' in temp_sub_expression_list: 
+                if self.verbosity:
+                        print(f"t condition found in {temp_sub_expression_list}")           
                 for i in range(len(temp_sub_expression_list)):
                     if temp_sub_expression_list[i] == 't':
                         if isinstance(temp_sub_expression_list[i - 1][0], bool):
-                            if temp_sub_expression_list[i - 1]: # If the check was successful
+                            if temp_sub_expression_list[i - 1][0]: # If the check was successful
+                                if self.verbosity:
+                                    print(f"then at index {i-1} was successful")
                                 if i + 1 >= len(temp_sub_expression_list):
                                     raise DiceParseError(self.expression, "Invalid then statement", "A then statement must be followed by a dice expression.")
                                 else:
                                     # If check was successful and the then statement is followed by a valid dice roll, add it
                                     try:
+                                        if self.verbosity:
+                                            print(f"appending {temp_sub_expression_list[i+1][0]} to results.")
                                         self.results.append(int(temp_sub_expression_list[i+1][0])) 
                                     except:
                                         raise DiceParseError(self.expression, "Invalid then statement", "A then statement must be followed by a dice expression.")
                             else: # Check was unsuccessful
+                                if self.verbosity:
+                                    print(f"then at index {i-1} was unsuccessful")
                                 if i - 1 < 0:
                                     raise DiceParseError(self.expression, "Invalid then statement", "A then statement must be followed by a dice expression.")
                                 else:
                                     # If check was successful and the then statement is followed by a valid dice roll, add it
                                     try:
-                                        self.failures.append(int(temp_sub_expression_list[i-1][1]))
+                                        if self.verbosity:
+                                            print(f"appending {temp_sub_expression_list[i-1][0]} to failures.")
+                                        self.failures.append(int(temp_sub_expression_list[i-1][1].result))
                                     except:
                                         raise DiceParseError(self.expression, "Invalid then statement", "A then statement must be followed by a dice expression.")
                         else:
@@ -308,10 +390,11 @@ class ExpressionEvaluator():
 
 
 def main():
-    ee = ExpressionEvaluator("1d20>15t1d8c10")
+    ee = ExpressionEvaluator("1d20+2c2", True)
     r, f = ee.evaluate()
     print(r)
     print(f)
+    print()
 
 
 if __name__ == "__main__":
