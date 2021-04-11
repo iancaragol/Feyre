@@ -4,9 +4,9 @@ services:
   feyre:
     container_name: feyre
     # env_file: 
-    #   - creds.env
-    #   - config.env
-    restart: always
+      # - creds.env
+      # - config.env
+    # restart: always
     build: ./
-    command: python Feyre.py
+    command: python Feyre.py test
     # command: sleep infinity

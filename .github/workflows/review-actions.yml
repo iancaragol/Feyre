@@ -1,5 +1,7 @@
-name: pr-review
-on: [pull_request]
+name: review-actions
+on: 
+  pull_request:
+    branches: [ master ]
 jobs:
   misspell:
     name: runner / misspell
