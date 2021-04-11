@@ -36,7 +36,7 @@ jobs:
     - name: Test with pylint
       run: |
         sudo apt install pylint -y
-        pylint -E app.py || { echo "Failure! - Python Error Checks Failed - $?" ; exit 1; }
+        pylint -E Feyre.py || { echo "Failure! - Python Error Checks Failed - $?" ; exit 1; }
         echo "Success! - Python Error Checks Passed"
     - name: python vuln check
       run: |
