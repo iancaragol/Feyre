@@ -3,10 +3,12 @@ version: '3.8'
 services:
   feyre:
     container_name: feyre
-    # env_file: 
-      # - creds.env
-      # - config.env
-    # restart: always
+    env_file: 
+      - config.env
+    restart: always
     build: ./
-    command: python Feyre.py test
-    # command: sleep infinity
+    command: python Feyre.py test false
+
+  redis:
+    container_name: redis
+    build: ./redis

@@ -37,6 +37,9 @@ RUN pip3 install -r requirements.txt -f /wheels \
   && rm -rf /root/.cache/pip/* \
   && rm requirements.txt
 
+# testing
+RUN apt-get install iputils-ping redis -y
+
 USER nonroot
 
 # Feyre.py
