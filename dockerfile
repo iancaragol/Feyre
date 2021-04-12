@@ -45,4 +45,4 @@ USER nonroot
 # Feyre.py
 COPY --chown=nonroot:nonroot . .
 
-CMD ["python", "Feyre.py"]
+ENTRYPOINT [ "python" ]

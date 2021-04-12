@@ -272,6 +272,7 @@ mongo_uri.txt
 
 # docker
 creds.env
+config.env
 
 # misc
 .vscode
