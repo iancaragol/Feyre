@@ -9,6 +9,7 @@ from asteval import Interpreter
 from ISStreamer.Streamer import Streamer
 from datetime import datetime
 from copy import deepcopy
+import uuid
 
 from _classes.BotData import BotData
 
@@ -127,7 +128,19 @@ async def hello(ctx):
     await ctx.send(embed=embed)
 #endregion
 
+#bot UUID
+@bot.command()
+async def botid(ctx):
+    """
+    bot UUID for testing
+    """
 
+    if os.environ['env'] == 'container' and sys.argv[1] == 'test':
+
+        if (ctx.author.id not in data.userSet):
+            data.userSet.add(ctx.author.id)
+
+        await ctx.send(botid)
 
 
 #region Items
@@ -456,6 +469,9 @@ async def on_ready():
     if(sys.argv[1] == 'release'):
         save_data.start()
 
+    if os.environ['env'] == 'container':
+        sys.stdout.flush()
+
 
 #region upper/lowercase
 @bot.command()
@@ -494,6 +510,11 @@ async def New(ctx, *, args = None):
 
 global bucket_key
 global access_key
+
+if os.environ['env'] == 'container':
+    botid = uuid.uuid4()
+    print(f'[#] BotID: {botid}')
+    sys.stdout.flush()
 
 if(sys.argv[1] == 'test'):
     pyDir = path.dirname(__file__)
