@@ -9,6 +9,7 @@ from asteval import Interpreter
 from ISStreamer.Streamer import Streamer
 from datetime import datetime
 from copy import deepcopy
+import uuid
 
 from _classes.BotData import BotData
 
@@ -127,7 +128,21 @@ async def hello(ctx):
     await ctx.send(embed=embed)
 #endregion
 
+#bot UUID
+@bot.command()
+async def botid(ctx):
+    """
+    bot UUID for testing
+    """
+    try:
+        if os.environ['ENV'] == 'container' and os.environ['TEST'].upper() == 'TRUE':
 
+            if (ctx.author.id not in data.userSet):
+                data.userSet.add(ctx.author.id)
+
+            await ctx.send(f'botid: {botid}')
+    except KeyError:
+        pass
 
 
 #region Items
@@ -456,6 +471,12 @@ async def on_ready():
     if(sys.argv[1] == 'release'):
         save_data.start()
 
+    try:
+        if os.environ['ENV'] == 'container':
+            sys.stdout.flush()
+    except KeyError:
+        pass
+
 
 #region upper/lowercase
 @bot.command()
@@ -495,24 +516,41 @@ async def New(ctx, *, args = None):
 global bucket_key
 global access_key
 
-if(sys.argv[1] == 'test'):
-    pyDir = path.dirname(__file__)
-    testToken = ""
-    with open(path.join(pyDir, 'test_token.txt'), 'r') as file:
-        testToken = file.readline().strip()
-    with open(path.join(pyDir, 'bucket_key.txt'), 'r') as file:
-        bucket_key = file.readline().strip()
-    with open(path.join(pyDir, 'access_key.txt'), 'r') as file:
-        access_key = file.readline().strip()
-    bot.run(testToken)
-    
-elif (sys.argv[1] == 'release'):
-    pyDir = path.dirname(__file__)
-    releaseToken = ""
-    with open(path.join(pyDir, 'release_token.txt'), 'r') as file:
-        releaseToken = file.readline().strip()
-    with open(path.join(pyDir, 'bucket_key.txt'), 'r') as file:
-        bucket_key = file.readline().strip()
-    with open(path.join(pyDir, 'access_key.txt'), 'r') as file:
-        access_key = file.readline().strip()
-    bot.run(releaseToken)
+try:
+    if os.environ['ENV'] == 'container':
+
+        botid = uuid.uuid4()
+        print(f'[#] BotID: {botid}')
+        sys.stdout.flush()
+
+        if os.environ['TEST'].upper() == 'TRUE':
+            token = os.environ['FEYRE_TOKEN_TEST']
+        else:
+            token = os.environ['FEYRE_TOKEN']
+        bucket_key = os.environ['BUCKET_KEY']
+        access_key = os.environ['ACCESS_KEY']
+        bot.run(token)
+
+except KeyError:
+
+    if(sys.argv[1] == 'test'):
+        pyDir = path.dirname(__file__)
+        testToken = ""
+        with open(path.join(pyDir, 'test_token.txt'), 'r') as file:
+            testToken = file.readline().strip()
+        with open(path.join(pyDir, 'bucket_key.txt'), 'r') as file:
+            bucket_key = file.readline().strip()
+        with open(path.join(pyDir, 'access_key.txt'), 'r') as file:
+            access_key = file.readline().strip()
+        bot.run(testToken)
+        
+    elif (sys.argv[1] == 'release'):
+        pyDir = path.dirname(__file__)
+        releaseToken = ""
+        with open(path.join(pyDir, 'release_token.txt'), 'r') as file:
+            releaseToken = file.readline().strip()
+        with open(path.join(pyDir, 'bucket_key.txt'), 'r') as file:
+            bucket_key = file.readline().strip()
+        with open(path.join(pyDir, 'access_key.txt'), 'r') as file:
+            access_key = file.readline().strip()
+        bot.run(releaseToken)

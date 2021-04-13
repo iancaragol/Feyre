@@ -269,3 +269,13 @@ bucket_key.txt
 access_key.txt
 db_user.txt
 mongo_uri.txt
+
+# docker
+creds.env
+config.env
+
+# misc
+.vscode
+
+# terraform
+.terraform*

@@ -1,0 +1,14 @@
+version: '3.8'
+
+services:
+  feyre:
+    container_name: feyre
+    env_file: 
+      - config.env
+    restart: always
+    build: ./
+    command: Feyre.py test false
+
+  # redis:
+  #   container_name: redis
+  #   build: ./redis

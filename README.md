@@ -42,5 +42,11 @@ What about dividing money up among the party? The currency command supports curr
 
 #### See Feyre's [documentation](https://feyre.readthedocs.io/en/latest/#) for a list of all supported commands and features!
 
+#### Building with Docker
 
+To build Feyre for development simply run the following command:
+
+`make run`
+
+This will build Feyre with `Docker` and `Docker-compose`.
 
