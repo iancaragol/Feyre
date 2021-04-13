@@ -1,6 +1,6 @@
 data "azurerm_container_registry" "acr" {
   name                = "feyre"
-  resource_group_name = "feyre"
+  resource_group_name = "Feyre"
 }
 
 resource "azurerm_virtual_network" "feyre_containers" {
@@ -8,10 +8,36 @@ resource "azurerm_virtual_network" "feyre_containers" {
   location            = "centralus"
   resource_group_name = "Feyre"
   address_space       = ["10.2.0.0/16"]
+}
 
-  subnet {
-    name           = "default"
-    address_prefix = "10.2.0.0/24"
+resource "azurerm_subnet" "default" {
+  name                 = "default"
+  resource_group_name = "Feyre"
+  virtual_network_name = azurerm_virtual_network.feyre_containers.name
+  address_prefix = ["10.2.0.0/24"]
+
+  delegation {
+    name = "delegation"
+
+    service_delegation {
+      name    = "Microsoft.ContainerInstance/containerGroups"
+      actions = ["Microsoft.Network/virtualNetworks/subnets/action"]
+    }
+  }
+}
+
+resource "azurerm_network_profile" "feyre_container_net_profile" {
+  name                = "examplenetprofile"
+  location            = "centralus"
+  resource_group_name = "Feyre"
+
+  container_network_interface {
+    name = "feyre_container_net_interface"
+
+    ip_configuration {
+      name      = "feyre_container_net_profile"
+      subnet_id = azurerm_subnet.default.id
+    }
   }
 }
 
