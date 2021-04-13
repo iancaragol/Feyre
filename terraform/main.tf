@@ -14,7 +14,7 @@ resource "azurerm_subnet" "default" {
   name                 = "default"
   resource_group_name = "Feyre"
   virtual_network_name = azurerm_virtual_network.feyre_containers.name
-  address_prefixs = ["10.2.0.0/24"]
+  address_prefixes = ["10.2.0.0/24"]
 
   delegation {
     name = "delegation"
@@ -27,7 +27,7 @@ resource "azurerm_subnet" "default" {
 }
 
 resource "azurerm_network_profile" "feyre_container_net_profile" {
-  name                = "examplenetprofile"
+  name                = "feyre_container_net_profile"
   location            = "centralus"
   resource_group_name = "Feyre"
 
