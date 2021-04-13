@@ -36,10 +36,10 @@ resource "azurerm_container_group" "feyre_test" {
       "ACCESS_KEY"       = var.ACCESS_KEY
     }
 
-    # ports {
-    #   port     = 80
-    #   protocol = "TCP"
-    # }
+    ports {
+      port     = 80
+      protocol = "TCP"
+    }
   }
 
   image_registry_credential {
