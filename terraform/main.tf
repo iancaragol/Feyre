@@ -3,9 +3,22 @@ data "azurerm_container_registry" "acr" {
   resource_group_name = "feyre"
 }
 
+resource "azurerm_virtual_network" "feyre_containers" {
+  name                = "feyre_containers"
+  location            = "centralus"
+  resource_group_name = "Feyre"
+  address_space       = ["10.0.0.0/16"]
+
+  subnet {
+    name           = "subnet1"
+    address_prefix = "10.0.1.0/24"
+  }
+}
+
 # azurerm_container_group.feyre_test:
 resource "azurerm_container_group" "feyre_test" {
   ip_address_type     = "Private"
+  network_profile_id  = azurerm_virtual_network.feyre_containers.id
   location            = "centralus"
   name                = "feyre-test"
   os_type             = "Linux"
@@ -40,8 +53,6 @@ resource "azurerm_container_group" "feyre_test" {
       port     = 80
       protocol = "TCP"
     }
-
-    network_profile_id = "/subscriptions/10586921-4e01-4730-961b-4188fcaee088/resourceGroups/Feyre/providers/Microsoft.Network/virtualNetworks/Feyre-vnet"
 
   }
 
