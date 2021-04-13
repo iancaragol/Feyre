@@ -103,7 +103,7 @@ jobs:
   terraform-feyre:
 
     needs: [changes, push-feyre]
-    if: ${{ needs.changes.outputs.feyre-terraform == 'true' }} || ${{ needs.changes.outputs.feyre-terraform-modules == 'true' }}
+    if: ${{ needs.changes.outputs.feyre-terraform == 'true' }} || ${{ needs.changes.outputs.feyre-terraform-modules == 'true' }} || ${{ needs.changes.outputs.feyre-src == 'true' }}
 
     runs-on: ubuntu-latest
 

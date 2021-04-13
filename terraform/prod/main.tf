@@ -1,5 +1,5 @@
 terraform {
-    backend "remote" {
+  backend "remote" {
     hostname     = "app.terraform.io"
     organization = "Feyre"
 
@@ -22,7 +22,7 @@ module "feyre_release" {
   memory      = 2
   image_tag   = var.image_tag
   project_env = "prod"
-  iss         = "false" 
+  iss         = "false"
 
   # Feyre Credentials
   FEYRE_TOKEN     = var.FEYRE_TOKEN
