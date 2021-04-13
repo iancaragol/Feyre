@@ -1,9 +1,9 @@
-variable "FEYRE_TOKEN_TEST" {
+variable "image_tag" {
   type    = string
   default = ""
 }
 
-variable "FEYRE_TOKEN_RELEASE" {
+variable "FEYRE_TOKEN" {
   type    = string
   default = ""
 }

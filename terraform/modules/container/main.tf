@@ -9,15 +9,6 @@ terraform {
       version = "=2.46.0"
     }
   }
-  # Using Terraform Cloud Remote Backend
-  backend "remote" {
-    hostname     = "app.terraform.io"
-    organization = "Feyre"
-
-    workspaces {
-      name = "Feyre"
-    }
-  }
 }
 
 # Configure the Microsoft Azure Provider
@@ -107,7 +98,7 @@ resource "azurerm_container_group" "container_group" {
       "ENV" = var.project_env
       "ISS" = var.iss
     }
-    image  = "${var.project_name}.azurecr.io/${var.project_name}:${var.image_tag}"
+    image  = "${var.project_name}.azurecr.io/${var.project_name}:${var.project_env}-${var.image_tag}"
     memory = var.memory
     name   = "${var.project_name}-${var.project_env}"
     secure_environment_variables = {
