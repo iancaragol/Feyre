@@ -1,9 +1,9 @@
-name: Deploy Dev 🚀
+name: Deploy Prod 🚀
 
 on:
   push:
     branches:
-      - develop
+      - master
 
 jobs:
 
@@ -32,7 +32,7 @@ jobs:
           feyre-terraform-modules:
             - 'terraform/modules/**'
           feyre-terraform:
-            - 'terraform/dev/*'
+            - 'terraform/prod/*'
 
   test-feyre:
 
@@ -97,8 +97,8 @@ jobs:
           username: ${{ secrets.REGISTRY_USERNAME }}
           password: ${{ secrets.REGISTRY_PASSWORD }}
       - run: |
-          docker build . -t ${{ secrets.REGISTRY_LOGIN_SERVER }}/feyre:dev-${{ github.sha }}
-          docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/feyre:dev-${{ github.sha }}
+          docker build . -t ${{ secrets.REGISTRY_LOGIN_SERVER }}/feyre:prod-${{ github.sha }}
+          docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/feyre:prod-${{ github.sha }}
 
   terraform-feyre:
 
@@ -108,7 +108,7 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      TF_VAR_FEYRE_TOKEN: ${{ secrets.FEYRE_TOKEN_DEV }}
+      TF_VAR_FEYRE_TOKEN: ${{ secrets.FEYRE_TOKEN_PROD }}
       TF_VAR_image_tag: ${{ github.sha }}
       TF_VAR_BUCKET_KEY: ${{ secrets.BUCKET_KEY }}
       TF_VAR_ACCESSKEY: ${{ secrets.ACCESSKEY }}
@@ -145,21 +145,21 @@ jobs:
         run: terraform --version
 
       - name: Terraform init
-        working-directory: terraform/dev
+        working-directory: terraform/prod
         run: terraform init
 
       - name: Terraform validate
-        working-directory: terraform/dev
+        working-directory: terraform/prod
         run: terraform validate
 
       - name: Terraform format
-        working-directory: terraform/dev
+        working-directory: terraform/prod
         run: terraform fmt -check
 
       - name: Terraform plan
-        working-directory: terraform/dev
+        working-directory: terraform/prod
         run: terraform plan
 
       - name: Terraform apply
-        working-directory: terraform/dev
+        working-directory: terraform/prod
         run: terraform apply -auto-approve
