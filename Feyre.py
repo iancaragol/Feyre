@@ -135,12 +135,12 @@ async def botid(ctx):
     bot UUID for testing
     """
     try:
-        if os.environ['env'] == 'container' and os.environ['test'].upper() == 'TRUE':
+        if os.environ['ENV'] == 'container' and os.environ['TEST'].upper() == 'TRUE':
 
             if (ctx.author.id not in data.userSet):
                 data.userSet.add(ctx.author.id)
 
-            await ctx.send(botid)
+            await ctx.send(f'botid: {botid}')
     except KeyError:
         pass
 
@@ -472,7 +472,7 @@ async def on_ready():
         save_data.start()
 
     try:
-        if os.environ['env'] == 'container':
+        if os.environ['ENV'] == 'container':
             sys.stdout.flush()
     except KeyError:
         pass
@@ -517,13 +517,16 @@ global bucket_key
 global access_key
 
 try:
-    if os.environ['env'] == 'container':
+    if os.environ['ENV'] == 'container':
 
         botid = uuid.uuid4()
         print(f'[#] BotID: {botid}')
         sys.stdout.flush()
 
-        token = os.environ['FEYRE_TOKEN']
+        if os.environ['TEST'].upper() == 'TRUE':
+            token = os.environ['FEYRE_TOKEN_TEST']
+        else:
+            token = os.environ['FEYRE_TOKEN']
         bucket_key = os.environ['BUCKET_KEY']
         access_key = os.environ['ACCESS_KEY']
         bot.run(token)

@@ -276,3 +276,6 @@ config.env
 
 # misc
 .vscode
+
+# terraform
+.terraform*
