@@ -40,6 +40,9 @@ resource "azurerm_container_group" "feyre_test" {
       port     = 80
       protocol = "TCP"
     }
+
+    network_profile_id = "/subscriptions/10586921-4e01-4730-961b-4188fcaee088/resourceGroups/Feyre/providers/Microsoft.Network/virtualNetworks/Feyre-vnet"
+
   }
 
   image_registry_credential {
