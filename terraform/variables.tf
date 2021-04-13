@@ -1,31 +1,39 @@
 variable "FEYRE_TOKEN_TEST" {
+  type    = string
   default = ""
 }
 
-variable "FEYRE_TOKEN" {
+variable "FEYRE_TOKEN_RELEASE" {
+  type    = string
   default = ""
 }
 
 variable "BUCKET_KEY" {
+  type    = string
   default = ""
 }
 
 variable "ACCESS_KEY" {
+  type    = string
   default = ""
 }
 
 variable "client_secret" {
+  type    = string
   default = ""
 }
 
 variable "client_id" {
+  type    = string
   default = ""
 }
 
 variable "tenant_id" {
+  type    = string
   default = ""
 }
 
 variable "subscription_id" {
+  type    = string
   default = ""
 }

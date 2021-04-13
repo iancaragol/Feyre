@@ -135,12 +135,10 @@ async def botid(ctx):
     bot UUID for testing
     """
     try:
-        if os.environ['ENV'] == 'container' and os.environ['TEST'].upper() == 'TRUE':
+        if (ctx.author.id not in data.userSet):
+            data.userSet.add(ctx.author.id)
 
-            if (ctx.author.id not in data.userSet):
-                data.userSet.add(ctx.author.id)
-
-            await ctx.send(f'botid: {botid}')
+        await ctx.send(f'botid: {botid}\nenv: {env}')
     except KeyError:
         pass
 
@@ -457,25 +455,33 @@ async def on_command_error(ctx, error):
 @bot.event
 async def on_ready():
     print()
-    print ("Starting up...")
-    print ("I am running as: " + bot.user.name)
-    print ("With the ID: " + str(bot.user.id))
+    print ("[#] Starting up...")
+    print ("[#] I am running as: " + bot.user.name)
+    print ("[#] With the ID: " + str(bot.user.id))
 
     await bot.change_presence(activity = discord.Game(name="feyre.io | !help"))
-    if(sys.argv[2] == 'true'):
-        print("Starting stream to initial state...")
-        send_data.start()
-    elif (sys.argv[2] == 'false'):
-        print("Stream argument is set to false. Skipping stream.")
-
-    if(sys.argv[1] == 'release'):
-        save_data.start()
 
     try:
-        if os.environ['ENV'] == 'container':
-            sys.stdout.flush()
+        if os.environ['ISS'].upper() == 'TRUE':
+            print("[#] Starting stream to initial state...")
+            send_data.start()
+        else:
+            print("[#] Stream argument not set. Skipping stream.")
+        
+        if env == 'RELEASE':
+            save_data.start()
+
+        sys.stdout.flush()
+
     except KeyError:
-        pass
+        if(sys.argv[2] == 'true'):
+            print("[#] Starting stream to initial state...")
+            send_data.start()
+        elif (sys.argv[2] == 'false'):
+            print("[#] Stream argument is set to false. Skipping stream.")
+
+        if(sys.argv[1] == 'release'):
+            save_data.start()
 
 
 #region upper/lowercase
@@ -515,21 +521,20 @@ async def New(ctx, *, args = None):
 
 global bucket_key
 global access_key
+global env
 
 try:
-    if os.environ['ENV'] == 'container':
+    env = os.environ['ENV'].upper()
 
-        botid = uuid.uuid4()
-        print(f'[#] BotID: {botid}')
-        sys.stdout.flush()
+    botid = uuid.uuid4()
+    print(f'[#] BotID: {botid}\n[#] ENV: {env}')
+    sys.stdout.flush()
 
-        if os.environ['TEST'].upper() == 'TRUE':
-            token = os.environ['FEYRE_TOKEN_TEST']
-        else:
-            token = os.environ['FEYRE_TOKEN']
-        bucket_key = os.environ['BUCKET_KEY']
-        access_key = os.environ['ACCESS_KEY']
-        bot.run(token)
+    token = os.environ['FEYRE_TOKEN']
+    token = os.environ['FEYRE_TOKEN']
+    bucket_key = os.environ['BUCKET_KEY']
+    access_key = os.environ['ACCESS_KEY']
+    bot.run(token)
 
 except KeyError:
 

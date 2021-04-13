@@ -276,6 +276,9 @@ config.env
 
 # misc
 .vscode
+azure_token
 
 # terraform
 .terraform*
+terraform.tfstate
+terraform.tfstate.backup
