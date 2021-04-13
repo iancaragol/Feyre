@@ -36,6 +36,7 @@ jobs:
 
   test-feyre:
 
+      needs: [changes]
       if: ${{ needs.changes.outputs.feyre-src == 'true' }}
 
       runs-on: ubuntu-latest
