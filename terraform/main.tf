@@ -10,8 +10,8 @@ resource "azurerm_virtual_network" "feyre_containers" {
   address_space       = ["10.2.0.0/16"]
 }
 
-resource "azurerm_subnet" "default" {
-  name                 = "default"
+resource "azurerm_subnet" "feyre_default" {
+  name                 = "feyre_default"
   resource_group_name = "Feyre"
   virtual_network_name = azurerm_virtual_network.feyre_containers.name
   address_prefixes = ["10.2.0.0/24"]
@@ -36,7 +36,7 @@ resource "azurerm_network_profile" "feyre_container_net_profile" {
 
     ip_configuration {
       name      = "feyre_container_net_profile"
-      subnet_id = azurerm_subnet.default.id
+      subnet_id = azurerm_subnet.feyre_default.id
     }
   }
 }
