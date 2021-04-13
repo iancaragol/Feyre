@@ -7,11 +7,11 @@ resource "azurerm_virtual_network" "feyre_containers" {
   name                = "feyre_containers"
   location            = "centralus"
   resource_group_name = "Feyre"
-  address_space       = ["10.0.0.0/16"]
+  address_space       = ["10.2.0.0/16"]
 
   subnet {
-    name           = "subnet1"
-    address_prefix = "10.0.1.0/24"
+    name           = "default"
+    address_prefix = "10.2.0.0/24"
   }
 }
 
