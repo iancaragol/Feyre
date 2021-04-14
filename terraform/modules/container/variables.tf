@@ -59,3 +59,11 @@ variable "tenant_id" {
 variable "subscription_id" {
   type = string
 }
+
+variable "dbuser" {
+  type = string
+}
+
+variable "dbpw" {
+  type = string
+}

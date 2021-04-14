@@ -38,3 +38,12 @@ variable "subscription_id" {
   default = ""
 }
 
+variable "dbuser" {
+  type    = string
+  default = ""
+}
+
+variable "dbpw" {
+  type    = string
+  default = ""
+}

@@ -32,4 +32,6 @@ module "feyre_test" {
   client_id       = var.client_id
   tenant_id       = var.tenant_id
   subscription_id = var.subscription_id
+  dbuser          = var.dbuser
+  dbpw            = var.dbpw
 }

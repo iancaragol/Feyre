@@ -105,6 +105,8 @@ resource "azurerm_container_group" "container_group" {
       "FEYRE_TOKEN" = var.FEYRE_TOKEN
       "BUCKET_KEY"  = var.BUCKET_KEY
       "ACCESS_KEY"  = var.ACCESS_KEY
+      "dbuser"      = var.dbuser
+      "dbpw"        = var.dbpw
     }
 
     ports {

@@ -147,12 +147,14 @@ jobs:
         env:
           TF_VAR_FEYRE_TOKEN: ${{ secrets.FEYRE_TOKEN_DEV }}
           TF_VAR_image_tag: ${{ github.sha }}
-          TF_VAR_BUCKET_KEY: ${{ secrets.BUCKET_KEY }}
-          TF_VAR_ACCESSKEY: ${{ secrets.ACCESSKEY }}
+          TF_VAR_BUCKET_KEY: ${{ secrets.BUCKET_KEY_PROD }} #TODO
+          TF_VAR_ACCESSKEY: ${{ secrets.ACCESSKEY_PROD }} #TODO
           TF_VAR_client_id: ${{ secrets.client_id }}
           TF_VAR_client_secret: ${{ secrets.client_secret }}
           TF_VAR_subscription_id: ${{ secrets.subscription_id }}
           TF_VAR_tenant_id: ${{ secrets.tenant_id }}
+          TF_VAR_dbuser: ${{ secrets.dbuser }}
+          TF_VAR_dbpw: ${{ secrets.dbpw }}
         run: terraform plan -no-color
         continue-on-error: true
 
@@ -189,10 +191,12 @@ jobs:
         env:
           TF_VAR_FEYRE_TOKEN: ${{ secrets.FEYRE_TOKEN_DEV }}
           TF_VAR_image_tag: ${{ github.sha }}
-          TF_VAR_BUCKET_KEY: ${{ secrets.BUCKET_KEY }}
-          TF_VAR_ACCESSKEY: ${{ secrets.ACCESSKEY }}
+          TF_VAR_BUCKET_KEY: ${{ secrets.BUCKET_KEY_PROD }} #TODO
+          TF_VAR_ACCESSKEY: ${{ secrets.ACCESSKEY_PROD }} #TODO
           TF_VAR_client_id: ${{ secrets.client_id }}
           TF_VAR_client_secret: ${{ secrets.client_secret }}
           TF_VAR_subscription_id: ${{ secrets.subscription_id }}
           TF_VAR_tenant_id: ${{ secrets.tenant_id }}
+          TF_VAR_dbuser: ${{ secrets.dbuser }}
+          TF_VAR_dbpw: ${{ secrets.dbpw }}
         run: terraform apply -auto-approve
