@@ -277,6 +277,7 @@ config.env
 # misc
 .vscode
 azure_token
+*.psd
 
 # terraform
 .terraform*
