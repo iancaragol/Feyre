@@ -4,7 +4,9 @@ on:
   push:
     branches:
       - develop
-
+  pull_request:
+    branches:
+      - develop
 jobs:
 
   changes:
@@ -181,8 +183,8 @@ jobs:
               body: output
             })
 
-
       - name: Terraform apply
+        if: github.event_name == 'push'
         working-directory: terraform/dev
         env:
           TF_VAR_FEYRE_TOKEN: ${{ secrets.FEYRE_TOKEN_DEV }}
