@@ -104,8 +104,8 @@ bot.remove_command('help')
 # bot.add_cog(MonsterManualCog(bot, data)) # Monsters
 # bot.add_cog(ClassFeaturesCog(bot, data)) # Class Lookup
 # bot.add_cog(ConditionLookupCog(bot, data)) # Conditions
-# bot.add_cog(StatsCog(bot, data)) # Conditions
-# bot.add_cog(DeveloperCog(bot, data, StatsCog))
+bot.add_cog(StatsCog(bot, data)) # Conditions
+bot.add_cog(DeveloperCog(bot, data, StatsCog))
 bot.add_cog(TESTDiceRoller(bot, data))
 
 #COMMANDS:
