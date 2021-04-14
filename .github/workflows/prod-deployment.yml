@@ -107,16 +107,6 @@ jobs:
 
     runs-on: ubuntu-latest
 
-    env:
-      TF_VAR_FEYRE_TOKEN: ${{ secrets.FEYRE_TOKEN_PROD }}
-      TF_VAR_image_tag: ${{ github.sha }}
-      TF_VAR_BUCKET_KEY: ${{ secrets.BUCKET_KEY }}
-      TF_VAR_ACCESSKEY: ${{ secrets.ACCESSKEY }}
-      TF_VAR_client_id: ${{ secrets.client_id }}
-      TF_VAR_client_secret: ${{ secrets.client_secret }}
-      TF_VAR_subscription_id: ${{ secrets.subscription_id }}
-      TF_VAR_tenant_id: ${{ secrets.tenant_id }}
-
     steps:
 
       - uses: actions/checkout@v2
@@ -130,8 +120,6 @@ jobs:
         with:
           path: /usr/local/bin/terraform
           key: ${{ runner.os }}-terraform-${{ hashFiles('**/terraform_version') }}
-          restore-keys: |
-            ${{ runner.os }}-terraform-
 
       - name: Terraform Install
         working-directory: terraform
@@ -158,8 +146,26 @@ jobs:
 
       - name: Terraform plan
         working-directory: terraform/prod
+        env:
+          TF_VAR_FEYRE_TOKEN: ${{ secrets.FEYRE_TOKEN_PROD }}
+          TF_VAR_image_tag: ${{ github.sha }}
+          TF_VAR_BUCKET_KEY: ${{ secrets.BUCKET_KEY }}
+          TF_VAR_ACCESSKEY: ${{ secrets.ACCESSKEY }}
+          TF_VAR_client_id: ${{ secrets.client_id }}
+          TF_VAR_client_secret: ${{ secrets.client_secret }}
+          TF_VAR_subscription_id: ${{ secrets.subscription_id }}
+          TF_VAR_tenant_id: ${{ secrets.tenant_id }}
         run: terraform plan
 
       - name: Terraform apply
         working-directory: terraform/prod
+        env:
+          TF_VAR_FEYRE_TOKEN: ${{ secrets.FEYRE_TOKEN_PROD }}
+          TF_VAR_image_tag: ${{ github.sha }}
+          TF_VAR_BUCKET_KEY: ${{ secrets.BUCKET_KEY }}
+          TF_VAR_ACCESSKEY: ${{ secrets.ACCESSKEY }}
+          TF_VAR_client_id: ${{ secrets.client_id }}
+          TF_VAR_client_secret: ${{ secrets.client_secret }}
+          TF_VAR_subscription_id: ${{ secrets.subscription_id }}
+          TF_VAR_tenant_id: ${{ secrets.tenant_id }}
         run: terraform apply -auto-approve
