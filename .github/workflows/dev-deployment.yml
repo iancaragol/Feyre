@@ -130,8 +130,6 @@ jobs:
         with:
           path: /usr/local/bin/terraform
           key: ${{ runner.os }}-terraform-${{ hashFiles('**/terraform_version') }}
-          restore-keys: |
-            ${{ runner.os }}-terraform-
 
       - name: Terraform Install
         working-directory: terraform
