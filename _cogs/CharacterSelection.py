@@ -1,7 +1,7 @@
 import asyncio
 import textwrap
 from itertools import count, filterfalse
-from os import path
+from os import path, environ
 
 import aioodbc
 import operator
@@ -18,9 +18,13 @@ class CharacterSelectionHandler:
         self.pw = ""
 
         pyDir = path.dirname(path.dirname(__file__))
-        with open(path.join(pyDir, 'db_user.txt'), 'r') as file:
-            self.uid = file.readline().strip()
-            self.pw = file.readline().strip()
+        try:
+            self.uid = environ['dbuser']
+            self.pw = environ['dbpw']
+        except KeyError:
+            with open(path.join(pyDir, 'db_user.txt'), 'r') as file:
+                self.uid = file.readline().strip()
+                self.pw = file.readline().strip()
 
     async def connect(self):
         driver = "Driver={ODBC Driver 17 for SQL Server};Server=tcp:feyre-db-server.database.windows.net,1433;Database=FeyreDB;"+"Uid={};Pwd={};Encrypt=yes;TrustServerCertificate=no;Connection Timeout=30;".format(self.uid, self.pw)

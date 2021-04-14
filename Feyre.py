@@ -89,21 +89,21 @@ bot = commands.AutoShardedBot(command_prefix = get_pre)
 bot.remove_command('help')
 
 # Add Cogs
-# bot.add_cog(InitiativeCog(bot, data)) # Initiative
-# bot.add_cog(Helper(bot, data)) # Help
-# bot.add_cog(SimpleDiceRoller(bot, data)) # Simple Dice: dp, d20, d12, etc...
-# bot.add_cog(CharacterSelector(bot, data)) # Character Selection
-# bot.add_cog(Banker(bot, data)) # Bank
-# bot.add_cog(DeckOfManyThings(bot, data)) # Deck of Many Things
-# bot.add_cog(DiceRoller(bot, data)) # Dice Rolling
-# bot.add_cog(CurrencyConverter(bot, data)) # Currency Converstion
-# bot.add_cog(Administrator(bot, data)) # Adminstrator Commands
-# bot.add_cog(ClassAbilityLookupCog(bot, data)) # Ability Lookup
-# bot.add_cog(FeatLookupCog(bot, data)) # Feat
-# bot.add_cog(SpellbookCog(bot, data)) # Spellbook
-# bot.add_cog(MonsterManualCog(bot, data)) # Monsters
-# bot.add_cog(ClassFeaturesCog(bot, data)) # Class Lookup
-# bot.add_cog(ConditionLookupCog(bot, data)) # Conditions
+bot.add_cog(InitiativeCog(bot, data)) # Initiative
+bot.add_cog(Helper(bot, data)) # Help
+bot.add_cog(SimpleDiceRoller(bot, data)) # Simple Dice: dp, d20, d12, etc...
+bot.add_cog(CharacterSelector(bot, data)) # Character Selection
+bot.add_cog(Banker(bot, data)) # Bank
+bot.add_cog(DeckOfManyThings(bot, data)) # Deck of Many Things
+bot.add_cog(DiceRoller(bot, data)) # Dice Rolling
+bot.add_cog(CurrencyConverter(bot, data)) # Currency Converstion
+bot.add_cog(Administrator(bot, data)) # Adminstrator Commands
+bot.add_cog(ClassAbilityLookupCog(bot, data)) # Ability Lookup
+bot.add_cog(FeatLookupCog(bot, data)) # Feat
+bot.add_cog(SpellbookCog(bot, data)) # Spellbook
+bot.add_cog(MonsterManualCog(bot, data)) # Monsters
+bot.add_cog(ClassFeaturesCog(bot, data)) # Class Lookup
+bot.add_cog(ConditionLookupCog(bot, data)) # Conditions
 bot.add_cog(StatsCog(bot, data)) # Conditions
 bot.add_cog(DeveloperCog(bot, data, StatsCog))
 bot.add_cog(TESTDiceRoller(bot, data))
