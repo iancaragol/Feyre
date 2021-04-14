@@ -559,3 +559,4 @@ except KeyError:
         with open(path.join(pyDir, 'access_key.txt'), 'r') as file:
             access_key = file.readline().strip()
         bot.run(releaseToken)
+

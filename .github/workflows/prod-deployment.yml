@@ -123,6 +123,7 @@ jobs:
 
       - name: Terraform Install
         working-directory: terraform
+        if: steps.cache.outputs.cache-hit != 'true'
         run: |
           tf_version=$(cat terraform_version)
           wget -q https://releases.hashicorp.com/terraform/"$tf_version"/terraform_"$tf_version"_linux_amd64.zip
