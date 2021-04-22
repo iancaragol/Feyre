@@ -6,6 +6,7 @@ import numpy as np
 import math
 from asteval import Interpreter
 import discord
+import json
 
 from discord.ext import commands
 from _classes.DieQueue import ShuntingYard
@@ -22,9 +23,10 @@ class TESTDiceRoller(commands.Cog):
 
     @commands.command(aliases = ['TestRoll', 'tr', 'TR'])
     async def troll(self, ctx, *, args = None):
-        roll = await self.shunting_yard.shunt(args)
-        formatted_msg = await self.roll_formatter.format_roll(roll)
-        msg = await ctx.send(formatted_msg)
+        roll_results = json.loads(await self.shunting_yard.shunt(args))
+
+        # TEMP RETURN JSON FIRST ITEM
+        msg = await ctx.send(str(roll_results['parent_result'][0]).replace('\'', '"'))
 
         # Add emoji to roll
         arrows = '🔁'

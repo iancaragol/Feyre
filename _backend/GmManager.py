@@ -1,6 +1,7 @@
 from pymongo import MongoClient
 from bson.objectid import ObjectId
 
+import pymongo
 import motor.motor_asyncio
 
 class GmManager:
@@ -17,10 +18,10 @@ class GmManager:
         await self.gms.insert_one(gm_dict)
 
     async def get_gm_dict(self):
-        gm_dict = await self.gms.find().sort('_id',-1).limit(1)[0]
+        gm_dict = list(self.gms.find().sort('_id', pymongo.DESCENDING).limit(1))[0]
         return gm_dict
 
     def get_gm_dict_sync(self): # Used on startup
-        gm_dict = self.gms.find().sort('_id',-1).limit(1)[0]
+        gm_dict = list(self.gms.find().sort('_id', pymongo.DESCENDING).limit(1))[0]
         return gm_dict
         

@@ -2,14 +2,13 @@ from pymongo import MongoClient
 from bson.objectid import ObjectId
 
 import motor.motor_asyncio
+import pymongo
 
 class PrefixManager:
     def __init__(self, mongo_uri, sync = False):
-        if sync:
-            self.client = MongoClient(mongo_uri) #host uri
-        else:
-            self.client = motor.motor_asyncio.AsyncIOMotorClient(mongo_uri)
-
+        self.sync_client = MongoClient(mongo_uri) #host uri
+        self.sync_prefixes = self.sync_client["feyre-mongodb-id"]["prefix"]
+        self.client = motor.motor_asyncio.AsyncIOMotorClient(mongo_uri)
         self.db = self.client["feyre-mongodb-id"]    #Select the database
         self.prefixes = self.db["prefix"]
 
@@ -17,10 +16,10 @@ class PrefixManager:
         await self.prefixes.insert_one(prefix_dict)
 
     async def get_prefix_dict(self):
-        prefix_dict = await self.prefixes.find().sort('_id',-1).limit(1)
-        return prefix_dict[0]
+        prefixes_dict = list(self.sync_prefixes.find().sort('_id', pymongo.DESCENDING).limit(1))[0]
+        return prefixes_dict 
 
     def get_prefix_dict_sync(self): # Used on startup
-        prefix_dict = self.prefixes.find().sort('_id',-1).limit(1)[0]
-        return prefix_dict
+        prefixes_dict = list(self.sync_prefixes.find().sort('_id', pymongo.DESCENDING).limit(1))[0]
+        return prefixes_dict 
         

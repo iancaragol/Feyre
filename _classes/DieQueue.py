@@ -1,13 +1,53 @@
+import json
 from random import randint
 
-class RollResult:
-    def __init__(self, value, dropped, critical):
+class ChildRollResult:
+    """
+    A child roll result is a single dice roll in a dice roll expression
+    
+    Ex: 1d20 + 5d6 is the dice expression so 1d20 and 5d6 are both child rolls
+        The Parent is the final value
+    """
+    def __init__(self, value, expression, dropped, critical, all_rolls):
         self.value = value
+        self.expression = expression
         self.dropped = dropped
         self.critical = critical
+        self.all_rolls = all_rolls
 
     def to_string(self):
         return f"Value: {self.value}, Dropped: {self.dropped}, Crit: {self.critical}"
+
+    def to_dict(self):
+        temp_dict = {
+            "value" : self.value,
+            "expression" : self.expression,
+            "dropped" : self.dropped,
+            "critical" : self.critical,
+            "rolls" : self.all_rolls
+        }
+
+        return temp_dict
+
+class ParentRollResult:
+    def __init__(self, expression, tokens, total, critical, child_rolls):
+        self.expression = expression
+        self.tokens = tokens
+        self.total = total
+        self.critical = critical
+        self.child_rolls = child_rolls
+
+    def to_dict(self):
+        temp_dict = {
+            "expression" : self.expression,
+            "tokens": self.tokens,
+            "total" : self.total,
+            "critical" : self.critical,
+            "child_rolls" : self.child_rolls
+        }
+
+        return temp_dict
+    
 
 class ShuntingYard:
     def __init__(self, verbose = False):
@@ -35,18 +75,20 @@ class ShuntingYard:
         """
         tokens = await self.tokenize(expression)
         count = 1
-        roll_results = []
+        roll_results = [] # List of RollResults objects
         
         if 'c' in tokens[-1]: # Special case, with Count. Ex: 1d6+1c3 = 1d6 THREE TIMES
             popped = tokens.pop()
             count = int(popped.replace('c', ''))
         
         # Repeat entire roll for # of count
+        # If count was only one, then the list will have length 1
         for i in range(count):
-            evaluated = await self.evaluate(tokens)
-            roll_results.append(evaluated)
+            evaluated = await self.evaluate(tokens, expression)
+            roll_results.append(evaluated.to_dict())
 
-        return roll_results
+        roll_results_json = json.dumps({"parent_result" : roll_results})
+        return roll_results_json 
 
     async def tokenize(self, expression):
         expression = expression.replace(' ', '').lower()
@@ -114,10 +156,10 @@ class ShuntingYard:
         elif op == '>=': return float(a) >= float(b)
         elif op == '<=': return float(a) <= float(b)
         elif op == '=': return float(a) == float(b)
-        elif op == 't': return self.applyThen(a, b)
+        elif op == 't': return await self.applyThen(a, b)
 
     # Function that returns value of expression after evaluation.
-    async def evaluate(self, tokens):
+    async def evaluate(self, tokens, expression):
         roll_results = [] # List of roll results to check for criticals, dropped
         dropped = []
         critical = False
@@ -135,9 +177,10 @@ class ShuntingYard:
 
             elif ('d' in tokens[i]): # Token is a dice, evaluate and push it to values
                 roll = await self.roll(tokens[i])
-                roll_results.append(roll.value) # This is super wacky, need to find a better way to express dropped/critical dice
+                roll_results.append(roll.to_dict()) # This is super wacky, need to find a better way to express dropped/critical dice
                 dropped.extend(roll.dropped)
-                if roll.critical: critical = True
+                if roll.critical: 
+                    critical = True
                 values.append(str(roll.value))
 
             elif tokens[i].isdigit(): # Token is a number, push it to values
@@ -176,7 +219,7 @@ class ShuntingYard:
             values.append(await self.applyOp(val1, val2, op))
         
         # Create final roll result, and return it
-        return RollResult(values[-1], dropped, critical)
+        return ParentRollResult(expression, tokens, values[-1], critical, roll_results)
 
     async def roll(self, expression):
         number = 0
@@ -229,7 +272,10 @@ class ShuntingYard:
             print(f"number: {number}, size: {size}, keep: {keep}, explode: {explode}") 
 
         for i in range(number):
-            roll = randint(1, size)
+            if size == 0:
+                roll = 0
+            else:    
+                roll = randint(1, size)
 
             # Evaluate dice explosions
             # If the roll is >= to the explode value, it is rolled again and added to the total
@@ -256,11 +302,11 @@ class ShuntingYard:
                     print(f"dropped {drop_die}")
                 dropped.append(drop_die)
         
-        final_result = sum(rolls)
+        value = sum(rolls)
         if self.verbose:        
-            print(f"sum: {final_result}")
+            print(f"sum: {value}")
 
-        return RollResult(final_result, dropped, critical)
+        return ChildRollResult(value, expression, dropped, critical, rolls)
 
 class RollFormatter():
     async def format_roll(self, roll_results):

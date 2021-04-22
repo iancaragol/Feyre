@@ -531,7 +531,6 @@ try:
     sys.stdout.flush()
 
     token = os.environ['FEYRE_TOKEN']
-    token = os.environ['FEYRE_TOKEN']
     bucket_key = os.environ['BUCKET_KEY']
     access_key = os.environ['ACCESS_KEY']
     bot.run(token)

@@ -29,6 +29,7 @@ from _classes.Items import ItemLookup
 # from _classes.StatsHandler import StatsHandler
 # from _classes.CharacterSelection import CharacterSelectionHandler
 
+from _backend.GmManager import GmManager
 from _backend.StatsManager import StatsManager
 from _backend.UserManager import UserManager
 from _backend.PrefixesManager import PrefixManager
@@ -166,6 +167,8 @@ class BotData():
         
         except Exception as e:
             try:
+                print(f"Error loading GM's: {e}")
+                print("Loading gms from disk...")
                 pyDir = path.dirname(__file__)
                 relPath = "..//_data//gms.txt"
                 absRelPath = path.join(pyDir, relPath)
