@@ -247,8 +247,11 @@ class DiceRoller(commands.Cog):
     {result}```'''
                     sendUser = self.bot.get_user(ctx.author.id)
                     await sendUser.send(userResult)
-                except:
-                    await ctx.send("```This channel does not have a dedicated GM. Type !gm to set yourself as GM.```")
+                except Exception as e:
+                    if str(e).startswith('403'):
+                        await ctx.send("```I do not have permission do DM you. Enable it by going to Privacy Settings > Allow direct messages from server members```")
+                    else:
+                        await ctx.send("```This channel does not have a dedicated GM. Type !gm to set yourself as GM.```")
 
     @commands.command(aliases = ['Roll', 'r', 'R'])
     async def roll(self, ctx, *, args = None):

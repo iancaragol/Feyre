@@ -4,6 +4,7 @@ import textwrap
 import asyncio
 import operator
 import re
+import os
 
 import discord
 from discord.ext import commands
@@ -18,9 +19,13 @@ class Bank():
         self.pw = ""
 
         pyDir = path.dirname(path.dirname(__file__))
-        with open(path.join(pyDir, 'db_user.txt'), 'r') as file:
-            self.uid = file.readline().strip()
-            self.pw = file.readline().strip()
+        try:
+            self.uid = os.environ['dbuser']
+            self.pw = os.environ['dbpw']
+        except KeyError:
+            with open(path.join(pyDir, 'db_user.txt'), 'r') as file:
+                self.uid = file.readline().strip()
+                self.pw = file.readline().strip()
 
     async def connect(self):
         driver = "Driver={ODBC Driver 17 for SQL Server};Server=tcp:feyre-db-server.database.windows.net,1433;Database=FeyreDB;"+"Uid={};Pwd={};Encrypt=yes;TrustServerCertificate=no;Connection Timeout=30;".format(self.uid, self.pw)

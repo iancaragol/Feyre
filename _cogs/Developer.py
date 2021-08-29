@@ -53,7 +53,7 @@ class DeveloperCog(commands.Cog):
             await ctx.send("```Got!```")
 
     @commands.command()
-    async def dump_prefix(self, ctx):
+    async def dump_prefixes(self, ctx):
         if(ctx.author.id == 112041042894655488):
             pm = PrefixManager(self.data.mongo_uri)
 
@@ -63,7 +63,7 @@ class DeveloperCog(commands.Cog):
             await ctx.send("```Dumped!```")
 
     @commands.command()
-    async def load_prefix(self, ctx):
+    async def load_prefixes(self, ctx):
         if(ctx.author.id == 112041042894655488): #112041042894655488
             pm = PrefixManager(self.data.mongo_uri)
 

@@ -29,6 +29,7 @@ from _classes.Items import ItemLookup
 # from _classes.StatsHandler import StatsHandler
 # from _classes.CharacterSelection import CharacterSelectionHandler
 
+from _backend.GmManager import GmManager
 from _backend.StatsManager import StatsManager
 from _backend.UserManager import UserManager
 from _backend.PrefixesManager import PrefixManager
@@ -125,6 +126,7 @@ class BotData():
             sm = StatsManager(self.mongo_uri)
             self.statsDict = sm.get_stats_sync()
             print("Stats loaded succesfully")
+            raise Exception
 
         except Exception as e:
             try:
@@ -144,6 +146,7 @@ class BotData():
             um = UserManager(self.mongo_uri)
             self.userSet = um.get_user_set_sync()
             print("Users loaded succesfully")
+            raise Exception
 
         except Exception as e:
             try:
@@ -163,9 +166,12 @@ class BotData():
             gm = GmManager(self.mongo_uri, sync=True)
             self.gmDict = gm.get_gm_dict_sync()
             print("Gms loaded succesfully")
+            raise Exception
         
         except Exception as e:
             try:
+                print(f"Error loading GM's: {e}")
+                print("Loading gms from disk...")
                 pyDir = path.dirname(__file__)
                 relPath = "..//_data//gms.txt"
                 absRelPath = path.join(pyDir, relPath)
@@ -180,6 +186,7 @@ class BotData():
             pm = PrefixManager(self.mongo_uri, sync=True)
             self.prefixDict = pm.get_prefix_dict_sync()
             print("Prefixes loaded succesfully")
+            raise Exception
         
         except Exception as e:
             try:

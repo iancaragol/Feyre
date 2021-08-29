@@ -9,10 +9,10 @@ run: # For running Feyre in a Docker container
 
 push-test: # Builds and pushes Feyre image to ACR (test)
 	@az acr login -n feyre
-	@docker build -t feyre.azurecr.io/feyre:test .
-	@docker push feyre.azurecr.io/feyre:test
+	@docker build -t feyre.azurecr.io/feyre:dev-testing .
+	@docker push feyre.azurecr.io/feyre:dev-testing
 
 push-release: # Builds and pushes Feyre image to ACR (release)
 	@az acr login -n feyre
-	@docker build -t feyre.azurecr.io/feyre:latest .
-	@docker push feyre.azurecr.io/feyre:latest
+	@docker build -t feyre.azurecr.io/feyre:prod-testing .
+	@docker push feyre.azurecr.io/feyre:prod-testing

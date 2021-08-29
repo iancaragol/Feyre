@@ -7,7 +7,7 @@ services:
       - config.env
     restart: always
     build: ./
-    command: Feyre.py test false
+    command: Feyre.py
 
   # redis:
   #   container_name: redis

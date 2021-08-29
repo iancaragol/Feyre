@@ -212,7 +212,7 @@ class InitiativeTracker:
 class InitiativeCog(commands.Cog):
     tracker_dict = {}
     msg_dict = {}
-    plus = '➕'
+    plus = '🎲'
     skull = '☠️'
     swords = '⚔️'
     down_arrow = '⬇️'

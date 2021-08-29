@@ -2,6 +2,7 @@ from pymongo import MongoClient
 from bson.objectid import ObjectId
 
 import motor.motor_asyncio
+import pymongo
 
 class UserManager:
     def __init__(self, mongo_uri):
@@ -13,16 +14,15 @@ class UserManager:
         self.users = self.db["users"]
 
     async def dump_user_set(self, user_set):
-        # user_query = {""}
-        #self.users.insert_one({"set_id":0,"users":list(user_set)})
-
-        await self.users.find_one_and_update({'_id':ObjectId("5f6fa4ce55656df810b12a26")}, {"$set":{
-            'users': list(user_set)
-            }
-        })
+        user_dict = {"user_list" : list(user_set)}
+        await self.users.insert_one(user_dict)
 
     async def get_user_set(self):
-        return set(await self.users.find({'set_id':0}).next()['users'])
+        as_list = list(self.sync_users.find().sort('_id', pymongo.DESCENDING).limit(1))
+        as_set = set(as_list[0]["user_list"])
+        return as_set
 
     def get_user_set_sync(self): # Used when the bot starts up
-        return set(self.sync_users.find({'set_id':0}).next()['users'])
+        as_list = list(self.sync_users.find().sort('_id', pymongo.DESCENDING).limit(1))
+        as_set = set(as_list[0]["user_list"])
+        return as_set

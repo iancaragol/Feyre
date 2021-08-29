@@ -2,6 +2,7 @@ from pymongo import MongoClient
 from bson.objectid import ObjectId
 from datetime import datetime
 
+import pymongo
 import motor.motor_asyncio
 
 class StatsManager:
@@ -84,9 +85,11 @@ class StatsManager:
         return stats_dict
 
     async def get_stats(self):
-        stats_dict = await self.stats.find().sort('_id',-1).limit(1)[0]
+        # Dirty way to get most recently insterted stats dictionary
+        # Temporarily synchronous
+        stats_dict = list(self.sync_stats.find().sort('_id', pymongo.DESCENDING).limit(1))[0]
         return await self.validate_stats(stats_dict)
 
     def get_stats_sync(self): # Used on startup
-        stats_dict = self.sync_stats.find().sort('_id',-1).limit(1)[0]
+        stats_dict = list(self.sync_stats.find().sort('_id', pymongo.DESCENDING).limit(1))[0]
         return self.validate_stats_sync(stats_dict)
