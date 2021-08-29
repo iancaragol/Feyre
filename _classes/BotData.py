@@ -126,6 +126,7 @@ class BotData():
             sm = StatsManager(self.mongo_uri)
             self.statsDict = sm.get_stats_sync()
             print("Stats loaded succesfully")
+            raise Exception
 
         except Exception as e:
             try:
@@ -145,6 +146,7 @@ class BotData():
             um = UserManager(self.mongo_uri)
             self.userSet = um.get_user_set_sync()
             print("Users loaded succesfully")
+            raise Exception
 
         except Exception as e:
             try:
@@ -164,6 +166,7 @@ class BotData():
             gm = GmManager(self.mongo_uri, sync=True)
             self.gmDict = gm.get_gm_dict_sync()
             print("Gms loaded succesfully")
+            raise Exception
         
         except Exception as e:
             try:
@@ -183,6 +186,7 @@ class BotData():
             pm = PrefixManager(self.mongo_uri, sync=True)
             self.prefixDict = pm.get_prefix_dict_sync()
             print("Prefixes loaded succesfully")
+            raise Exception
         
         except Exception as e:
             try:

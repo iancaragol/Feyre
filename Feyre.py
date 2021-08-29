@@ -447,7 +447,8 @@ async def on_command_error(ctx, error):
             print("Attempted dice roll: " + ctx.invoked_with)
             print(e)
             return
-    raise error
+    else:
+        raise error
     # CommandNotFound errors are suppressed
     #print(error.args[0])
 

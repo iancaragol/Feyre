@@ -8,10 +8,11 @@ class ChildRollResult:
     Ex: 1d20 + 5d6 is the dice expression so 1d20 and 5d6 are both child rolls
         The Parent is the final value
     """
-    def __init__(self, value, expression, dropped, critical, all_rolls):
+    def __init__(self, value, expression, dropped, exploded, critical, all_rolls):
         self.value = value
         self.expression = expression
         self.dropped = dropped
+        self.exploded = exploded
         self.critical = critical
         self.all_rolls = all_rolls
 
@@ -23,6 +24,7 @@ class ChildRollResult:
             "value" : self.value,
             "expression" : self.expression,
             "dropped" : self.dropped,
+            "exploded" : self.exploded,
             "critical" : self.critical,
             "rolls" : self.all_rolls
         }
@@ -64,7 +66,7 @@ class ShuntingYard:
             "right_parenthesis": ")",
             "greater_than":">",
             "less_than":"<",
-            "greater_than_eqaul":">=",
+            "greater_than_equal":">=",
             "less_than_equal":"<=",
             "equal":"="
         }
@@ -91,9 +93,22 @@ class ShuntingYard:
         return roll_results_json 
 
     async def tokenize(self, expression):
+        """
+        Token mappings:
+        d = dice
+        k = keep
+        e = explode (>=)
+        ᶒ = explode_on (==) <-- Mapping this to a unique character makes it easier to parse with current parsing methods
+        c = count
+        t = then
+        """
         expression = expression.replace(' ', '').lower()
         for k, v in self.abbrevations.items():
             expression = expression.replace(k, v)
+        
+        # Basically, users will type >=
+        # The algorithm needs to treat this as one token
+        expression = expression.replace('<=', '≤').replace('>=', '≥')
 
         tokens = []
         new_token = ""
@@ -106,7 +121,13 @@ class ShuntingYard:
             elif (expression[i] == 'k'): # Keep
                 new_token += 'k'
             elif (expression[i] == 'e'): # Explode
-                new_token += 'e'
+                if (i < len(expression)):
+                    if (expression[i+1] == 'o'): # Explode On
+                        new_token += "ᶒ" # This may seem wild, but it makes parsing much easier
+                    else:
+                        new_token += 'e'
+                else:
+                    new_token += 'e'
             elif (expression[i] == 'c'): # Count
                 tokens.append(new_token)
                 new_token = 'c'
@@ -153,8 +174,8 @@ class ShuntingYard:
         elif op == '/': return float(a) // float(b)
         elif op == '>': return float(a) >= float(b)
         elif op == '<': return float(a) <= float(b)
-        elif op == '>=': return float(a) >= float(b)
-        elif op == '<=': return float(a) <= float(b)
+        elif op == '≥': return float(a) >= float(b)
+        elif op == '≤': return float(a) <= float(b)
         elif op == '=': return float(a) == float(b)
         elif op == 't': return await self.applyThen(a, b)
 
@@ -226,12 +247,22 @@ class ShuntingYard:
         size = 0
         keep = -1 # If  keep is -1, then keep all
         explode = -1 # If explode is -1, then dont explode (default)
+        explode_on = -1 # Explode on is == instead of >=
         last_char = ''
         temp_number = ""
         critical = False # If a critical (20 when 1d20) was rolled
 
+        # This is the list of rolled dice
+        # Keep modifier will drop dice from this list
+        # and add them to dropped
         rolls = []
-        dropped = []
+
+        dropped = [] # List of dropped dice
+
+        # List of rolls from exploded dice
+        # If there are dice in this list
+        # then they will be added to the final result
+        exploded = [] 
 
         if self.verbose:
             print(f"--> roll({expression})") 
@@ -239,8 +270,8 @@ class ShuntingYard:
         for i in range(len(expression)):
             if (expression[i].isdigit()): # If its a number
                 temp_number += expression[i]
-            if (expression[i] == 'd'): # Expression must have a dice 1d20 then keep/explode modifires
-                number = int(temp_number) # EX: 1d20, 5d20k5, 5d20e5, 5d20e5k5
+            if (expression[i] == 'd'): # Expression must have a dice 1d20 then keep/explode modifiers
+                number = int(temp_number) if (temp_number != "") else 0 # EX: 1d20, 5d20k5, 5d20e5, 5d20e5k5
                 last_char = 'd'
                 temp_number = ""
 
@@ -252,19 +283,29 @@ class ShuntingYard:
                 last_char = 'k'
                 temp_number = ""
 
-            elif (expression[i] == 'e'):
+            elif (expression[i] == 'e'): # Explode
                 if (last_char == 'k'): # If last char is an k, then we have k5e5
                     keep = int(temp_number)
                 elif (last_char == 'd'): # If last char is d, then we have d5e5
                     size = int(temp_number)
                 last_char = 'e'
                 temp_number = ""
-            
+
+            elif (expression[i] == 'ᶒ'): # Explode ON
+                if (last_char == 'k'): # If last char is an k, then we have k5e5
+                    keep = int(temp_number)
+                elif (last_char == 'd'): # If last char is d, then we have d5e5
+                    size = int(temp_number)
+                last_char = 'ᶒ'
+                temp_number = ""
+                    
         # Make sure we get whatever was last 
         if (last_char == 'k'):
             keep = int(temp_number)
         if (last_char == 'e'):
             explode = int(temp_number)
+        if (last_char == 'ᶒ'):
+            explode_on = int(temp_number)
         elif (last_char == 'd'):
             size = int(temp_number)
 
@@ -282,13 +323,24 @@ class ShuntingYard:
             # Currently, you can only explode once
             if explode != -1:
                 if roll >= explode:
-                    rolls.append(roll)
                     if self.verbose:
-                        print(f"exploded on {roll}")
-                    roll = randint(1, size)
+                        print(f"exploded (>=) on {roll}")
+                    exploded_roll = randint(1, size) # Roll the exploded dice
+                    exploded.append(exploded_roll)
+            
+            # Explode On is the same as explode
+            # Except == instead of >=
+            if explode_on != -1:
+                if roll == explode_on:
+                    if self.verbose:
+                        print(f"exploded (==) on {roll}")
+                    exploded_roll = randint(1, size) # Roll the exploded dice
+                    exploded.append(exploded_roll)
 
+            # Add the roll to the final roll list
             rolls.append(roll)
 
+            # By default, criticals are only for D20
             if size == 20 and roll == 20:
                 critical = True
 
@@ -303,29 +355,12 @@ class ShuntingYard:
                 dropped.append(drop_die)
         
         value = sum(rolls)
+        if (len(exploded) >= 0):
+            value += sum(exploded) # Add exploded rolls to the final result
+
         if self.verbose:        
             print(f"sum: {value}")
 
-        return ChildRollResult(value, expression, dropped, critical, rolls)
-
-class RollFormatter():
-    async def format_roll(self, roll_results):
-        output_string = ""
-        # Most standard case, Count = 1
-        if len(roll_results) == 1:
-            result = roll_results[0]
-            
-            output_string += "-> "
-            output_string += f"**{result.value}**"
-
-            if result.critical:
-                output_string += ", *Critical!*"
-            
-            return output_string
-            
-
-    async def  format_roll_verbose(self, roll_results):
-        print("TO DO")
-    
+        return ChildRollResult(value, expression, dropped, exploded, critical, rolls)
 
 
