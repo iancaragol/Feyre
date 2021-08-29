@@ -289,3 +289,6 @@ terraform.tfstate.backup
 *.seg
 *.toc
 *.seg
+
+# terraform stuffs
+terraform_stuffs
