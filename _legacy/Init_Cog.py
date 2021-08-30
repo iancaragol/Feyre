@@ -1,3 +1,5 @@
+# This version of the Inititiative tracker is no longer used!
+
 @bot.event
 async def on_raw_reaction_add(payload):
     cross = '\N{CROSSED SWORDS}'

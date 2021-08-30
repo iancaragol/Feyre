@@ -1,92 +1,30 @@
 import discord
 import numpy
-import os
-import asyncio
 
-from os import path
+from os import access, path
 from json import load, dumps
 from datetime import datetime
 
-from azure.keyvault.secrets import SecretClient
-from azure.identity import DefaultAzureCredential
-
 from _classes.BookOfTor import BookOfTor
-# from _classes.Monster import MonsterManual
-# from _classes.Feat import Feats
-# from _classes.Spellbook import Sb
-# from _classes.DiceRolls import Roller
-# from _classes.Init import Initiative
-from _classes.Weapons import Weapons
-# from _classes.Class_Abilities import Class_Abil
-from _classes.Items import ItemLookup
-# from _classes.DeckOfMany import DeckOfMany
-# from _classes.ClassFeatures import ClassFeatures
-# from _classes.CurrencyConversion import CurrencyConverter
-# from _classes.Conditions import ConditionLookup
-# from _classes.Bank import Character, Bank
-
-# from _classes.HelpHandler import HelpHandler
-# from _classes.StatsHandler import StatsHandler
-# from _classes.CharacterSelection import CharacterSelectionHandler
 
 from _backend.GmManager import GmManager
 from _backend.StatsManager import StatsManager
 from _backend.UserManager import UserManager
 from _backend.PrefixesManager import PrefixManager
 
-class BotData():
+class CommonInfra():
     """
-    Main class for bot. Adds all commands to the bot and starts it with the start(token) function.
-                                       
-    Attributes:
-        diceRoller: instance of the Roller() class
-        spellBook: instance of the Sb() class
-        monsterManual: instance of the MonsterManual class
-        feats: instances of the Feats() class
-        bookOfTor: instance of the BookOfTor() class
-
-        initDict: dictionary mapping discord channel to Iniative()
-        initEmbedDict: dictionary mapping discord channel to most recent message
-        statsDict: iniatlized from text file, maps commands to ints
-
-    TO DO:
-        Bot should DM mm lookup/etc by default
-        Bot should support DM's
-        GM/Secret rolls
-        Only admin's should be able to change the bot's prefix
-        Inline dice rolls
-        Fix dice roller (freezes on !roll 1000d20
+    Class containing common resources used across different cogs
     """
-    def __init__(self):
+    def __init__(self, mongo_uri, botid, env, bucket_key, access_key):
         """
-        Initalizes the Bot() class
+        Initalizes the CommonInfra() class
 
         Raises:
             File read error
             JSON read error
         """
-        #Main feature classes
-        # self.diceRoller = Roller()
-        # self.spellBook = Sb()
-        # self.monsterManual = MonsterManual()
-        # self.feats = Feats()
         self.bookOfTor = BookOfTor()
-        self.weapons = Weapons()
-        #self.class_abilities = Class_Abil() #deprecated
-        self.item_lookup = ItemLookup()
-        # self.deck_of_many = DeckOfMany()
-        # self.class_features = ClassFeatures()
-        # self.currency_converter = CurrencyConverter()
-        # self.condition_lookup = ConditionLookup()
-
-        # self.bank = Bank()
-        # self.help_handler = HelpHandler()
-        # self.stats_handler = StatsHandler()
-        # self.character_selection_handler = CharacterSelectionHandler()
-
-        #Initiative tracking dictionaries
-        # self.initDict = {}
-        # self.initEmbedDict = {}
 
         self.roll_dict = {}
 
@@ -99,34 +37,22 @@ class BotData():
 
         self.userSet = set()
 
-        self.mongo_uri = ""
+        self.mongo_uri = mongo_uri
+        self.botid = botid
+        self.env = env
+        self.bucket_key = bucket_key
+        self.access_key = access_key
 
-        # Get secrets from KeyVault
-        # keyVaultName = os.environ["KEY_VAULT_NAME"]
-        # KVUri = f"https://{keyVaultName}.vault.azure.net"
-
-        # # credential = DefaultAzureCredential()
-        # # client = SecretClient(vault_url=KVUri, credential=credential)
-
-        # # self.mongo_uri = client.get_secret('feyre-mongo-uri').value
-
-        try:
-            pyDir = path.dirname(__file__)
-            relPath = "..//mongo_uri.txt"
-            absRelPath = path.join(pyDir, relPath)
-            with open(absRelPath, 'r') as file:
-                self.mongo_uri = file.readline().strip()
-            print("Mongo Uri loaded successfully.")
-
-        except Exception as e:
-            print("Error loading mongo uri: {}".format(e))
+        # These values are set after the bot has been initalized
+        # DataManager holds all of the streaming and Feyre data
+        self.dataManager = None # DataManager must be set after the bot has been initialized
+        self.dev_user = None # Work around to allow Social request command to DM 
 
         try:
             print("Loading stats from mongo db...")
             sm = StatsManager(self.mongo_uri)
             self.statsDict = sm.get_stats_sync()
             print("Stats loaded succesfully")
-            raise Exception
 
         except Exception as e:
             try:
@@ -146,7 +72,6 @@ class BotData():
             um = UserManager(self.mongo_uri)
             self.userSet = um.get_user_set_sync()
             print("Users loaded succesfully")
-            raise Exception
 
         except Exception as e:
             try:
@@ -166,7 +91,6 @@ class BotData():
             gm = GmManager(self.mongo_uri, sync=True)
             self.gmDict = gm.get_gm_dict_sync()
             print("Gms loaded succesfully")
-            raise Exception
         
         except Exception as e:
             try:
@@ -186,7 +110,6 @@ class BotData():
             pm = PrefixManager(self.mongo_uri, sync=True)
             self.prefixDict = pm.get_prefix_dict_sync()
             print("Prefixes loaded succesfully")
-            raise Exception
         
         except Exception as e:
             try:
@@ -222,4 +145,31 @@ class BotData():
 
         return split_arr
 
+
+    async def createAndSendEmbeds(self, ctx, returnedArray):
+        if(len(returnedArray[1]) < 2048):
+            embed = discord.Embed(title = returnedArray[0], description = returnedArray[1])#, color=data.embedcolor)
+            await ctx.send(embed = embed)
+
+        #discord has a 2048 character limit so this is needed to split the message into chunks
+        else:
+            s = returnedArray[1]
+            parts = [s[i:i+2048] for i in range(0, len(s), 2048)]
+                        
+            for i in range(0, len(parts)):
+                if(i == 0):
+                    embed = discord.Embed(title = returnedArray[0], description = parts[i])#, color=data.embedcolor)
+                else:
+                    embed = discord.Embed(title = returnedArray[0] + " *- Continued*", description = parts[i])#, color=data.embedcolor)
+                await ctx.send(embed = embed)
     
+    async def codify(self, string, title = None):
+        if title:
+            s = f'''```md
+    # {title}
+
+    {string}```'''
+        
+        else:
+            s = '```' + string + '```'
+        return s    

@@ -1,8 +1,7 @@
 import os
 import difflib
-import random
-import asyncio
 import csv
+from discord.ext import commands
 
 class ItemLookup():
     def __init__(self):
@@ -32,8 +31,6 @@ class ItemLookup():
             ret_string = self.item_dictionary[matches[0]].to_string_match(self.item_dictionary[matches[1]].name)
 
         return ret_string
-
-    
 
 class Item():
     def __init__(self, name, rarity, item_type, attunement, description, pg_number):
@@ -91,3 +88,47 @@ Did you mean {}?```'''.format(self.name, self.rarity, self.item_type, self.attun
 
 
         return code_block
+
+class ItemLookupCog(commands.Cog):
+    def __init__(self, bot, data):
+        self.bot = bot
+        self.data = data
+        self.item_lookup = ItemLookup()
+
+    @commands.command(aliases = ['Item'])
+    async def item(self, ctx, *, args = None):
+        self.data.userSet.add(ctx.author.id)
+        self.data.statsDict['!item'] += 1
+
+        if not args:
+            await ctx.send('''```Missing the search argument! See !help item for more info.```''')
+            return
+
+        item = await self.item_lookup.search(args)
+
+        if len(item) >= 1997 and len(item) < 3997:
+            item1 = item[0:1990] + '```'
+            item2 = '```diff\n' + item[1991:]
+            await ctx.send(item1)
+            await ctx.send(item2)
+
+        elif len(item) >= 3997 and len(item) < 5980:
+            item1 = item[0:1990] + '```'
+            item2 = '```diff\n' + item[1990:3979] + '```'
+            item3 = '```diff\n' + item[3979:]
+            await ctx.send(item1)
+            await ctx.send(item2)
+            await ctx.send(item3)
+
+        elif len(item) >= 5980:
+            item1 = item[0:1990] + '```'
+            item2 = '```diff\n' + item[1990:3979] + '```'
+            item3 = '```diff\n' + item[3979:5979] + '```'
+            item4 = '```diff\n' + item[5979:]
+            await ctx.send(item1)
+            await ctx.send(item2)
+            await ctx.send(item3)
+            await ctx.send(item4)
+        
+        else:
+            await ctx.send(item)

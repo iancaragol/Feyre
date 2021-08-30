@@ -1,8 +1,0 @@
-FROM redis:alpine3.13
-
-# create nonroot user
-RUN adduser -D nonroot
-RUN chown -R nonroot:nonroot /home/nonroot
-WORKDIR /home/nonroot
-
-USER nonroot

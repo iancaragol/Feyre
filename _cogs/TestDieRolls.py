@@ -10,7 +10,7 @@ import json
 import re
 
 from discord.ext import commands
-from _classes.DieQueue import ShuntingYard
+from _classes.DiceRollerV2 import ShuntingYard
 
 class TESTDiceRoller(commands.Cog):
     # Very Temporary!

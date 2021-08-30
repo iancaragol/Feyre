@@ -88,7 +88,7 @@ class SpellbookCog(commands.Cog):
         #discord has a 2048 character limit so this is needed to split the message into chunks
         else:
             s = spell_tup[1]
-            parts = await self.data.string_splitter(s, '\n', 5) # Helper function from BotData
+            parts = await self.data.string_splitter(s, '\n', 5) # Helper function from CommonInfra
                         
             for i in range(len(parts)):
                 if(i == 0):

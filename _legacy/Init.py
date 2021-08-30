@@ -1,3 +1,5 @@
+# No longer used
+
 class Initiative():
     """
     Keeps track of iniative on a guild, channel basis.

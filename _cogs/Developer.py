@@ -10,6 +10,7 @@ from _backend.StatsManager import StatsManager
 from _backend.PrefixesManager import PrefixManager
 from _backend.GmManager import GmManager
 from copy import deepcopy
+from os import sys
 
 class DeveloperCog(commands.Cog):
     def __init__(self, bot, data, stats_cog):
@@ -130,5 +131,24 @@ class DeveloperCog(commands.Cog):
         await ctx.send(response)
 
     
+    @commands.command(aliases = ['botid'])
+    async def whoami(self, ctx):
+        """
+        bot UUID for testing
+        """
+        try:
+            self.data.userSet.add(ctx.author.id)
+            await ctx.send(f'ID: {self.data.botid}\n ENV: {self.data.env}')
+        except KeyError:
+            pass
 
     
+    @commands.command(aliases = ['Quit'])
+    async def quit(self, ctx):
+        if(ctx.author.id == 112041042894655488):
+            print("Saving to disk...")
+            await self.data.datamanager.save_to_disk()
+            User = self.bot.get_user(112041042894655488)
+            requestStr = "Shutting down..."
+            await User.send(requestStr)
+            sys.exit()

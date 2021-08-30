@@ -1,5 +1,5 @@
 import difflib
-import asyncio
+from discord.ext import commands
 
 class Weapon:
     def __init__(self, name, cost, damage_die, damage_type, weight, properties):
@@ -118,3 +118,26 @@ class Weapons:
             return False
 
         return self.weapon_dictionary[close_matches[0]]
+
+class WeaponLookupCog(commands.Cog):
+    def __init__(self, bot, data):
+        self.bot = bot
+        self.data = data
+        self.weapons = Weapons()
+
+    @commands.command(aliases = ['Weapon', 'w', 'W'])
+    async def weapon(self, ctx, *, args = None):
+        self.data.userSet.add(ctx.author.id)
+        self.data.statsDict['!weapon'] += 1
+
+        if not args:
+            await ctx.send('''```Missing command arguments, see !help weapon for more information.\nEx: !w Longsword```''')
+            return
+
+        wep = await self.weapons.search(args)
+        if wep == False:
+            await ctx.send("```Sorry, I couldn't find that weapon.```")
+        else:
+            await ctx.send(await wep.to_string())
+
+    
