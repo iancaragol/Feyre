@@ -43,11 +43,11 @@ class ClassAbilityLookup:
         self.setup()
 
     def setup(self):
-        pyDir = os.path.dirname(__file__)
-        relPath = "/../_data/_class_abilities/class_abilities.csv"
-        absRelPath = pyDir + relPath
-        with open(absRelPath, encoding='utf-8') as abilitys:
-            ability_reader = csv.reader(abilitys)
+        #pyDir = os.path.dirname(__file__)
+        path = "/home/app/_data/_class_abilities/class_abilities.csv"
+        #absRelPath = pyDir + path
+        with open(path, encoding='utf-8') as abilities:
+            ability_reader = csv.reader(abilities)
             for row in ability_reader:
                 new_ability = Ability(row[0], row[1], row[2])
                 self.ability_dictionary[f"{new_ability.character_class} - {new_ability.ability_name}"] = new_ability
@@ -55,11 +55,11 @@ class ClassAbilityLookup:
 
         # Fancy searching
         schema = Schema(title=TEXT(stored=True))
-        if not os.path.exists("_index/abilities"):
+        if not os.path.exists("_index//abilities"):
             os.mkdir("_index/abilities")
-        self.ix = create_in("_index/abilities", schema)
+        self.ix = create_in("_index//abilities", schema)
 
-        self.ix = open_dir("_index/abilities")
+        self.ix = open_dir("_index//abilities")
         writer = self.ix.writer()
         for v in self.ability_dictionary.values():
             title = f"{v.character_class} - {v.ability_name}"

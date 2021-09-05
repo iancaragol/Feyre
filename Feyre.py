@@ -110,7 +110,7 @@ async def request(ctx, *, args = None):
     if (args == None):
         await ctx.send("```!request requires arguments! Try !request [feature]```")
     else:
-        user = bot.get_user(112041042894655488)
+        user = await bot.fetch_user(112041042894655488)
 
         requestStr = f"**Feature Request**\nFrom: {ctx.author}\n\n{args}"
         await user.send(requestStr)
@@ -176,11 +176,11 @@ async def on_ready():
     if (env == "PRODUCTION"):
         if (os.environ['ISS'].upper() == 'TRUE'):
             print("[#] Starting stream to initial state...")
-            send_data.start()
+            data.dataManager.send_data.start()
         else:
             print("[#] Stream environment variable not set. Skipping stream.")
 
-        save_data.start()
+        data.dataManager.save_data.start()
         print("[#] Started auto backup of data.")
 
     elif (env == "DEVELOPMENT"):

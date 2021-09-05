@@ -111,7 +111,6 @@ class DeveloperCog(commands.Cog):
     async def ping(self, ctx):
         await ctx.send('```Pong! {0}ms```'.format(round(self.bot.latency, 3)))
 
-    
     @commands.command()
     async def cpu(self, ctx):
         cpu_percent = psutil.cpu_percent()
@@ -130,7 +129,6 @@ class DeveloperCog(commands.Cog):
 
         await ctx.send(response)
 
-    
     @commands.command(aliases = ['botid'])
     async def whoami(self, ctx):
         """
@@ -142,7 +140,6 @@ class DeveloperCog(commands.Cog):
         except KeyError:
             pass
 
-    
     @commands.command(aliases = ['Quit'])
     async def quit(self, ctx):
         if(ctx.author.id == 112041042894655488):

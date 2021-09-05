@@ -7,7 +7,7 @@ Makefile
 notes.txt
 README.md
 docs
-_old_code
+_legacy
 config.env
 azure_token
 test_token.txt
