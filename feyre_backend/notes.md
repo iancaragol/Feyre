@@ -1,3 +1,4 @@
+# Backend Service
 
 ## Controller
 
@@ -12,6 +13,25 @@ An operation is created and executed by the controller whenever a request is rec
 ## Model
 
 The model is where any properties that are used by the operation are stored. The model should have a to_dict method which will be used to create the JSON response.
+
+# Sync Service
+
+Sync service runs in a seperate docker container and periodically syncronizes the local Redis store with the Mongo DB.
+
+On service startup, Sync Service will download all data from the MongoDB and recreate it in Redis UNLESS the data stored in Redis is more up-to-date. (Meaning the SyncService crashed, while BackendService continued writing to Redis)
+
+Once per hour, sync service will take all of the data stored in Redis and format it as JSON objects to be stored in the Mongo DB.
+
+Currently the following is stored in redis:
+
+Key: "users"
+Type: set
+Values: The user IDs of any users
+
+Key: "command" (ex: roll)
+Type: int
+Values: The number of times this command has been used
+
 
 ### References:
 https://livecodestream.dev/post/python-flask-api-starter-kit-and-project-layout/
