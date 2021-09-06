@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  backendservice:
+    container_name: feyre_backend_service
+    env_file: 
+      - backend.env
+    restart: always
+    build: ./
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./:/home/app/
+    command: setup.py -s backend
+    depends_on:
+      - redis-primary
+      - redis-secondary
+
+  redis-primary:
+    image: docker.io/bitnami/redis:6.2
+    ports:
+      - '6379'
+    env_file: 
+      - redis_primary.env
+    volumes:
+      - 'redis_data:/bitnami/redis/data'
+
+  redis-secondary:
+    image: docker.io/bitnami/redis:6.2
+    ports:
+      - '6379'
+    depends_on:
+      - redis-primary
+    env_file: 
+      - redis_secondary.env
+
+volumes:
+  redis_data:
+    driver: local
