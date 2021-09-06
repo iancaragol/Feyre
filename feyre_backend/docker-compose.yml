@@ -15,6 +15,22 @@ services:
     depends_on:
       - redis-primary
       - redis-secondary
+      - datasyncservice
+  
+  datasyncservice:
+    container_name: feyre_datasync_service
+    env_file: 
+      - backend.env
+    restart: always
+    build: ./
+    ports:
+      - "5001:5001"
+    volumes:
+      - ./:/home/app/
+    command: setup.py -s sync
+    depends_on:
+      - redis-primary
+      - redis-secondary
 
   redis-primary:
     image: docker.io/bitnami/redis:6.2

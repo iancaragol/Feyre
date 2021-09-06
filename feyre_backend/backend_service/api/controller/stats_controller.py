@@ -17,7 +17,7 @@ def stats():
     """
     redis_helper.red.incr('stats', amount = 1)
 
-    all = False
+    show_all = False
     args = request.args
 
     # Add the user id to the user set
