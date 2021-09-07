@@ -1,16 +1,12 @@
+from common.redis_keys import RedisKeys
+
 class StatsModel:
     def __init__(self):
-        # This is a list of the most used commands. These are the commands that are returned with the ALL parameter is set to false
-        # It is a SUBSET of all_commands
-        self.commands = [
-            "roll",
-            "stats"
-        ]
-
-        # This is the list of ALL commands feyre supports
-        self.all_commands = [
-            "roll",
-            "stats"
-        ]
+        # Redis Keys is a common class that holds info on all of the different keys used for REDIS
+        # Any time we need to enumerate over keys, we can use this class
+        rk = RedisKeys()
+        
+        self.commands = rk.commands
+        self.all_commands = rk.all_commands
 
         self.stats_dict = {}
