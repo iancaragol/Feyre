@@ -15,7 +15,7 @@ def stats():
         all: (true/false) Returns all stats instead of a subset
     ---
     """
-    redis_helper.red.incr('stats', amount = 1)
+    redis_helper.red.incr('c_stats', amount = 1)
 
     show_all = False
     args = request.args

@@ -18,7 +18,7 @@ def roll():
     """
 
     # Increment the roll operation counter
-    redis_helper.red.incr('roll', amount = 1)
+    redis_helper.red.incr('c_roll', amount = 1)
 
     verbose = False
     args = request.args
