@@ -24,15 +24,6 @@ Once per hour, sync service will take all of the data stored in Redis and format
 
 Currently the following is stored in redis:
 
-Key: "users"
-Type: set
-Values: The user IDs of any users
-
-Key: "command" (ex: roll)
-Type: int
-Values: The number of times this command has been used
-
-
 ### References:
 https://livecodestream.dev/post/python-flask-api-starter-kit-and-project-layout/
 https://github.com/bitnami/bitnami-docker-redis#configuration
@@ -46,19 +37,29 @@ https://google.github.io/styleguide/pyguide.html
     Create the controller, model, and operations
 
 #### Step 2:
-    Add the new command to the StatsModel
+    Add the new command to Commands.py
 
 #### Step 3:
     Register the new controller's blueprint in app.py
 
+#### Step 4:
+    If command needs to be synced with Mongo DB, implement the sync_command API
+
 # Redis Models
+
+#### key:updated_time
+    All keys have an additional key called updated_time. This is the timestamp of the last update time for that key.
+    So when SETTING a key, this value must be SET too.
+
+    Ex:
+        user_set:updated_time
 
 #### user_set
     Set of all User IDs. All REST requests will have user=? in the query parameters. That value will ALWAYS be added to the users set
 
     Ex: [414560806764675074, 680486242424586250, 107624977066381312]
 
-#### user_id
+#### user_(user_id)
     Json object representing any of the user's personal data, such as characters, saved rolls, etc...
 
     Ex: user_107624977066381312 : 
@@ -67,3 +68,11 @@ https://google.github.io/styleguide/pyguide.html
             
         }
     }
+    
+#### c_command
+    Contains the counter for that specific command. Rather than having a c_command:updated_time we set c_:updated_time. Keeping track of the update time for each individual counter is not needed.
+
+    Ex: c_roll
+
+#### init_(channel_id)
+    Not sure what this will look like yet.

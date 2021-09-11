@@ -1,34 +1,38 @@
+from common import redis_keys
 from json import dumps
-from backend_service.api.model.stats_model import StatsModel
+from common.redis_helper import RedisHelper
+from common.commands import Commands
 
 class StatsOperation:
-    def __init__(self, redis, show_all):
-        self.red = redis
+    """
+    Operation to get the usage count of all commands and return it as a JSON dictionary
+    """
+    def __init__(self, show_all):
+        self.redis_helper = RedisHelper()
+        self.commands = Commands()
         self.show_all = show_all
 
     def execute(self):
+        """
+        Exceutes the StatsOperation
+
+        Returns the response body
+        """
         response_body = {"commands": self.get_stats()}
         response_body["user_count"] = self.get_user_count()
-        return dumps(response_body)
+        return response_body
 
     def get_stats(self):
-        stats_model = StatsModel()
-
-        command_list = stats_model.commands
+        """
+        Returns a dictionary of command counts
+        """
+        command_list = self.commands.commands
         if self.show_all:
-            command_list = stats_model.all_commands
-
-        for command in command_list:
-            val = self.red.get(command)
-            if val:
-                stats_model.stats_dict[command] = int(val.decode("utf-8"))
-
-        return stats_model.stats_dict
+            command_list = self.all_commands
+        return self.redis_helper.get_commands_dictionary(command_list)
 
     def get_user_count(self):
         """
         Returns the cardinality (count) of the user set
-
-        https://redis.io/commands/scard
         """
-        return int(self.red.scard("user_set"))
+        return self.redis_helper.get_user_set_count()

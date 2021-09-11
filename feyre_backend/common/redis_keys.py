@@ -1,20 +1,25 @@
 class RedisKeys:
+    """
+    Common class shared across Backend and Sync services
+
+    All Redis Keys and prefixes are stored here to ensure consistency. This class should only be consumed by RedisHelper
+    """
     def __init__(self):
         # Redis Keys is a common class that holds info on all of the different keys used for REDIS
         # Any time we need to enumerate over keys, we can use this class
+        # Keys can be changed here, and do not need to be typed all over the place.
 
-        # This is a list of the most used commands. These are the commands that are returned with the ALL parameter is set to false
-        # It is a SUBSET of all_commands
-        self.commands = [
-            "c_roll",
-            "c_stats"
-        ]
+        # Updated Time
+        # Whenever a <Key, Value> pair is updated in Redis <Key:Updated Time> is also updated with the current timestamp
+        # Ex:
+        # user_set:updated_time = timestamp
+        self.updated_time = "updated_time"
 
-        # This is the list of ALL commands feyre supports
-        self.all_commands = [
-            "c_roll",
-            "c_stats"
-        ]
+        # Command Prefix
+        # Appended to the command name
+        # Ex:
+        # c_roll = 1
+        self.command_prefix = "c_"
 
         # User prefix
         # Example User:
@@ -27,8 +32,13 @@ class RedisKeys:
         #       }
         #   ]
         # }
-        self.user_prefix = 'u_'
+        self.user_prefix = "u_"
 
+        # User set
+        # Set of Discord User IDs
+        # Ex:
+        # [101203123, 10239024124, 437854554]
+        self.user_set = "user_set"
         
 
         

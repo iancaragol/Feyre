@@ -4,8 +4,8 @@ from backend_service.api.controller.stats_controller import stats_api
 
 def create_app():
     app = Flask(__name__)
-    app.register_blueprint(roll_api, url_prefix='/backendService/api/roll')
-    app.register_blueprint(stats_api, url_prefix='/backendService/api/stats')
+    app.register_blueprint(roll_api, url_prefix='/api/backendService/roll')
+    app.register_blueprint(stats_api, url_prefix='/api/backendService/stats')
 
     return app
 

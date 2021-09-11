@@ -1,4 +1,6 @@
 import datetime
+import traceback
+
 from http import HTTPStatus
 from flask import Blueprint, request
 from backend_service.api.operation.stats_operation import StatsOperation
@@ -12,11 +14,11 @@ def stats():
     """
     Returns the stats dictionary
 
-    Query Paramters:
+    Query Parameters:
         all: (true/false) Returns all stats instead of a subset
     ---
     """
-    redis_helper.red.incr('c_stats', amount = 1)
+    redis_helper.increment_command("stats")
 
     show_all = False
     args = request.args
@@ -24,16 +26,15 @@ def stats():
     # Add the user id to the user set
     if "user" in args:
         user = args["user"]
-        redis_helper.red.sadd("user_set", user)
-        redis_helper.red.set("user_set:updated_time", datetime.now().timestamp())
+        redis_helper.add_to_user_set(user)
     else:
         return "Missing user query parameter", HTTPStatus.BAD_REQUEST
 
     if "all" in args:
         show_all = bool(args["all"])
     try:
-        result = StatsOperation(redis = redis_helper.red, show_all = show_all).execute()
+        result = StatsOperation(show_all = show_all).execute()
         return result, HTTPStatus.OK
     except Exception as e:
-        return str(e), HTTPStatus.INTERNAL_SERVER_ERROR
+        return f"An exception occurred when getting stats.\n{e}\n{traceback.format_exc()}", HTTPStatus.INTERNAL_SERVER_ERROR
     

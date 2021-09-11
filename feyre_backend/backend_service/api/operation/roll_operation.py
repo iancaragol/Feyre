@@ -6,6 +6,9 @@ from backend_service.api.model.child_roll_model import ChildRollModel
 from backend_service.api.model.parent_roll_model import ParentRollModel
 
 class RollOperation():
+    """
+    Operation that takes a dice expression, evaluates it, and returns a list of ParentRollModels
+    """
     def __init__(self, expression = None, verbose = False):
         self.expression = expression
         self.verbose = verbose

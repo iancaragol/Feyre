@@ -1,3 +1,5 @@
+import traceback
+
 from datetime import datetime
 from http import HTTPStatus
 from flask import Blueprint, request
@@ -12,14 +14,14 @@ def roll():
     """
     Creates Roll Operations based on query parameters and returns a JSON object containing a list of ParentRollModels
 
-    Query Paramters:
+    Query Parameters:
         verbose: (true/false) Enables print statements for that specific dice roll
         expression: (string) The Dice Expression to be rolled
     ---
     """
 
     # Increment the roll operation counter
-    redis_helper.red.incr('c_roll', amount = 1)
+    redis_helper.increment_command("roll")
 
     verbose = False
     args = request.args
@@ -27,8 +29,7 @@ def roll():
     # Add the user id to the user set
     if "user" in args:
         user = args["user"]
-        redis_helper.red.sadd("user_set", user)
-        redis_helper.red.set("user_set:updated_time", datetime.now().timestamp())
+        redis_helper.add_to_user_set(user)
     else:
         return "Missing user query parameter", HTTPStatus.BAD_REQUEST
 
@@ -43,6 +44,6 @@ def roll():
             result = RollOperation(expression = expression, verbose = verbose).execute()
             return result, HTTPStatus.OK
         except RollOperationException as e:
-            return e.message, HTTPStatus.INTERNAL_SERVER_ERROR
+            return f"An exception occurred when attempting the roll operation with expression = {expression}.\n{e}\n{traceback.format_exc()}", HTTPStatus.INTERNAL_SERVER_ERROR
     else:
         return "Missing expression query parameter", HTTPStatus.BAD_REQUEST
