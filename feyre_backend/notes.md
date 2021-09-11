@@ -50,3 +50,20 @@ https://google.github.io/styleguide/pyguide.html
 
 #### Step 3:
     Register the new controller's blueprint in app.py
+
+# Redis Models
+
+#### user_set
+    Set of all User IDs. All REST requests will have user=? in the query parameters. That value will ALWAYS be added to the users set
+
+    Ex: [414560806764675074, 680486242424586250, 107624977066381312]
+
+#### user_id
+    Json object representing any of the user's personal data, such as characters, saved rolls, etc...
+
+    Ex: user_107624977066381312 : 
+    {
+        characters = {
+            
+        }
+    }

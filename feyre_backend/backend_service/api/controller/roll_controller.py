@@ -1,3 +1,4 @@
+from datetime import datetime
 from http import HTTPStatus
 from flask import Blueprint, request
 from backend_service.api.operation.roll_operation import RollOperation, RollOperationException
@@ -26,7 +27,8 @@ def roll():
     # Add the user id to the user set
     if "user" in args:
         user = args["user"]
-        redis_helper.red.sadd("users", user)
+        redis_helper.red.sadd("user_set", user)
+        redis_helper.red.set("user_set:updated_time", datetime.now().timestamp())
     else:
         return "Missing user query parameter", HTTPStatus.BAD_REQUEST
 

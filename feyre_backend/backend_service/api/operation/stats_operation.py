@@ -31,4 +31,4 @@ class StatsOperation:
 
         https://redis.io/commands/scard
         """
-        return int(self.red.scard("users"))
+        return int(self.red.scard("user_set"))
