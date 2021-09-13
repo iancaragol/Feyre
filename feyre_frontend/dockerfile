@@ -12,6 +12,8 @@ RUN npm install
 USER nonroot
 
 # Feyre.py
-COPY --chown=nonroot:nonroot . .
+COPY --chown=nonroot:nonroot register.js .
+COPY --chown=nonroot:nonroot commands/ commands/
+COPY --chown=nonroot:nonroot app.js .
 
 ENTRYPOINT [ "node" ]
