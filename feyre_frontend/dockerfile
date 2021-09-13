@@ -13,6 +13,7 @@ USER nonroot
 
 # Feyre.py
 COPY --chown=nonroot:nonroot register.js .
+COPY --chown=nonroot:nonroot common/ common/
 COPY --chown=nonroot:nonroot commands/ commands/
 COPY --chown=nonroot:nonroot app.js .
 

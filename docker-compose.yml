@@ -1,17 +1,64 @@
-version: '3.8'
+version: '3.9'
 
 services:
-  feyre:
-    container_name: feyre
+  frontendservice:
+    container_name: feyre_frontend_service
     env_file: 
-      - config.env
+      - ./feyre_frontend/.env
     restart: always
-    build: ./
-    command: Feyre.py
-    volumes:
-      - ./_data:/home/app/_data
+    build: ./feyre_frontend
+    command: app.js
 
-  # If you want to use redis
-  # redis:
-  #   container_name: redis
-  #   build: ./redis
+  backendservice:
+    container_name: feyre_backend_service
+    env_file: 
+      - ./feyre_backend/backend.env
+    restart: always
+    build: ./feyre_backend
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./feyre_backend:/home/app/
+    command: setup.py -s backend
+    depends_on:
+      - redis-primary
+      - redis-secondary
+      - datasyncservice
+      - frontendservice
+  
+  datasyncservice:
+    container_name: feyre_datasync_service
+    env_file: 
+      - ./feyre_backend/backend.env
+    restart: always
+    build: ./feyre_backend
+    ports:
+      - "5001:5001"
+    volumes:
+      - ./feyre_backend:/home/app/
+    command: setup.py -s sync
+    depends_on:
+      - redis-primary
+      - redis-secondary
+
+  redis-primary:
+    image: docker.io/bitnami/redis:6.2
+    ports:
+      - '6379'
+    env_file: 
+      - ./feyre_backend/redis_primary.env
+    volumes:
+      - 'redis_data:/bitnami/redis/data'
+
+  redis-secondary:
+    image: docker.io/bitnami/redis:6.2
+    ports:
+      - '6379'
+    depends_on:
+      - redis-primary
+    env_file: 
+      - ./feyre_backend/redis_secondary.env
+
+volumes:
+  redis_data:
+    driver: local
