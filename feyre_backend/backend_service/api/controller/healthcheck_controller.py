@@ -8,4 +8,4 @@ def healthcheck():
     Healthcheck endpoint
     """
 
-    return "OK"
+    return {"status": 200, "message": "OK"}
