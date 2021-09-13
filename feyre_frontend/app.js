@@ -36,9 +36,12 @@ client.login(DISCORD_TOKEN);
 
 // Main
 client.on('interactionCreate', async interaction => {
+
+    console.log("Processing command:", interaction.commandName);
     if (!interaction.isCommand()) return;
     const command = client.commands.get(interaction.commandName);
     if (!command) return;
+
     try {
         await command.execute(interaction);
     } catch (error) {
