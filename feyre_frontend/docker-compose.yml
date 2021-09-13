@@ -7,6 +7,4 @@ services:
       - frontend.env
     restart: always
     build: .
-    volumes:
-      - ./:/home/app/
     command: app.py
