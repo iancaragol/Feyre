@@ -4,7 +4,7 @@ services:
   frontendservice:
     container_name: feyre_frontend_service
     env_file: 
-      - frontend.env
+      - .env
     restart: always
     build: .
-    command: app.py
+    command: app.js

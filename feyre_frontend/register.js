@@ -1,3 +1,6 @@
+// This file registers all all the Slash commands for the bot
+// It should only be run when a new command is added, or removed
+
 // Require Dependencies
 const { REST } = require('@discordjs/rest');
 const { Routes } = require('discord-api-types/v9');

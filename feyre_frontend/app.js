@@ -1,3 +1,5 @@
+// This is the main file for the frontend application
+
 // Required Dependencies
 const dotenv = require('dotenv');
 const fs = require('fs');
