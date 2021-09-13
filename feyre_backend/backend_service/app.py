@@ -7,7 +7,7 @@ def create_app():
     app = Flask(__name__)
     app.register_blueprint(roll_api, url_prefix='/api/backendService/roll')
     app.register_blueprint(stats_api, url_prefix='/api/backendService/stats')
-    app.register_blueprint(healthcheck_api, url_prefix='/api/backendService/healthcheck')
+    app.register_blueprint(healthcheck_api, url_prefix='/api/backendservice/healthcheck')
 
     return app
 
