@@ -1,0 +1,12 @@
+version: '3.9'
+
+services:
+  frontendservice:
+    container_name: feyre_frontend_service
+    env_file: 
+      - frontend.env
+    restart: always
+    build: .
+    volumes:
+      - ./:/home/app/
+    command: app.py
