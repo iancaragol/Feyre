@@ -1,5 +1,5 @@
 data "azurerm_container_registry" "acr" {
-  name                = "${var.project_name}k8sacr" # Did you get an error saying that your repo must be globally unique? Try adding some extra charcters here
+  name                = "${var.project_name}acr"
   resource_group_name = azurerm_resource_group.default.name
 
   depends_on = [
@@ -8,7 +8,7 @@ data "azurerm_container_registry" "acr" {
 }
 
 resource "azurerm_container_registry" "acr" {
-  name                = "${var.project_name}k8sacr"
+  name                = "${var.project_name}acr"
   resource_group_name = azurerm_resource_group.default.name
   location            = var.cloud_location
   sku                 = "Basic"
