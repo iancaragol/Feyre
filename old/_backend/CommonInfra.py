@@ -18,7 +18,7 @@ class CommonInfra():
     """
     def __init__(self, mongo_uri, botid, env, bucket_key, access_key):
         """
-        Initalizes the CommonInfra() class
+        Initializes the CommonInfra() class
 
         Raises:
             File read error
@@ -43,7 +43,7 @@ class CommonInfra():
         self.bucket_key = bucket_key
         self.access_key = access_key
 
-        # These values are set after the bot has been initalized
+        # These values are set after the bot has been initialized
         # DataManager holds all of the streaming and Feyre data
         self.dataManager = None # DataManager must be set after the bot has been initialized
         self.dev_user = None # Work around to allow Social request command to DM 
@@ -52,7 +52,7 @@ class CommonInfra():
             print("Loading stats from mongo db...")
             sm = StatsManager(self.mongo_uri)
             self.statsDict = sm.get_stats_sync()
-            print("Stats loaded succesfully")
+            print("Stats loaded successfully")
 
         except Exception as e:
             try:
@@ -62,7 +62,7 @@ class CommonInfra():
                 relPath = "..//_data//stats.txt"
                 absRelPath = path.join(pyDir, relPath)
                 self.statsDict = load(open(absRelPath))
-                print("Stats loaded succesfully")
+                print("Stats loaded successfully")
 
             except Exception as e:
                 print("Error loading stats: {}".format(e))
@@ -71,7 +71,7 @@ class CommonInfra():
             print("Loading users from mongo db...")
             um = UserManager(self.mongo_uri)
             self.userSet = um.get_user_set_sync()
-            print("Users loaded succesfully")
+            print("Users loaded successfully")
 
         except Exception as e:
             try:
@@ -81,7 +81,7 @@ class CommonInfra():
                 relPath = "..//_data//users.txt"
                 absRelPath = path.join(pyDir, relPath)
                 self.userSet = set(load(open(absRelPath)))
-                print("Users loaded succesfully")
+                print("Users loaded successfully")
 
             except Exception as e:
                 print(f"Error loading GM's: {e}")
@@ -90,7 +90,7 @@ class CommonInfra():
             print("Loading gms from mongo db...")
             gm = GmManager(self.mongo_uri, sync=True)
             self.gmDict = gm.get_gm_dict_sync()
-            print("Gms loaded succesfully")
+            print("Gms loaded successfully")
         
         except Exception as e:
             try:
@@ -100,7 +100,7 @@ class CommonInfra():
                 relPath = "..//_data//gms.txt"
                 absRelPath = path.join(pyDir, relPath)
                 self.gmDict = load(open(absRelPath))
-                print("GM's loaded succesfully")
+                print("GM's loaded successfully")
 
             except Exception as e:
                 print(f"Error loading GM's: {e}")
@@ -109,7 +109,7 @@ class CommonInfra():
             print("Loading prefixes from mongo db...")
             pm = PrefixManager(self.mongo_uri, sync=True)
             self.prefixDict = pm.get_prefix_dict_sync()
-            print("Prefixes loaded succesfully")
+            print("Prefixes loaded successfully")
         
         except Exception as e:
             try:
@@ -119,7 +119,7 @@ class CommonInfra():
                 relPath = "..//_data//prefixes.txt"
                 absRelPath = path.join(pyDir, relPath)
                 self.prefixDict = load(open(absRelPath))
-                print("Prefixes loaded succesfully")
+                print("Prefixes loaded successfully")
 
             except Exception as e:
                 print(f"Error loading prefixes: {e}")

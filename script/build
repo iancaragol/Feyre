@@ -124,7 +124,7 @@ while true
 do
   k8s_apply
   if [ $? -ne 0 ]; then
-    echo "💡 A possible race condition occured. Sleeping and trying again... Hint: press 'ctrl+c' to abort the retry loop"
+    echo "💡 A possible race condition occurred. Sleeping and trying again... Hint: press 'ctrl+c' to abort the retry loop"
     sleep 5
   else
     k8s_success

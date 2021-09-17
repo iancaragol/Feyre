@@ -1,6 +1,6 @@
 # The Great Rewrite
 
-## Why is this neccessary?
+## Why is this necessary?
 Feyre has been built using the discord.py library created by Rapptz. Going forward, this library will no longer be supported. I would like to thank Danny for all of his hard work. Without discord.py, Feyre would not exist. Through discord.py I was able to create something that is *actually used* and has a had positive impact on people's lives by helping them play D&D and other RPG games. 
 
 https://gist.github.com/Rapptz/4a2f62751b9600a31a0d3c78100287f1

@@ -53,7 +53,7 @@ tags: [gargantuan, elemental, cr23, storm-kings-thunder]
 
 The maegera the dawn titan can take 3 legendary actions, choosing from the options below. Only one legendary action option can be used at a time, and only at the end of another creature's turn. The maegera the dawn titan regains spent legendary actions at the start of its turn.
 
-***Quench Magic.*** Maegera targets one creature that it can see within 60 feet of it. Any resistence or immunity to fire damage that the target gains from a spell or magic item is suppressed.  The effect lasts until the end of Maegera's next turn.
+***Quench Magic.*** Maegera targets one creature that it can see within 60 feet of it. Any resistance or immunity to fire damage that the target gains from a spell or magic item is suppressed.  The effect lasts until the end of Maegera's next turn.
 
 ***Smoke Cloud (Costs 2 Actions).*** Maegera exhales a billowing cloud of hot smoke and embers that fills a 60 feet cube. Each creature in the area takes 11 (2d10) fire damage. The cloud lasts until the end of Maegera's next turn. Creatures completely in the cloud are blinded and can't be seen.
 

@@ -147,7 +147,7 @@ class CharacterSelectionHandler:
             await cursor.close()
             await cnxn.close()
 
-            return """```An error occured. Please report the issue with !request.```"""
+            return """```An error occurred. Please report the issue with !request.```"""
 
     async def remove_character(self, user_id, character_id):
         cnxn = await self.connect()

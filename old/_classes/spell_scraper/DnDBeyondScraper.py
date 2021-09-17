@@ -9,7 +9,7 @@ class DnDBeyondWebScraper():
     def __init__(self):
         self.spell_list = []
         self.spell_url_list = []
-        self.spell_excpetion_url_list = []
+        self.spell_exception_url_list = []
 
     def simple_get(self, url):
         try:
@@ -112,7 +112,7 @@ class DnDBeyondWebScraper():
         except Exception as e:
             print(f"Exception on: {url}")
             print(e)
-            self.spell_excpetion_url_list.append(url)
+            self.spell_exception_url_list.append(url)
 
             
 
@@ -136,7 +136,7 @@ absRelPath = os.path.join(pyDir, relPath)
 fileName = os.path.join(absRelPath, "failed_spells.txt")
 
 with open(fileName, "w") as text_file:
-    for sp in ws.spell_excpetion_url_list:
+    for sp in ws.spell_exception_url_list:
         text_file.write(sp)
 
 

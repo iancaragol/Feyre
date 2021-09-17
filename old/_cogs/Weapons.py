@@ -29,9 +29,9 @@ class Weapons:
     def __init__(self):
         self.weapon_dictionary = {}
 
-        self.populate_dicitonary()
+        self.populate_dictionary()
         
-    def populate_dicitonary(self):
+    def populate_dictionary(self):
         club = Weapon("Club", "1sp", "1d4", "bludgeoning", "2 lb", "Light")
         self.weapon_dictionary[club.name] = club
         dagger = Weapon("Dagger", "2gp", "1d4", "piercing", "1 lb", "Finesse, light, thrown (range 20/60)")

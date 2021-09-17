@@ -172,7 +172,7 @@ class Helper(commands.Cog):
             '''
             ```
             !d[size] [expression] can be used if you only want to roll one dice.
-            This command supports standard dice sizes [4,6,8,10,12,20] and expressions. A space is neccessary between the dice and any modifiers.
+            This command supports standard dice sizes [4,6,8,10,12,20] and expressions. A space is necessary between the dice and any modifiers.
 
             You can also use !dp to roll for percentile.
 

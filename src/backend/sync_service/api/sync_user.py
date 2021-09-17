@@ -110,7 +110,7 @@ def sync_users():
         mongoDB_last_entry_seconds = (now - mongoDB_last_entry_timestamp).total_seconds()
         print(f"   [3] MongoDB user_set was last updated {mongoDB_last_entry_seconds} seconds ago.", flush=True)
 
-        # Compare last update tiem for Redis and Mongo DB
+        # Compare last update time for Redis and Mongo DB
         if (redis_user_set_updated_time_seconds < mongoDB_last_entry_seconds):
             users = construct_users_json()
             insert_id = users_collection.insert_one(users).inserted_id

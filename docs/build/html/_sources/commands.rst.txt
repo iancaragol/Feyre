@@ -60,7 +60,7 @@ Finally, you can reroll any dice roll by clicing the reroll emoji.
 
 !d[size] [expression] can be used if you only want to roll one dice. If you only need to roll one dice this command is quicker than typing !roll.
 
-This command supports standard dice sizes [4,6,8,10,12,20] and expressions. A space is neccessary between the dice and any modifiers.
+This command supports standard dice sizes [4,6,8,10,12,20] and expressions. A space is necessary between the dice and any modifiers.
 
 You can also use !dp to roll for percentile::
 

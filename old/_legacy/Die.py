@@ -69,7 +69,7 @@ class Die:
         self.result = sum(self.rolls)
 
         if self.verbosity:
-            print(f"Evaulation result: {self.modifiers}")
+            print(f"Evaluation result: {self.modifiers}")
 
         return self.result
 
@@ -87,14 +87,14 @@ class DiceExpressionEvaluator:
 
         self.left_side = None # Left side of equality, if this expression is an equality
 
-    def seperate_string_number(self):
+    def separate_string_number(self):
         """
-        Seperates the dice expression into a strings
+        Separates the dice expression into a strings
 
         1d20+5 -> ['1', 'd', '20', '+' '5']
         """
         if self.verbosity:
-            print(f"---> seperate_string_number")
+            print(f"---> separate_string_number")
         # https://stackoverflow.com/questions/430079/how-to-split-strings-into-text-and-number
         previous_character = self.expression[0]
         groups = []
@@ -169,7 +169,7 @@ class DiceExpressionEvaluator:
                     raise DiceParseError(self.expression, "Invalid dice size", f"The value {self.expression_list[i+1]} at index {i+1} is not a valid dice size because it is not an integer. \n\n{self.expression_list}")
 
                 # Now check the number of dice
-                if i == 0: # Saftey check for out of bounds, if starts with d assume 1
+                if i == 0: # Safety check for out of bounds, if starts with d assume 1
                     number = 1
                 
                 else: # Otherwise get number

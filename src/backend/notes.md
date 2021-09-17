@@ -16,7 +16,7 @@ The model is where any properties that are used by the operation are stored. The
 
 # Sync Service
 
-Sync service runs in a seperate docker container and periodically syncronizes the local Redis store with the Mongo DB.
+Sync service runs in a separate docker container and periodically syncronizes the local Redis store with the Mongo DB.
 
 On service startup, Sync Service will download all data from the MongoDB and recreate it in Redis UNLESS the data stored in Redis is more up-to-date. (Meaning the SyncService crashed, while BackendService continued writing to Redis)
 

@@ -17,7 +17,7 @@ tags: [medium, humanoid, cr0, storm-kings-thunder]
 |:-----:|:-----:|:-----:|:-----:|:-----:|:-----:|
 | 16 (+3) | 11 (0) | 14 (+2) | 11 (0) | 11 (0) | 15 (+2) |
 
-**Skills** History +2, Intimidation +4, Investigation +2, Perception +2, Presuasion +4
+**Skills** History +2, Intimidation +4, Investigation +2, Perception +2, Persuasion +4
 
 **Languages** Common
 

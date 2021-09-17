@@ -9,7 +9,7 @@ Privacy & Data
 Privacy
 =======
 
-Feyre only reads the arguments of an existing command from :ref:`Commands`. Feyre *can not* read messages in your discord server that are not on that list. It will only see and proccess messages that start with the prefix for your server and the command. Furthermore, all data feyre stores is anonymous.
+Feyre only reads the arguments of an existing command from :ref:`Commands`. Feyre *can not* read messages in your discord server that are not on that list. It will only see and process messages that start with the prefix for your server and the command. Furthermore, all data feyre stores is anonymous.
 
 What can Feyre see?
 -------------------
