@@ -12,7 +12,7 @@ const getJSON = bent('json');
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('health') // The name of the Discord Slash command
-        .setDescription('Returns the healthcheck of the Feyre backend'), // The description of the Discord Slash command
+        .setDescription('Returns the healthcheck of the backend'), // The description of the Discord Slash command
 
     // The function to execute when the slash command is called (calls our backend)
     async execute(interaction) {
