@@ -293,3 +293,6 @@ terraform.tfstate.backup
 
 # terraform stuffs
 terraform_stuffs
+
+# tokens
+tokens.txt
