@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: frontend
+  name: frontend
+  labels:
+    name: frontend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: frontend
+  template:
+    metadata:
+      labels:
+        name: frontend
+    spec:
+      containers:
+        - name: frontend
+          image: birkik8sacr.azurecr.io/frontend:${IMAGE_TAG}
+          imagePullPolicy: Always
+          command: ["node"]
+          args: ["app.js"]
+          env:
+            - name: DISCORD_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: frontend-secret
+                  key: DISCORD_TOKEN
+            - name: ENVIRONMENT
+              value: "${ENVIRONMENT}"
+          resources:
+            limits:
+              cpu: "0.5"
+              memory: "500Mi"
+            requests:
+              cpu: "0.25"
+              memory: "50Mi"

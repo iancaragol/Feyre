@@ -283,8 +283,9 @@ azure_token
 *.psd
 
 # terraform
-.terraform*
 terraform.tfstate
+.terraform/
+terraform.auto.tfvars.json
 terraform.tfstate.backup
 *.toc
 *.seg
