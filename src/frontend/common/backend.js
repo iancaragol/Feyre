@@ -1,4 +1,4 @@
-async function create_url({protocol = 'http', host = null, path = null, port = 5000}) {
+async function create_url({protocol = 'http', host = null, path = null, port = 80}) {
 
     console.log(protocol, host, path, port);
 
@@ -13,7 +13,7 @@ async function create_url({protocol = 'http', host = null, path = null, port = 5
     }
     else if (process.env.ENVIRONMENT == 'dev' && host === null) {
         // If the environment is dev, use the "name" set via docker-compose
-        host = 'backendservice';
+        host = 'backend';
     }
     else if (process.env.ENVIRONMENT == 'prod' && host === null) {
         // Add logic for K8s to get the svc hostname
