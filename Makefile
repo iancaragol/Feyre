@@ -7,12 +7,11 @@ run: # For running Feyre in a Docker container
 
 	@echo "\e[32m[#] Feyre container is now running!\e[0m"
 
-push-test: # Builds and pushes Feyre image to ACR (test)
-	@az acr login -n feyre
-	@docker build -t feyre.azurecr.io/feyre:dev-testing .
-	@docker push feyre.azurecr.io/feyre:dev-testing
+push-azure:
+	script/build-and-push-azure
 
-push-release: # Builds and pushes Feyre image to ACR (release)
-	@az acr login -n feyre
-	@docker build -t feyre.azurecr.io/feyre:prod-testing .
-	@docker push feyre.azurecr.io/feyre:prod-testing
+build:
+	@script/build
+
+destroy:
+	@script/destroy

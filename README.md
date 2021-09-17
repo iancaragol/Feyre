@@ -16,7 +16,7 @@ See the *Features* section below for full details. Here are some of the top feat
 
 <!-- markdownlint-disable no-inline-html -->
 <p align="left">
-  <img width=600px src="assets/roll.png"/>
+  <img width=600px src="docs/assets/roll.png"/>
 </p>
 <!-- markdownlint-enable no-inline-html -->
 

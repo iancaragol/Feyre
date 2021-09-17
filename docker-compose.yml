@@ -1,41 +1,41 @@
 version: '3.9'
 
 services:
-  frontendservice:
-    container_name: feyre_frontend_service
+  frontend:
+    container_name: frontend
     env_file: 
-      - ./feyre_frontend/.env
+      - ./src/frontend/.env
     restart: always
-    build: ./feyre_frontend
+    build: ./src/frontend
     command: app.js
 
-  backendservice:
-    container_name: feyre_backend_service
+  backend:
+    container_name: backend
     env_file: 
-      - ./feyre_backend/backend.env
+      - ./src/backend/backend.env
     restart: always
-    build: ./feyre_backend
+    build: ./src/backend
     ports:
-      - "5000:5000"
+      - "80:80"
     volumes:
-      - ./feyre_backend:/home/app/
+      - ./src/backend:/home/app/
     command: setup.py -s backend
     depends_on:
       - redis-primary
       - redis-secondary
-      - datasyncservice
-      - frontendservice
+      - datasync
+      - frontend
   
-  datasyncservice:
-    container_name: feyre_datasync_service
+  datasync:
+    container_name: datasync
     env_file: 
-      - ./feyre_backend/backend.env
+      - ./src/backend/backend.env
     restart: always
-    build: ./feyre_backend
+    build: ./src/backend
     ports:
       - "5001:5001"
     volumes:
-      - ./feyre_backend:/home/app/
+      - ./src/backend:/home/app/
     command: setup.py -s sync
     depends_on:
       - redis-primary
@@ -46,7 +46,7 @@ services:
     ports:
       - '6379'
     env_file: 
-      - ./feyre_backend/redis_primary.env
+      - ./src/backend/redis_primary.env
     volumes:
       - 'redis_data:/bitnami/redis/data'
 
@@ -57,7 +57,7 @@ services:
     depends_on:
       - redis-primary
     env_file: 
-      - ./feyre_backend/redis_secondary.env
+      - ./src/backend/redis_secondary.env
 
 volumes:
   redis_data:
