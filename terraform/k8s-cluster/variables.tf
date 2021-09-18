@@ -7,6 +7,12 @@ variable "project_name" {
   type        = string
 }
 
+variable "env_name" {
+  description = "The name of your environment"
+  default     = "dev"
+  type        = string
+}
+
 # You must pass in the IPs you wish to allow as a variable
 # variable "allowed_ip_list" {
 #   description = "The list of IP addresses that are allowed to access the cluster's management API"

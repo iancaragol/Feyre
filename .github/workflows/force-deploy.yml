@@ -11,6 +11,8 @@ jobs:
 
   terraform-k8s-cluster:
 
+    environment: development
+
     runs-on: ubuntu-latest
 
     steps:
