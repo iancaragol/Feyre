@@ -23,7 +23,7 @@ resource "azurerm_kubernetes_cluster" "default" {
   name                = "${var.project_name}-${var.ENVIRONMENT}-aks"
   location            = azurerm_resource_group.default.location
   resource_group_name = azurerm_resource_group.default.name
-  dns_prefix          = "${var.project_name}"
+  dns_prefix          = var.project_name
 
   # api_server_authorized_ip_ranges = var.allowed_ip_list
   default_node_pool {
