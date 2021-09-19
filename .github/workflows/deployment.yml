@@ -210,7 +210,8 @@ jobs:
       - uses: actions/github-script@0.9.0
         if: github.event_name == 'pull_request'
         env:
-          PLAN: "terraform\n${{ steps.plan.outputs.stdout }}"
+          PLAN_K8S_CLUSTER: "terraform\n${{ steps.plan_k8s_cluster.outputs.stdout }}"
+          PLAN_K8S: "terraform\n${{ steps.plan_k8s.outputs.stdout }}"
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
