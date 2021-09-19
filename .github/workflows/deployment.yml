@@ -213,7 +213,7 @@ jobs:
     environment: development
 
     # These are the resources that run on the k8s-cluster
-    needs: [changes, build, terraform-k8s-cluster]
+    needs: [changes, build, terraform-k8s-cluster-development]
     if: needs.changes.outputs.src == 'true' || needs.changes.outputs.terraform-k8s == 'true' || needs.changes.outputs.terraform-k8s-cluster == 'true'
 
     runs-on: ubuntu-latest
