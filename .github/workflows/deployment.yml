@@ -218,7 +218,7 @@ jobs:
             const output = `## Terraform Plan - \`k8s-cluster\` - Development 🪐
             - Terraform Format and Style 🖌: \`${{ steps.fmt_k8s_cluster.outcome }}\`
             - Terraform Initialization ⚙️: \`${{ steps.init_k8s_cluster.outcome }}\`
-            - Terraform Validation 🤖: ${{ steps.validate_k8s_cluster.outputs.stdout }}
+            - Terraform Validation 🤖: \`${{ steps.validate_k8s_cluster.outcome }}\`
             - Terraform Plan 📖: \`${{ steps.plan_k8s_cluster.outcome }}\`
             
             <details><summary><b>Show Plan</b></summary>
@@ -232,7 +232,7 @@ jobs:
             ## Terraform Plan - \`k8s\` - Development 🪐
             - Terraform Format and Style 🖌: \`${{ steps.fmt_k8s.outcome }}\`
             - Terraform Initialization ⚙️: \`${{ steps.init_k8s.outcome }}\`
-            - Terraform Validation 🤖: ${{ steps.validate_k8s.outputs.stdout }}
+            - Terraform Validation 🤖: \`${{ steps.validate_k8s.outcome }}\`
             - Terraform Plan 📖: \`${{ steps.plan_k8s.outcome }}\`
             
             <details><summary><b>Show Plan</b></summary>
