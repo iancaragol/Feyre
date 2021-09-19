@@ -154,6 +154,7 @@ jobs:
         working-directory: terraform/k8s-cluster
         id: plan
         env:
+          TF_LOG: TRACE # troubleshooting
           TF_VAR_ENVIRONMENT: dev
           # Azure Auth
           TF_VAR_CLIENT_ID: ${{ secrets.DEV_CLIENT_ID }}
