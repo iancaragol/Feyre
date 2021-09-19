@@ -11,7 +11,7 @@ provider "azurerm" {
 }
 
 resource "azurerm_resource_group" "default" {
-  name     = "${var.project_name}-rg"
+  name     = "${var.project_name}-${var.ENVIRONMENT}-rg"
   location = var.cloud_location
 
   tags = {
@@ -20,7 +20,7 @@ resource "azurerm_resource_group" "default" {
 }
 
 resource "azurerm_kubernetes_cluster" "default" {
-  name                = "${var.project_name}-aks"
+  name                = "${var.project_name}-${var.ENVIRONMENT}-aks"
   location            = azurerm_resource_group.default.location
   resource_group_name = azurerm_resource_group.default.name
   dns_prefix          = "${var.project_name}"

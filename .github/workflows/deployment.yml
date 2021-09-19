@@ -154,9 +154,7 @@ jobs:
         working-directory: terraform/k8s-cluster
         id: plan
         env:
-          # Creds
-          TF_VAR_appId: ${{ secrets.DEV_AZURE_APP_ID }}
-          TF_VAR_password: ${{ secrets.DEV_AZURE_PASSWORD }}
+          TF_VAR_ENVIRONMENT: dev
           # Azure Auth
           TF_VAR_CLIENT_ID: ${{ secrets.DEV_CLIENT_ID }}
           TF_VAR_CLIENT_SECRET: ${{ secrets.DEV_CLIENT_SECRET }}
@@ -172,7 +170,7 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            const output = `## Terraform Plan 🪐
+            const output = `## Terraform Plan - Development 🪐
             - Terraform Format and Style 🖌: \`${{ steps.fmt.outcome }}\`
             - Terraform Initialization ⚙️: \`${{ steps.init.outcome }}\`
             - Terraform Validation 🤖: ${{ steps.validate.outputs.stdout }}
@@ -197,11 +195,7 @@ jobs:
         if: github.event_name == 'pull_request'
         working-directory: terraform/k8s-cluster
         env:
-          # Config
-          TF_VAR_IMAGE_TAG: latest
-          # Creds
-          TF_VAR_appId: ${{ secrets.DEV_AZURE_APP_ID }}
-          TF_VAR_password: ${{ secrets.DEV_AZURE_PASSWORD }}
+          TF_VAR_ENVIRONMENT: dev
           # Azure Auth
           TF_VAR_CLIENT_ID: ${{ secrets.DEV_CLIENT_ID }}
           TF_VAR_CLIENT_SECRET: ${{ secrets.DEV_CLIENT_SECRET }}
@@ -263,6 +257,7 @@ jobs:
         env:
           # Config
           TF_VAR_IMAGE_TAG: dev
+          TF_VAR_ENVIRONMENT: dev
           # Creds
           TF_VAR_DISCORD_TOKEN: ${{ secrets.DEV_DISCORD_TOKEN }}
           # Azure Auth
@@ -306,7 +301,8 @@ jobs:
         working-directory: terraform/k8s
         env:
           # Config
-          TF_VAR_IMAGE_TAG: latest
+          TF_VAR_ENVIRONMENT: dev
+          TF_VAR_IMAGE_TAG: dev
           # Creds
           TF_VAR_DISCORD_TOKEN: ${{ secrets.DEV_DISCORD_TOKEN }}
           # Azure Auth
