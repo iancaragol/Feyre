@@ -283,6 +283,11 @@ jobs:
       
       # Apply (k8s-cluster)
 
+      - name: Terraform init (k8s-cluster)
+        working-directory: terraform/k8s-cluster
+        id: init_k8s_cluster
+        run: terraform init
+
       - name: Terraform apply (k8s-cluster)
         if: github.event_name == 'pull_request'
         working-directory: terraform/k8s-cluster
@@ -296,6 +301,11 @@ jobs:
         run: terraform apply -auto-approve
 
       # Apply (k8s)
+
+      - name: Terraform init (k8s)
+        working-directory: terraform/k8s
+        id: init_k8s
+        run: terraform init
 
       - name: Terraform apply (k8s)
         if: github.event_name == 'pull_request'
