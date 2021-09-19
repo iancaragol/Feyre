@@ -100,6 +100,8 @@ jobs:
         run: |
           docker build -t ${{ secrets.DEV_REGISTRY_LOGIN_SERVER }}/frontend:dev frontend
           docker build -t ${{ secrets.DEV_REGISTRY_LOGIN_SERVER }}/backend:dev backend
+          docker push ${{ secrets.DEV_REGISTRY_LOGIN_SERVER }}/frontend:dev
+          docker push ${{ secrets.DEV_REGISTRY_LOGIN_SERVER }}/backend:dev
 
       - name: 'Build and Push image - latest'
         if: github.event_name == 'push'
