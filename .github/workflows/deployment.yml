@@ -75,11 +75,9 @@ jobs:
 
       - uses: actions/checkout@v2
       - uses: azure/login@v1
-        if: github.event_name == 'push'
         with:
           creds: ${{ secrets.DEV_AZURE_CREDENTIALS }}
       - name: 'ACR Login'
-        if: github.event_name == 'push'
         uses: azure/docker-login@v1
         with:
           login-server: ${{ secrets.DEV_REGISTRY_LOGIN_SERVER }}
