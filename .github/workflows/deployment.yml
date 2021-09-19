@@ -170,7 +170,7 @@ jobs:
         env:
           PLAN: "terraform\n${{ steps.plan.outputs.stdout }}"
         with:
-          github-token: ${{ secrets.DEV_GITHUB_TOKEN }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             const output = `## Terraform Plan 🪐
             - Terraform Format and Style 🖌: \`${{ steps.fmt.outcome }}\`
