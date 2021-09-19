@@ -94,12 +94,12 @@ jobs:
         continue-on-error: true
       
       # This job just ensures the images are built properly. In the future it will ensure they run properly as well
-      - name: 'Build image - ci-test'
+      - name: 'Build image - dev'
         if: github.event_name == 'pull_request'
         working-directory: src
         run: |
-          docker build -t ${{ secrets.DEV_REGISTRY_LOGIN_SERVER }}/frontend:ci-test frontend
-          docker build -t ${{ secrets.DEV_REGISTRY_LOGIN_SERVER }}/backend:ci-test backend
+          docker build -t ${{ secrets.DEV_REGISTRY_LOGIN_SERVER }}/frontend:dev frontend
+          docker build -t ${{ secrets.DEV_REGISTRY_LOGIN_SERVER }}/backend:dev backend
 
       - name: 'Build and Push image - latest'
         if: github.event_name == 'push'
@@ -110,7 +110,7 @@ jobs:
           docker build -t ${{ secrets.DEV_REGISTRY_LOGIN_SERVER }}/backend:latest backend
           docker push ${{ secrets.DEV_REGISTRY_LOGIN_SERVER }}/backend:latest
 
-  terraform-k8s-cluster:
+  terraform-k8s-cluster-development:
     # This is the k8s-cluster itself and the other resources that the k8s resources depend on
     needs: [changes, build]
     if: needs.changes.outputs.src == 'true' || needs.changes.outputs.terraform-k8s == 'true' || needs.changes.outputs.terraform-k8s-cluster == 'true'
@@ -194,7 +194,7 @@ jobs:
             })
 
       - name: Terraform apply
-        if: github.event_name == 'push'
+        if: github.event_name == 'pull_request'
         working-directory: terraform/k8s-cluster
         env:
           # Config
@@ -209,7 +209,7 @@ jobs:
           TF_VAR_TENANT_ID: ${{ secrets.DEV_TENANT_ID }}
         run: terraform apply -auto-approve
 
-  terraform-k8s:
+  terraform-k8s-development:
     environment: development
 
     # These are the resources that run on the k8s-cluster
@@ -262,7 +262,7 @@ jobs:
         id: plan
         env:
           # Config
-          TF_VAR_IMAGE_TAG: latest
+          TF_VAR_IMAGE_TAG: dev
           # Creds
           TF_VAR_DISCORD_TOKEN: ${{ secrets.DEV_DISCORD_TOKEN }}
           # Azure Auth
@@ -278,9 +278,9 @@ jobs:
         env:
           PLAN: "terraform\n${{ steps.plan.outputs.stdout }}"
         with:
-          github-token: ${{ secrets.DEV_GITHUB_TOKEN }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            const output = `## Terraform Plan 🪐
+            const output = `## Terraform Plan - Development 🪐
             - Terraform Format and Style 🖌: \`${{ steps.fmt.outcome }}\`
             - Terraform Initialization ⚙️: \`${{ steps.init.outcome }}\`
             - Terraform Validation 🤖: ${{ steps.validate.outputs.stdout }}
@@ -301,8 +301,8 @@ jobs:
               body: output
             })
 
-      - name: Terraform apply
-        if: github.event_name == 'push'
+      - name: Terraform apply - development
+        if: github.event_name == 'pull_request'
         working-directory: terraform/k8s
         env:
           # Config
