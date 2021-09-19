@@ -18,21 +18,21 @@ variable "IMAGE_TAG" {
 
 # Azure Creds
 variable "CLIENT_SECRET" {
-  type = string
+  type      = string
   sensitive = true
 }
 
 variable "CLIENT_ID" {
-  type = string
+  type      = string
   sensitive = true
 }
 
 variable "TENANT_ID" {
-  type = string
+  type      = string
   sensitive = true
 }
 
 variable "SUBSCRIPTION_ID" {
-  type = string
+  type      = string
   sensitive = true
 }
