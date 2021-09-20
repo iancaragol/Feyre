@@ -298,3 +298,4 @@ terraform_stuffs
 
 # tokens
 tokens.txt
+kube_config.txt

@@ -20,7 +20,7 @@ spec:
           image: ${ACR_NAME}.azurecr.io/backend:${IMAGE_TAG}
           imagePullPolicy: Always
           command: ["python3"]
-          args: ["app.py"]
+          args: ["setup.py", "-s", "backend"]
           resources:
             limits:
               cpu: "0.5"
