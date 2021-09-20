@@ -4,7 +4,7 @@ data "terraform_remote_state" "k8s_cluster" {
   config = {
     organization = "Feyre"
     workspaces = {
-      name = "k8s-cluster"
+      name = "k8s-cluster-${var.ENVIRONMENT}"
     }
   }
 }
