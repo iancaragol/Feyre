@@ -160,7 +160,9 @@ jobs:
       - name: Terraform init (k8s-cluster)
         working-directory: terraform/k8s-cluster
         id: init_k8s_cluster
-        run: terraform init
+        run: |
+          sed -i 's/ENVIRONMENT_REPLACEMENT/dev/' versions.tf
+          terraform init
 
       - name: Terraform validate (k8s-cluster)
         working-directory: terraform/k8s-cluster
@@ -192,7 +194,9 @@ jobs:
       - name: Terraform init (k8s)
         working-directory: terraform/k8s
         id: init_k8s
-        run: terraform init
+        run: |
+          sed -i 's/ENVIRONMENT_REPLACEMENT/dev/' versions.tf
+          terraform init
 
       - name: Terraform validate (k8s)
         working-directory: terraform/k8s
@@ -336,7 +340,9 @@ jobs:
   #     - name: Terraform init (k8s)
   #       working-directory: terraform/k8s
   #       id: init_k8s
-  #       run: terraform init
+  #       run: |
+            # sed -i 's/ENVIRONMENT_REPLACEMENT/prod/' versions.tf
+            # terraform init
 
   #     - name: Terraform validate (k8s)
   #       working-directory: terraform/k8s
@@ -456,7 +462,9 @@ jobs:
       - name: Terraform init (k8s-cluster)
         working-directory: terraform/k8s-cluster
         id: init_k8s_cluster
-        run: terraform init
+        run: |
+          sed -i 's/ENVIRONMENT_REPLACEMENT/dev/' versions.tf
+          terraform init
 
       - name: Terraform apply (k8s-cluster)
         if: github.event_name == 'pull_request'
@@ -475,7 +483,9 @@ jobs:
       - name: Terraform init (k8s)
         working-directory: terraform/k8s
         id: init_k8s
-        run: terraform init
+        run: |
+          sed -i 's/ENVIRONMENT_REPLACEMENT/dev/' versions.tf
+          terraform init
 
       - name: Terraform apply (k8s)
         if: github.event_name == 'pull_request'

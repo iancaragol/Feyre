@@ -3,7 +3,7 @@ terraform {
     organization = "Feyre"
 
     workspaces {
-      name = "k8s-cluster-${var.ENVIRONMENT}"
+      name = "k8s-cluster-ENVIRONMENT_REPLACEMENT" # CI uses sed to set the workspace - gross
     }
   }
 
