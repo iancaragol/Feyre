@@ -8,12 +8,14 @@ on:
 
 jobs:
 
+  # Detects specific files changes to run jobs conditionally
   changes:
     runs-on: ubuntu-latest
     outputs:
       src: ${{ steps.filter.outputs.src }}
       terraform-k8s-cluster: ${{ steps.filter.outputs.terraform-k8s-cluster }}
       terraform-k8s: ${{ steps.filter.outputs.terraform-k8s }}
+      discord-commands: ${{ steps.filter.outputs.discord-commands }}
     steps:
     - uses: actions/checkout@v2
     - uses: dorny/paths-filter@v2
@@ -26,7 +28,11 @@ jobs:
             - 'terraform/k8s-cluster/**'
           terraform-k8s:
             - 'terraform/k8s/**'
+          discord-commands:
+            - 'src/frontend/commands/**'
 
+  # For running tests against the backend/frontend services
+  # Right now this only tests the backend
   test:
 
       needs: changes
@@ -58,12 +64,14 @@ jobs:
           python -m pip install --upgrade pip
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
 
+      # Runs a python vuln check against the backend requirements.txt file
       - name: python vuln check
         working-directory: src/backend
         run: |
           pip install safety
           safety check
 
+  # Builds Docker images for the backend and frontend
   build:
 
     needs: [changes, test]
@@ -91,7 +99,7 @@ jobs:
         # Ignore the failure of a step and avoid terminating the job.
         continue-on-error: true
       
-      # This job just ensures the images are built properly. In the future it will ensure they run properly as well
+      # Builds and pushes images tagged as 'dev' for pull requests
       - name: 'Build image - dev'
         if: github.event_name == 'pull_request'
         working-directory: src
@@ -101,6 +109,7 @@ jobs:
           docker push ${{ secrets.DEV_REGISTRY_LOGIN_SERVER }}/frontend:dev
           docker push ${{ secrets.DEV_REGISTRY_LOGIN_SERVER }}/backend:dev
 
+      # Builds and pushes images tagged as 'prod' for pushes to 'main/master'
       - name: 'Build and Push image - latest'
         if: github.event_name == 'push'
         working-directory: src
@@ -110,6 +119,7 @@ jobs:
           docker build -t ${{ secrets.DEV_REGISTRY_LOGIN_SERVER }}/backend:latest backend
           docker push ${{ secrets.DEV_REGISTRY_LOGIN_SERVER }}/backend:latest
 
+  # Runs a Terraform plan for the dev environment
   terraform-plan-development:
     needs: [changes, build]
     if: needs.changes.outputs.src == 'true' || needs.changes.outputs.terraform-k8s == 'true' || needs.changes.outputs.terraform-k8s-cluster == 'true'
@@ -132,6 +142,7 @@ jobs:
       - name: Terraform version
         run: terraform --version
 
+      # Set the Kube Config for the dev environment. This assumes the k8s-cluster is up
       - uses: azure/k8s-set-context@v1
         with:
           method: kubeconfig
@@ -188,6 +199,7 @@ jobs:
         id: validate_k8s
         run: terraform validate -no-color
 
+      # Runs a plan for the k8s resources to be deployed
       - name: Terraform plan (k8s)
         if: github.event_name == 'pull_request'
         working-directory: terraform/k8s
@@ -207,7 +219,7 @@ jobs:
         continue-on-error: true
 
       # Post comment on PR with development plan info
-
+      # This comment includes the plan for the k8s-cluster and the k8s resources
       - uses: actions/github-script@0.9.0
         if: github.event_name == 'pull_request'
         env:
@@ -251,6 +263,7 @@ jobs:
               body: output
             })
 
+  # Deploys resources to Azure in the dev environment
   terraform-apply-development:
     environment: development
 
@@ -281,6 +294,18 @@ jobs:
           method: kubeconfig
           kubeconfig: ${{ secrets.DEV_KUBE_CONFIG }}
         id: setcontext
+
+      # Register Slash Commands - dev environment
+      # If any 'commands' files were changed, re-register them with Discord
+      - name: Register Slash Commands
+        if: needs.changes.outputs.discord-commands == 'true'
+        env:
+          DICORD_TOKEN: ${{ secrets.DEV_DISCORD_TOKEN }} | base64 -d
+          CLIENT_ID: ${{ secrets.DEV_CLIENT_ID }}
+        run: |
+          export DICORD_TOKEN=$(echo $DICORD_TOKEN | base64 -d)
+          docker-compose run --rm frontend "register.js" -e CLIENT_ID=$CLIENT_ID -e DISCORD_TOKEN=$DICORD_TOKEN
+          echo "Registered all slash commands in the src/frontend/commands folder!"
       
       # Apply (k8s-cluster)
 
