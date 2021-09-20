@@ -9,3 +9,7 @@ output "kubernetes_cluster_name" {
 output "kubernetes_cluster_full_id" {
   value = azurerm_kubernetes_cluster.default.id
 }
+
+output "acr_name" {
+  value = azurerm_container_registry.acr.name
+}
