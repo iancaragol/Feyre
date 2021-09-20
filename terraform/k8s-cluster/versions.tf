@@ -3,7 +3,7 @@ terraform {
     organization = "Feyre"
 
     workspaces {
-      name = "k8s-cluster"
+      name = "k8s-cluster-${var.ENVIRONMENT}"
     }
   }
 

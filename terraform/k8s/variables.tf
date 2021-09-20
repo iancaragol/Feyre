@@ -7,7 +7,6 @@ variable "DISCORD_TOKEN" {
 variable "ENVIRONMENT" {
   description = "The Environment context which all containers are running in (dev/prod)"
   type        = string
-  default     = "prod"
 }
 
 variable "IMAGE_TAG" {

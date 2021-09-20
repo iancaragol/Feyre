@@ -10,7 +10,6 @@ variable "project_name" {
 variable "ENVIRONMENT" {
   description = "The Environment context which all containers are running in (dev/prod)"
   type        = string
-  default     = "prod"
 }
 
 # You must pass in the IPs you wish to allow as a variable

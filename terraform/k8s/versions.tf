@@ -3,7 +3,7 @@ terraform {
     organization = "Feyre"
 
     workspaces {
-      name = "k8s-workloads"
+      name = "k8s-workloads-${var.ENVIRONMENT}"
     }
   }
   required_version = "=1.0.6"
