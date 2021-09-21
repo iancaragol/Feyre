@@ -86,7 +86,7 @@ K8S_CLUSTER_NAME=$(terraform show | grep 'kubernetes_cluster_name' | cut -d "=" 
 RESOURCE_GROUP_NAME=$(terraform show | grep 'resource_group_name' | cut -d "=" -f 2 | tr '"' ' ' | xargs | cut -d ' ' -f 1)
 
 az account set --subscription $SUBSCRIPTION_ID
-az aks get-credentials --resource-group $RESOURCE_GROUP_NAME --name $K8S_CLUSTER_NAME
+az aks get-credentials --resource-group $RESOURCE_GROUP_NAME --name $K8S_CLUSTER_NAME$ENVIRONMENT
 
 cd $REPO_DIR
 
