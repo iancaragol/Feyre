@@ -4,10 +4,17 @@
 
 set -e
 
+if [ -z "$1" ]; then
+  ENVIRONMENT=""
+else
+  echo "Setting environment to $1"
+  ENVIRONMENT=$1
+fi
+
 # Global Directory Variables
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )" # The directory of this script
 REPO_DIR="$(dirname "$SCRIPT_DIR")" # The root directory of this repository
-ACR_NAME="feyrek8sacr"
+ACR_NAME="feyrek8sacr$ENVIRONMENT"
 
 echo "🔨 Let's build some images and push them"
 

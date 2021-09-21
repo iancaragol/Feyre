@@ -55,10 +55,10 @@ fi
 
 TF_VAR_FILE="terraform/k8s-cluster/terraform.auto.tfvars.json"
 if [ -f "$TF_VAR_FILE" ]; then
-    echo "✅ $TF_VAR_FILE exists"
-else 
-    echo "❌ $TF_VAR_FILE does not exist! Please create it and add your Azure credentials. Exiting..."
-    exit 1
+  echo "✅ $TF_VAR_FILE exists"
+else
+  echo "❌ $TF_VAR_FILE does not exist! Please create it and add your Azure credentials. Exiting..."
+  exit 1
 fi
 
 grep -i "aaaaaa-aaaa-aaaa-aaaa-aaaaaaaa\|bbbbbb-bbbb-bbbb-bbbb-bbbbbbbb" $TF_VAR_FILE
@@ -94,14 +94,14 @@ echo "🔨 Time to build and push our images to ACR so they may be used by AKS"
 
 push_to_acr () {
   echo "🚀 Building and Pushing to ACR..."
-  $REPO_DIR/script/build-and-push-azure
+  $REPO_DIR/script/build-and-push-azure $1
 }
 
 # Push images to ACR
 set +e
 while true
 do
-  push_to_acr
+  push_to_acr $ENVIRONMENT
   if [ $? -ne 0 ]; then
     echo "💡 Failed to push to ACR. Trying again... Hint: press 'ctrl+c' to abort the retry loop"
     sleep 5
