@@ -299,3 +299,4 @@ terraform_stuffs
 # tokens
 tokens.txt
 kube_config.txt
+repo_secret.json
