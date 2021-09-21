@@ -11,6 +11,18 @@ REPO_DIR="$(dirname "$SCRIPT_DIR")" # The root directory of this repository
 
 echo "🔨 Let's build a K8s cluster!"
 
+read -p "Please select your environment (dev/prod)? " DEV_OR_PRODif [ "$DEV_OR_PROD" = "prod" ]; then
+  echo "🌎 Environment set to PROD";
+  ENVIRONMENT="prod"
+else
+  echo "🌎 Environment set to DEV";
+  ENVIRONMENT="dev"
+fi
+
+echo "ℹ Altering terraform files for $ENVIRONMENT environment"
+sed -i "s/ENVIRONMENT_REPLACEMENT/$ENVIRONMENT/" $REPO_DIR/terraform/k8s-cluster/versions.tf
+sed -i "s/ENVIRONMENT_REPLACEMENT/$ENVIRONMENT/" $REPO_DIR/terraform/k8s/versions.tf
+
 set +e # Allow failures when checking for dependencies
 
 which tfenv > /dev/null
@@ -106,7 +118,6 @@ k8s_success () {
   PROXY_IP=$(kubectl get -o jsonpath="{.status.loadBalancer.ingress[0].ip}" service -n kong kong-proxy)
 
   echo -e "✅ All manifests applied successfully\n"
-  echo -e "✨ Done! ✨"
 }
 
 k8s_apply () {
@@ -131,3 +142,9 @@ do
     break
   fi
 done
+
+echo "ℹ Swapping back terraform files for $ENVIRONMENT environment"
+sed -i "s/$ENVIRONMENT/ENVIRONMENT_REPLACEMENT/" $REPO_DIR/terraform/k8s-cluster/versions.tf
+sed -i "s/$ENVIRONMENT/ENVIRONMENT_REPLACEMENT/" $REPO_DIR/terraform/k8s/versions.tf
+echo ""
+echo -e "✨ Done! ✨"
