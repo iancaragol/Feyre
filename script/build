@@ -11,7 +11,8 @@ REPO_DIR="$(dirname "$SCRIPT_DIR")" # The root directory of this repository
 
 echo "🔨 Let's build a K8s cluster!"
 
-read -p "Please select your environment (dev/prod)? " DEV_OR_PRODif [ "$DEV_OR_PROD" = "prod" ]; then
+read -p "Please select your environment (dev/prod)? " DEV_OR_PROD
+if [ "$DEV_OR_PROD" = "prod" ]; then
   echo "🌎 Environment set to PROD";
   ENVIRONMENT="prod"
 else
