@@ -19,7 +19,6 @@ variable "IMAGE_TAG" {
 # Azure Creds
 variable "CLIENT_SECRET" {
   type      = string
-  sensitive = true
 }
 
 variable "CLIENT_ID" {
