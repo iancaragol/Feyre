@@ -53,6 +53,9 @@ def post_secret(secret_key: str, secret_value: str) -> None:
     if response.status_code == 201:
         print("Secret created successfully!")
         return
+    elif response.status_code == 204:
+        print("Secret updated successfully!")
+        return
     else:
         print("Something went wrong")
         print(response.status_code)
