@@ -179,10 +179,10 @@ jobs:
         env:
           TF_VAR_ENVIRONMENT: dev
           # Azure Auth
-          TF_VAR_CLIENT_ID: ${{ secrets.DEV_CLIENT_ID }}
-          TF_VAR_CLIENT_SECRET: ${{ secrets.DEV_CLIENT_SECRET }}
-          TF_VAR_SUBSCRIPTION_ID: ${{ secrets.DEV_SUBSCRIPTION_ID }}
-          TF_VAR_TENANT_ID: ${{ secrets.DEV_TENANT_ID }}
+          TF_VAR_CLIENT_ID: ${{ secrets.CLIENT_ID }}
+          TF_VAR_CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
+          TF_VAR_SUBSCRIPTION_ID: ${{ secrets.SUBSCRIPTION_ID }}
+          TF_VAR_TENANT_ID: ${{ secrets.TENANT_ID }}
         run: terraform plan -no-color
         continue-on-error: true
 
@@ -216,10 +216,10 @@ jobs:
           # Creds
           TF_VAR_DISCORD_TOKEN: ${{ secrets.DEV_DISCORD_TOKEN }}
           # Azure Auth
-          TF_VAR_CLIENT_ID: ${{ secrets.DEV_CLIENT_ID }}
-          TF_VAR_CLIENT_SECRET: ${{ secrets.DEV_CLIENT_SECRET }}
-          TF_VAR_SUBSCRIPTION_ID: ${{ secrets.DEV_SUBSCRIPTION_ID }}
-          TF_VAR_TENANT_ID: ${{ secrets.DEV_TENANT_ID }}
+          TF_VAR_CLIENT_ID: ${{ secrets.CLIENT_ID }}
+          TF_VAR_CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
+          TF_VAR_SUBSCRIPTION_ID: ${{ secrets.SUBSCRIPTION_ID }}
+          TF_VAR_TENANT_ID: ${{ secrets.TENANT_ID }}
         run: terraform plan -no-color
         continue-on-error: true
 
@@ -457,7 +457,7 @@ jobs:
         if: needs.changes.outputs.discord-commands == 'true'
         env:
           DICORD_TOKEN: ${{ secrets.DEV_DISCORD_TOKEN }} | base64 -d
-          CLIENT_ID: ${{ secrets.DEV_CLIENT_ID }}
+          CLIENT_ID: ${{ secrets.CLIENT_ID }}
         run: |
           export DICORD_TOKEN=$(echo $DICORD_TOKEN | base64 -d)
           docker-compose run --rm frontend "register.js" -e CLIENT_ID=$CLIENT_ID -e DISCORD_TOKEN=$DICORD_TOKEN
@@ -476,10 +476,10 @@ jobs:
         env:
           TF_VAR_ENVIRONMENT: dev
           # Azure Auth
-          TF_VAR_CLIENT_ID: ${{ secrets.DEV_CLIENT_ID }}
-          TF_VAR_CLIENT_SECRET: ${{ secrets.DEV_CLIENT_SECRET }}
-          TF_VAR_SUBSCRIPTION_ID: ${{ secrets.DEV_SUBSCRIPTION_ID }}
-          TF_VAR_TENANT_ID: ${{ secrets.DEV_TENANT_ID }}
+          TF_VAR_CLIENT_ID: ${{ secrets.CLIENT_ID }}
+          TF_VAR_CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
+          TF_VAR_SUBSCRIPTION_ID: ${{ secrets.SUBSCRIPTION_ID }}
+          TF_VAR_TENANT_ID: ${{ secrets.TENANT_ID }}
         run: terraform apply -auto-approve
 
       # Apply (k8s)
@@ -499,10 +499,10 @@ jobs:
           # Creds
           TF_VAR_DISCORD_TOKEN: ${{ secrets.DEV_DISCORD_TOKEN }}
           # Azure Auth
-          TF_VAR_CLIENT_ID: ${{ secrets.DEV_CLIENT_ID }}
-          TF_VAR_CLIENT_SECRET: ${{ secrets.DEV_CLIENT_SECRET }}
-          TF_VAR_SUBSCRIPTION_ID: ${{ secrets.DEV_SUBSCRIPTION_ID }}
-          TF_VAR_TENANT_ID: ${{ secrets.DEV_TENANT_ID }}
+          TF_VAR_CLIENT_ID: ${{ secrets.CLIENT_ID }}
+          TF_VAR_CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
+          TF_VAR_SUBSCRIPTION_ID: ${{ secrets.SUBSCRIPTION_ID }}
+          TF_VAR_TENANT_ID: ${{ secrets.TENANT_ID }}
         run: terraform apply -auto-approve
 
       # Add me later to get Discord push notifications on deployment! 😊
