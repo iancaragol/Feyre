@@ -465,7 +465,7 @@ jobs:
         run: |
           export DICORD_TOKEN=$(echo $DICORD_TOKEN | base64 -d)
           echo "DISCORD_TOKEN=$DISCORD_TOKEN" >> src/frontend/.env
-          echo "CLIENT_ID=$CLIENT_ID" >> >> src/frontend/.env
+          echo "CLIENT_ID=$CLIENT_ID" >> src/frontend/.env
           touch src/backend/backend.env
           touch src/backend/redis_primary.env
           touch src/backend/redis_secondary.env
