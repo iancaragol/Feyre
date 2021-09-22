@@ -121,6 +121,8 @@ jobs:
 
   # Runs a Terraform plan for the dev environment
   terraform-plan-development:
+    permissions:
+      pull-requests: write
     needs: [changes, build]
     if: needs.changes.outputs.src == 'true' || needs.changes.outputs.terraform-k8s == 'true' || needs.changes.outputs.terraform-k8s-cluster == 'true'
 
@@ -462,11 +464,13 @@ jobs:
           CLIENT_ID: ${{ secrets.DEV_DISCORD_CLIENT_ID }}
         run: |
           export DICORD_TOKEN=$(echo $DICORD_TOKEN | base64 -d)
-          touch src/frontend/.env
+          echo "DISCORD_TOKEN=$DISCORD_TOKEN" >> src/frontend/.env
+          echo "CLIENT_ID=$CLIENT_ID" >> >> src/frontend/.env
           touch src/backend/backend.env
           touch src/backend/redis_primary.env
           touch src/backend/redis_secondary.env
-          docker-compose run --rm frontend "register.js" -e CLIENT_ID=$CLIENT_ID -e DISCORD_TOKEN=$DICORD_TOKEN
+          docker-compose build
+          docker-compose run --rm frontend "register.js"
           echo "Registered all slash commands in the src/frontend/commands folder!"
       
       # Apply (k8s-cluster)
