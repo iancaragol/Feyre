@@ -130,6 +130,11 @@ jobs:
       # Setup
       - uses: actions/checkout@v2
 
+      - name: SED - Replace Environment
+        run: |
+          sed -i 's/ENVIRONMENT_REPLACEMENT/dev/' terraform/k8s-cluster/versions.tf 
+          sed -i 's/ENVIRONMENT_REPLACEMENT/dev/' terraform/k8s/versions.tf
+
       - uses: azure/login@v1
         with:
           creds: ${{ secrets.DEV_AZURE_CREDENTIALS }}
@@ -160,9 +165,7 @@ jobs:
       - name: Terraform init (k8s-cluster)
         working-directory: terraform/k8s-cluster
         id: init_k8s_cluster
-        run: |
-          sed -i 's/ENVIRONMENT_REPLACEMENT/dev/' versions.tf
-          terraform init
+        run: terraform init
 
       - name: Terraform validate (k8s-cluster)
         working-directory: terraform/k8s-cluster
@@ -174,7 +177,6 @@ jobs:
         working-directory: terraform/k8s-cluster
         id: plan_k8s_cluster
         env:
-          TF_LOG: "TRACE" # DEBUGGING
           TF_VAR_ENVIRONMENT: dev
           # Azure Auth
           TF_VAR_CLIENT_ID: ${{ secrets.DEV_CLIENT_ID }}
@@ -195,9 +197,7 @@ jobs:
       - name: Terraform init (k8s)
         working-directory: terraform/k8s
         id: init_k8s
-        run: |
-          sed -i 's/ENVIRONMENT_REPLACEMENT/dev/' versions.tf
-          terraform init
+        run: terraform init
 
       - name: Terraform validate (k8s)
         working-directory: terraform/k8s
@@ -428,6 +428,11 @@ jobs:
       # Setup
       - uses: actions/checkout@v2
 
+      - name: SED - Replace Environment
+        run: |
+          sed -i 's/ENVIRONMENT_REPLACEMENT/dev/' terraform/k8s-cluster/versions.tf 
+          sed -i 's/ENVIRONMENT_REPLACEMENT/dev/' terraform/k8s/versions.tf
+
       - uses: azure/login@v1
         with:
           creds: ${{ secrets.DEV_AZURE_CREDENTIALS }}
@@ -463,9 +468,7 @@ jobs:
       - name: Terraform init (k8s-cluster)
         working-directory: terraform/k8s-cluster
         id: init_k8s_cluster
-        run: |
-          sed -i 's/ENVIRONMENT_REPLACEMENT/dev/' versions.tf
-          terraform init
+        run: terraform init
 
       - name: Terraform apply (k8s-cluster)
         if: github.event_name == 'pull_request'
@@ -484,9 +487,7 @@ jobs:
       - name: Terraform init (k8s)
         working-directory: terraform/k8s
         id: init_k8s
-        run: |
-          sed -i 's/ENVIRONMENT_REPLACEMENT/dev/' versions.tf
-          terraform init
+        run: terraform init
 
       - name: Terraform apply (k8s)
         if: github.event_name == 'pull_request'
