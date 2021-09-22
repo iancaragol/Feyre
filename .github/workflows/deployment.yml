@@ -463,7 +463,7 @@ jobs:
           DISCORD_TOKEN: ${{ secrets.DEV_DISCORD_TOKEN }}
           CLIENT_ID: ${{ secrets.DEV_DISCORD_CLIENT_ID }}
         run: |
-          export DICORD_TOKEN=$(echo $DICORD_TOKEN | base64 -d)
+          export DISCORD_TOKEN=$(echo $DISCORD_TOKEN | base64 -d)
           echo "DISCORD_TOKEN=$DISCORD_TOKEN" >> src/frontend/.env
           echo "CLIENT_ID=$CLIENT_ID" >> src/frontend/.env
           touch src/backend/backend.env
