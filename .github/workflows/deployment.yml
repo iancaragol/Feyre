@@ -453,11 +453,13 @@ jobs:
 
       # Register Slash Commands - dev environment
       # If any 'commands' files were changed, re-register them with Discord
+      - uses: satackey/action-docker-layer-caching@v0.0.11
+        continue-on-error: true
       - name: Register Slash Commands
         if: needs.changes.outputs.discord-commands == 'true'
         env:
           DICORD_TOKEN: ${{ secrets.DEV_DISCORD_TOKEN }}
-          CLIENT_ID: ${{ secrets.CLIENT_ID }}
+          CLIENT_ID: ${{ secrets.DEV_DISCORD_CLIENT_ID }}
         run: |
           export DICORD_TOKEN=$(echo $DICORD_TOKEN | base64 -d)
           touch src/frontend/.env
