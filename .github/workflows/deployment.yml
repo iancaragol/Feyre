@@ -456,10 +456,11 @@ jobs:
       - name: Register Slash Commands
         if: needs.changes.outputs.discord-commands == 'true'
         env:
-          DICORD_TOKEN: ${{ secrets.DEV_DISCORD_TOKEN }} | base64 -d
+          DICORD_TOKEN: ${{ secrets.DEV_DISCORD_TOKEN }}
           CLIENT_ID: ${{ secrets.CLIENT_ID }}
         run: |
           export DICORD_TOKEN=$(echo $DICORD_TOKEN | base64 -d)
+          touch src/frontend/.env
           docker-compose run --rm frontend "register.js" -e CLIENT_ID=$CLIENT_ID -e DISCORD_TOKEN=$DICORD_TOKEN
           echo "Registered all slash commands in the src/frontend/commands folder!"
       
