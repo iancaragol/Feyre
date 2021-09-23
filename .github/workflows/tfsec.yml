@@ -6,6 +6,8 @@ on:
   pull_request:
 jobs:
   tfsec:
+    permissions:
+      pull-requests: write
     name: runner / tfsec
     runs-on: ubuntu-latest
 

@@ -5,7 +5,7 @@ on:
       - master
   pull_request:
 jobs:
-  misspell:
+  misspell: 
     name: runner / misspell
     runs-on: ubuntu-latest
     steps:
@@ -18,6 +18,8 @@ jobs:
           locale: "US"
 
   first-interaction:
+    permissions:
+      pull-requests: write
     name: runner / first-interaction
     runs-on: ubuntu-latest
     steps:
