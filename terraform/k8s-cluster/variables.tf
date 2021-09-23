@@ -46,17 +46,17 @@ variable "node_disk_size_gb" {
 
 # Azure Creds
 variable "CLIENT_SECRET" {
-  type      = string
+  type = string
 }
 
 variable "CLIENT_ID" {
-  type      = string
+  type = string
 }
 
 variable "TENANT_ID" {
-  type      = string
+  type = string
 }
 
 variable "SUBSCRIPTION_ID" {
-  type      = string
+  type = string
 }
