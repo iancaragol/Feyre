@@ -7,8 +7,22 @@ on:
   pull_request:
 
 jobs:
+
+  # For setting global vars to use in other steps
+  vars:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set outputs
+        env: 
+          GH_SHA_FULL: ${{ github.sha }}
+        id: vars
+        run: |
+          echo "Setting the sha_short to: $(echo "$GH_SHA_FULL" | cut -c1-8)"
+          echo "::set-output name=sha_short::$(echo "$GH_SHA_FULL" | cut -c1-8)"
+
   # Detects specific files changes to run jobs conditionally
   changes:
+    needs: vars
     runs-on: ubuntu-latest
     outputs:
       src: ${{ steps.filter.outputs.src }}
@@ -213,7 +227,8 @@ jobs:
         id: plan_k8s
         env:
           # Config
-          TF_VAR_IMAGE_TAG: dev
+          TF_VAR_FRONTEND_IMAGE_TAG: ${{ steps.vars.outputs.sha_short }}
+          TF_VAR_BACKEND_IMAGE_TAG: ${{ steps.vars.outputs.sha_short }}
           TF_VAR_ENVIRONMENT: dev
           # Creds
           TF_VAR_DISCORD_TOKEN: ${{ secrets.DEV_DISCORD_TOKEN }}
@@ -480,7 +495,8 @@ jobs:
         env:
           # Config
           TF_VAR_ENVIRONMENT: dev
-          TF_VAR_IMAGE_TAG: dev
+          TF_VAR_FRONTEND_IMAGE_TAG: ${{ steps.vars.outputs.sha_short }}
+          TF_VAR_BACKEND_IMAGE_TAG: ${{ steps.vars.outputs.sha_short }}
           # Creds
           TF_VAR_DISCORD_TOKEN: ${{ secrets.DEV_DISCORD_TOKEN }}
           # Azure Auth
