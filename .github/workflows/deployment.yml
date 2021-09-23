@@ -118,20 +118,20 @@ jobs:
         if: github.event_name == 'pull_request'
         working-directory: src
         run: |
-          docker build -t ${{ secrets.DEV_REGISTRY_LOGIN_SERVER }}/frontend:dev frontend
-          docker build -t ${{ secrets.DEV_REGISTRY_LOGIN_SERVER }}/backend:dev backend
-          docker push ${{ secrets.DEV_REGISTRY_LOGIN_SERVER }}/frontend:dev
-          docker push ${{ secrets.DEV_REGISTRY_LOGIN_SERVER }}/backend:dev
+          docker build -t ${{ secrets.DEV_REGISTRY_LOGIN_SERVER }}/frontend:${{ steps.vars.outputs.sha_short }} frontend
+          docker build -t ${{ secrets.DEV_REGISTRY_LOGIN_SERVER }}/backend:${{ steps.vars.outputs.sha_short }} backend
+          docker push ${{ secrets.DEV_REGISTRY_LOGIN_SERVER }}/frontend:${{ steps.vars.outputs.sha_short }}
+          docker push ${{ secrets.DEV_REGISTRY_LOGIN_SERVER }}/backend:${{ steps.vars.outputs.sha_short }}
 
       # Builds and pushes images tagged as 'prod' for pushes to 'main/master'
       - name: "Build and Push image - latest"
         if: github.event_name == 'push'
         working-directory: src
         run: |
-          docker build -t ${{ secrets.DEV_REGISTRY_LOGIN_SERVER }}/frontend:latest frontend
-          docker push ${{ secrets.DEV_REGISTRY_LOGIN_SERVER }}/frontend:latest
-          docker build -t ${{ secrets.DEV_REGISTRY_LOGIN_SERVER }}/backend:latest backend
-          docker push ${{ secrets.DEV_REGISTRY_LOGIN_SERVER }}/backend:latest
+          docker build -t ${{ secrets.DEV_REGISTRY_LOGIN_SERVER }}/frontend:${{ steps.vars.outputs.sha_short }} frontend
+          docker push ${{ secrets.DEV_REGISTRY_LOGIN_SERVER }}/frontend:${{ steps.vars.outputs.sha_short }}
+          docker build -t ${{ secrets.DEV_REGISTRY_LOGIN_SERVER }}/backend:${{ steps.vars.outputs.sha_short }} backend
+          docker push ${{ secrets.DEV_REGISTRY_LOGIN_SERVER }}/backend:${{ steps.vars.outputs.sha_short }}
 
   # Runs a Terraform plan for the dev environment
   terraform-plan-development:
