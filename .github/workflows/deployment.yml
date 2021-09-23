@@ -9,6 +9,7 @@ on:
 jobs:
 
   # For setting global vars to use in other steps
+  # Note: Anywhere you want to use the outputs, you need to use the "needs: vars" yaml tag
   vars:
     outputs:
       short_sha: ${{ steps.vars.outputs.short_sha}}
@@ -89,7 +90,7 @@ jobs:
 
   # Builds Docker images for the backend and frontend
   build:
-    needs: [changes, test]
+    needs: [changes, test, vars]
     if:
       needs.changes.outputs.src == 'true' || needs.changes.outputs.terraform-k8s
       == 'true' || needs.changes.outputs.terraform-k8s-cluster == 'true'
@@ -120,7 +121,7 @@ jobs:
         if: github.event_name == 'pull_request'
         working-directory: src
         env:
-          SHORT_SHA: ${{ steps.vars.outputs.short_sha }}
+          SHORT_SHA: ${{ needs.vars.outputs.short_sha }}
         run: |
           docker build -t ${{ secrets.DEV_REGISTRY_LOGIN_SERVER }}/frontend:$SHORT_SHA frontend
           docker build -t ${{ secrets.DEV_REGISTRY_LOGIN_SERVER }}/backend:$SHORT_SHA backend
@@ -132,7 +133,7 @@ jobs:
         if: github.event_name == 'push'
         working-directory: src
         env:
-          SHORT_SHA: ${{ steps.vars.outputs.short_sha }}
+          SHORT_SHA: ${{ needs.vars.outputs.short_sha }}
         run: |
           docker build -t ${{ secrets.DEV_REGISTRY_LOGIN_SERVER }}/frontend:$SHORT_SHA frontend
           docker push ${{ secrets.DEV_REGISTRY_LOGIN_SERVER }}/frontend:$SHORT_SHA
@@ -143,7 +144,7 @@ jobs:
   terraform-plan-development:
     permissions:
       pull-requests: write
-    needs: [changes, build]
+    needs: [changes, build, vars]
     if:
       needs.changes.outputs.src == 'true' || needs.changes.outputs.terraform-k8s
       == 'true' || needs.changes.outputs.terraform-k8s-cluster == 'true'
@@ -233,8 +234,8 @@ jobs:
         id: plan_k8s
         env:
           # Config
-          TF_VAR_FRONTEND_IMAGE_TAG: ${{ steps.vars.outputs.short_sha }}
-          TF_VAR_BACKEND_IMAGE_TAG: ${{ steps.vars.outputs.short_sha }}
+          TF_VAR_FRONTEND_IMAGE_TAG: ${{ needs.vars.outputs.short_sha }}
+          TF_VAR_BACKEND_IMAGE_TAG: ${{ needs.vars.outputs.short_sha }}
           TF_VAR_ENVIRONMENT: dev
           # Creds
           TF_VAR_DISCORD_TOKEN: ${{ secrets.DEV_DISCORD_TOKEN }}
@@ -417,7 +418,7 @@ jobs:
   terraform-apply-development:
     environment: development
 
-    needs: [changes, build, terraform-plan-development]
+    needs: [changes, build, terraform-plan-development, vars]
     if:
       needs.changes.outputs.src == 'true' || needs.changes.outputs.terraform-k8s
       == 'true' || needs.changes.outputs.terraform-k8s-cluster == 'true'
@@ -501,8 +502,8 @@ jobs:
         env:
           # Config
           TF_VAR_ENVIRONMENT: dev
-          TF_VAR_FRONTEND_IMAGE_TAG: ${{ steps.vars.outputs.short_sha }}
-          TF_VAR_BACKEND_IMAGE_TAG: ${{ steps.vars.outputs.short_sha }}
+          TF_VAR_FRONTEND_IMAGE_TAG: ${{ needs.vars.outputs.short_sha }}
+          TF_VAR_BACKEND_IMAGE_TAG: ${{ needs.vars.outputs.short_sha }}
           # Creds
           TF_VAR_DISCORD_TOKEN: ${{ secrets.DEV_DISCORD_TOKEN }}
           # Azure Auth
