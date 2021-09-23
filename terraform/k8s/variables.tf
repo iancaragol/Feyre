@@ -10,9 +10,13 @@ variable "ENVIRONMENT" {
   default     = "dev"
 }
 
-variable "IMAGE_TAG" {
-  description = "The image tag to use for deployments"
-  default     = "latest"
+variable "BACKEND_IMAGE_TAG" {
+  description = "The image tag to use for backend deployments"
+  type        = string
+}
+
+variable "FRONTEND_IMAGE_TAG" {
+  description = "The image tag to use for frontend deployments"
   type        = string
 }
 

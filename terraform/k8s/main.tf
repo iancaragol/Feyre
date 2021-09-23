@@ -5,7 +5,7 @@ module "backend" {
   ACR_NAME = data.azurerm_container_registry.acr.name
 
   # Environment variables
-  IMAGE_TAG   = var.IMAGE_TAG
+  IMAGE_TAG   = var.BACKEND_IMAGE_TAG
   ENVIRONMENT = var.ENVIRONMENT
 }
 
@@ -18,6 +18,6 @@ module "frontend" {
   # Secret variables
   DISCORD_TOKEN = var.DISCORD_TOKEN
   # Environment variables
-  IMAGE_TAG   = var.IMAGE_TAG
+  IMAGE_TAG   = var.FRONTEND_IMAGE_TAG
   ENVIRONMENT = var.ENVIRONMENT
 }
