@@ -116,8 +116,8 @@ jobs:
         # Ignore the failure of a step and avoid terminating the job.
         continue-on-error: true
 
-      # Builds and pushes images tagged as 'dev' for pull requests
-      - name: "Build image - dev"
+      # Builds and pushes images on pull request workflows
+      - name: "Build image - On Pull Request"
         if: github.event_name == 'pull_request'
         working-directory: src
         env:
@@ -128,8 +128,9 @@ jobs:
           docker push ${{ secrets.DEV_REGISTRY_LOGIN_SERVER }}/frontend:$SHORT_SHA
           docker push ${{ secrets.DEV_REGISTRY_LOGIN_SERVER }}/backend:$SHORT_SHA
 
-      # Builds and pushes images tagged as 'prod' for pushes to 'main/master'
-      - name: "Build and Push image - latest"
+      # Builds and pushes images on push workflows
+      # TODO: Later on this will push images to the PROD registry and not the DEV one
+      - name: "Build and Push image - On Push"
         if: github.event_name == 'push'
         working-directory: src
         env:
