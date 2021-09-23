@@ -10,6 +10,8 @@ jobs:
 
   # For setting global vars to use in other steps
   vars:
+    outputs:
+      short_sha: ${{ steps.vars.outputs.short_sha}}
     runs-on: ubuntu-latest
     steps:
       - name: Set outputs
@@ -17,8 +19,8 @@ jobs:
           GH_SHA_FULL: ${{ github.sha }}
         id: vars
         run: |
-          echo "Setting the sha_short to: $(echo "$GH_SHA_FULL" | cut -c1-8)"
-          echo "::set-output name=sha_short::$(echo "$GH_SHA_FULL" | cut -c1-8)"
+          echo "Setting the short_sha to: $(echo "$GH_SHA_FULL" | cut -c1-8)"
+          echo "::set-output name=short_sha::$(echo "$GH_SHA_FULL" | cut -c1-8)"
 
   # Detects specific files changes to run jobs conditionally
   changes:
@@ -118,24 +120,24 @@ jobs:
         if: github.event_name == 'pull_request'
         working-directory: src
         env:
-          SHA_SHORT: ${{ steps.vars.outputs.sha_short }}
+          SHORT_SHA: ${{ steps.vars.outputs.short_sha }}
         run: |
-          docker build -t ${{ secrets.DEV_REGISTRY_LOGIN_SERVER }}/frontend:$SHA_SHORT frontend
-          docker build -t ${{ secrets.DEV_REGISTRY_LOGIN_SERVER }}/backend:$SHA_SHORT backend
-          docker push ${{ secrets.DEV_REGISTRY_LOGIN_SERVER }}/frontend:$SHA_SHORT
-          docker push ${{ secrets.DEV_REGISTRY_LOGIN_SERVER }}/backend:$SHA_SHORT
+          docker build -t ${{ secrets.DEV_REGISTRY_LOGIN_SERVER }}/frontend:$SHORT_SHA frontend
+          docker build -t ${{ secrets.DEV_REGISTRY_LOGIN_SERVER }}/backend:$SHORT_SHA backend
+          docker push ${{ secrets.DEV_REGISTRY_LOGIN_SERVER }}/frontend:$SHORT_SHA
+          docker push ${{ secrets.DEV_REGISTRY_LOGIN_SERVER }}/backend:$SHORT_SHA
 
       # Builds and pushes images tagged as 'prod' for pushes to 'main/master'
       - name: "Build and Push image - latest"
         if: github.event_name == 'push'
         working-directory: src
         env:
-          SHA_SHORT: ${{ steps.vars.outputs.sha_short }}
+          SHORT_SHA: ${{ steps.vars.outputs.short_sha }}
         run: |
-          docker build -t ${{ secrets.DEV_REGISTRY_LOGIN_SERVER }}/frontend:$SHA_SHORT frontend
-          docker push ${{ secrets.DEV_REGISTRY_LOGIN_SERVER }}/frontend:$SHA_SHORT
-          docker build -t ${{ secrets.DEV_REGISTRY_LOGIN_SERVER }}/backend:$SHA_SHORT backend
-          docker push ${{ secrets.DEV_REGISTRY_LOGIN_SERVER }}/backend:$SHA_SHORT
+          docker build -t ${{ secrets.DEV_REGISTRY_LOGIN_SERVER }}/frontend:$SHORT_SHA frontend
+          docker push ${{ secrets.DEV_REGISTRY_LOGIN_SERVER }}/frontend:$SHORT_SHA
+          docker build -t ${{ secrets.DEV_REGISTRY_LOGIN_SERVER }}/backend:$SHORT_SHA backend
+          docker push ${{ secrets.DEV_REGISTRY_LOGIN_SERVER }}/backend:$SHORT_SHA
 
   # Runs a Terraform plan for the dev environment
   terraform-plan-development:
@@ -231,8 +233,8 @@ jobs:
         id: plan_k8s
         env:
           # Config
-          TF_VAR_FRONTEND_IMAGE_TAG: ${{ steps.vars.outputs.sha_short }}
-          TF_VAR_BACKEND_IMAGE_TAG: ${{ steps.vars.outputs.sha_short }}
+          TF_VAR_FRONTEND_IMAGE_TAG: ${{ steps.vars.outputs.short_sha }}
+          TF_VAR_BACKEND_IMAGE_TAG: ${{ steps.vars.outputs.short_sha }}
           TF_VAR_ENVIRONMENT: dev
           # Creds
           TF_VAR_DISCORD_TOKEN: ${{ secrets.DEV_DISCORD_TOKEN }}
@@ -499,8 +501,8 @@ jobs:
         env:
           # Config
           TF_VAR_ENVIRONMENT: dev
-          TF_VAR_FRONTEND_IMAGE_TAG: ${{ steps.vars.outputs.sha_short }}
-          TF_VAR_BACKEND_IMAGE_TAG: ${{ steps.vars.outputs.sha_short }}
+          TF_VAR_FRONTEND_IMAGE_TAG: ${{ steps.vars.outputs.short_sha }}
+          TF_VAR_BACKEND_IMAGE_TAG: ${{ steps.vars.outputs.short_sha }}
           # Creds
           TF_VAR_DISCORD_TOKEN: ${{ secrets.DEV_DISCORD_TOKEN }}
           # Azure Auth
