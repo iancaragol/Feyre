@@ -8,30 +8,16 @@ on:
 
 jobs:
 
-  # For setting global vars to use in other steps
-  # Note: Anywhere you want to use the outputs, you need to use the "needs: vars" yaml tag
-  vars:
-    outputs:
-      short_sha: ${{ steps.vars.outputs.short_sha}}
-    runs-on: ubuntu-latest
-    steps:
-      - name: Set outputs
-        env: 
-          GH_SHA_FULL: ${{ github.sha }}
-        id: vars
-        run: |
-          echo "Setting the short_sha to: $(echo "$GH_SHA_FULL" | cut -c1-8)"
-          echo "::set-output name=short_sha::$(echo "$GH_SHA_FULL" | cut -c1-8)"
-
   # Detects specific files changes to run jobs conditionally
   changes:
-    needs: vars
     runs-on: ubuntu-latest
     outputs:
-      src: ${{ steps.filter.outputs.src }}
-      terraform-k8s-cluster: ${{ steps.filter.outputs.terraform-k8s-cluster }}
-      terraform-k8s: ${{ steps.filter.outputs.terraform-k8s }}
-      discord-commands: ${{ steps.filter.outputs.discord-commands }}
+      src: ${{ steps.filter.outputs.src }} # Used to calulate general changes to source code
+      terraform-k8s-cluster: ${{ steps.filter.outputs.terraform-k8s-cluster }} # changes to the k8s cluster
+      terraform-k8s: ${{ steps.filter.outputs.terraform-k8s }} # changes to k8s workloads
+      discord-commands: ${{ steps.filter.outputs.discord-commands }} # changes to the discord commands
+      backend-src: ${{ steps.filter.outputs.backend-src }} # changes to the backend source code
+      frontend-src: ${{ steps.filter.outputs.frontend-src }} # changes to the frontend source code
     steps:
       - uses: actions/checkout@5a4ac9002d0be2fb38bd78e4b4dbde5606d7042f # pin@v2
       - uses: dorny/paths-filter@b2feaf19c27470162a626bd6fa8438ae5b263721 # pin@v2
@@ -46,6 +32,45 @@ jobs:
               - 'terraform/k8s/**'
             discord-commands:
               - 'src/frontend/commands/**'
+            backend-src:
+              - 'src/backend/**'
+            frontend-src:
+              - 'src/frontend/**'
+
+  # For setting global vars to use in other steps
+  # Note: Anywhere you want to use the outputs, you need to use the "needs: vars" yaml tag
+  # About: backend/frontend tags: this job checks to see if changes have been made to the source code for the frontend and backend
+  # .. services. If changes have been made, new image tags are generated. This get pushed to our registry and applied to k8s in the terraform deployment
+  # .. If no changes are made then it pulls the current image tags from the terraform state so a deployment is not triggered.
+  vars:
+    needs: changes
+    runs-on: ubuntu-latest
+    outputs:
+      short_sha: ${{ steps.vars.outputs.short_sha  }}
+      frontend_tag: ${{ steps.vars.outputs.front_end_tag  }}
+      backend_tag: ${{ steps.vars.outputs.backend_tag  }}
+    steps:
+      - name: Set outputs
+        env: 
+          GH_SHA_FULL: ${{ github.sha }}
+        id: vars
+        run: |
+          export SHORT_SHA=$(echo "$GH_SHA_FULL" | cut -c1-8)
+
+          if [ "${{ needs.changes.outputs.frontend-src }}" == "true" ]; \
+          then echo "::set-output name=frontend_tag::$SHORT_SHA"; \
+          else echo "::set-output name=frontend_tag::$(.github/ci/current_tag frontend)"; \
+          fi
+
+          if [ "${{ needs.changes.outputs.backend-src }}" == "true" ]; \
+          then echo "::set-output name=backend_tag::$SHORT_SHA"; \
+          else echo "::set-output name=backend_tag::$(.github/ci/current_tag backend)"; \
+          fi
+
+          echo "short_sha: ${{ steps.vars.outputs.short_sha}}"
+          echo "frontend_tag: ${{ steps.vars.outputs.frontend_tag}}"
+          echo "backend_tag: ${{ steps.vars.outputs.backend_tag}}"
+          
 
   # For running tests against the backend/frontend services
   # Right now this only tests the backend
@@ -121,12 +146,13 @@ jobs:
         if: github.event_name == 'pull_request'
         working-directory: src
         env:
-          SHORT_SHA: ${{ needs.vars.outputs.short_sha }}
+          BACKEND_TAG: ${{ steps.vars.outputs.backend_tag  }}
+          FRONTEND_TAG: ${{ steps.vars.outputs.frontend_tag  }}
         run: |
-          docker build -t ${{ secrets.DEV_REGISTRY_LOGIN_SERVER }}/frontend:$SHORT_SHA frontend
-          docker build -t ${{ secrets.DEV_REGISTRY_LOGIN_SERVER }}/backend:$SHORT_SHA backend
-          docker push ${{ secrets.DEV_REGISTRY_LOGIN_SERVER }}/frontend:$SHORT_SHA
-          docker push ${{ secrets.DEV_REGISTRY_LOGIN_SERVER }}/backend:$SHORT_SHA
+          docker build -t ${{ secrets.DEV_REGISTRY_LOGIN_SERVER }}/frontend:$FRONTEND_TAG frontend
+          docker build -t ${{ secrets.DEV_REGISTRY_LOGIN_SERVER }}/backend:$BACKEND_TAG backend
+          docker push ${{ secrets.DEV_REGISTRY_LOGIN_SERVER }}/frontend:$FRONTEND_TAG
+          docker push ${{ secrets.DEV_REGISTRY_LOGIN_SERVER }}/backend:$BACKEND_TAG
 
       # Builds and pushes images on push workflows
       # TODO: Later on this will push images to the PROD registry and not the DEV one
@@ -134,12 +160,13 @@ jobs:
         if: github.event_name == 'push'
         working-directory: src
         env:
-          SHORT_SHA: ${{ needs.vars.outputs.short_sha }}
+          BACKEND_TAG: ${{ steps.vars.outputs.backend_tag  }}
+          FRONTEND_TAG: ${{ steps.vars.outputs.frontend_tag  }}
         run: |
-          docker build -t ${{ secrets.DEV_REGISTRY_LOGIN_SERVER }}/frontend:$SHORT_SHA frontend
-          docker push ${{ secrets.DEV_REGISTRY_LOGIN_SERVER }}/frontend:$SHORT_SHA
-          docker build -t ${{ secrets.DEV_REGISTRY_LOGIN_SERVER }}/backend:$SHORT_SHA backend
-          docker push ${{ secrets.DEV_REGISTRY_LOGIN_SERVER }}/backend:$SHORT_SHA
+          docker build -t ${{ secrets.DEV_REGISTRY_LOGIN_SERVER }}/frontend:$FRONTEND_TAG frontend
+          docker push ${{ secrets.DEV_REGISTRY_LOGIN_SERVER }}/frontend:$FRONTEND_TAG
+          docker build -t ${{ secrets.DEV_REGISTRY_LOGIN_SERVER }}/backend:$BACKEND_TAG backend
+          docker push ${{ secrets.DEV_REGISTRY_LOGIN_SERVER }}/backend:$BACKEND_TAG
 
   # Runs a Terraform plan for the dev environment
   terraform-plan-development:
@@ -235,8 +262,8 @@ jobs:
         id: plan_k8s
         env:
           # Config
-          TF_VAR_FRONTEND_IMAGE_TAG: ${{ needs.vars.outputs.short_sha }}
-          TF_VAR_BACKEND_IMAGE_TAG: ${{ needs.vars.outputs.short_sha }}
+          TF_VAR_FRONTEND_IMAGE_TAG: ${{ steps.vars.outputs.frontend_tag  }}
+          TF_VAR_BACKEND_IMAGE_TAG: ${{ steps.vars.outputs.backend_tag  }}
           TF_VAR_ENVIRONMENT: dev
           # Creds
           TF_VAR_DISCORD_TOKEN: ${{ secrets.DEV_DISCORD_TOKEN }}
@@ -253,12 +280,8 @@ jobs:
       - uses: actions/github-script@5d03ada4b0a753e9460b312e61cc4f8fdeacf163 # pin@0.9.0
         if: github.event_name == 'pull_request'
         env:
-          PLAN_K8S_CLUSTER: "terraform
-
-            ${{ steps.plan_k8s_cluster.outputs.stdout }}"
-          PLAN_K8S: "terraform
-
-            ${{ steps.plan_k8s.outputs.stdout }}"
+          PLAN_K8S_CLUSTER: "terraform ${{ steps.plan_k8s_cluster.outputs.stdout }}"
+          PLAN_K8S: "terraform ${{ steps.plan_k8s.outputs.stdout }}"
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
@@ -503,8 +526,8 @@ jobs:
         env:
           # Config
           TF_VAR_ENVIRONMENT: dev
-          TF_VAR_FRONTEND_IMAGE_TAG: ${{ needs.vars.outputs.short_sha }}
-          TF_VAR_BACKEND_IMAGE_TAG: ${{ needs.vars.outputs.short_sha }}
+          TF_VAR_FRONTEND_IMAGE_TAG: ${{ steps.vars.outputs.frontend_tag  }}
+          TF_VAR_BACKEND_IMAGE_TAG: ${{ steps.vars.outputs.backend_tag  }}
           # Creds
           TF_VAR_DISCORD_TOKEN: ${{ secrets.DEV_DISCORD_TOKEN }}
           # Azure Auth
