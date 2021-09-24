@@ -29,6 +29,8 @@ spec:
                   key: DISCORD_TOKEN
             - name: ENVIRONMENT
               value: "${ENVIRONMENT}"
+            - name: ENV_KUBE
+              value: "true"
           resources:
             limits:
               cpu: "0.5"
