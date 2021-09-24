@@ -16,7 +16,7 @@ services:
     restart: always
     build: ./src/backend
     ports:
-      - "80:80"
+      - "5000:5000"
     volumes:
       - ./src/backend:/home/app/
     command: setup.py -s backend

@@ -42,4 +42,4 @@ spec:
               cpu: "0.25"
               memory: "50Mi"
           ports:
-            - containerPort: 80
+            - containerPort: 5000
