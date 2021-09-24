@@ -12,7 +12,7 @@ jobs:
   changes:
     runs-on: ubuntu-latest
     outputs:
-      src: ${{ steps.filter.outputs.src }} # Used to calulate general changes to source code
+      src: ${{ steps.filter.outputs.src }} # Used to calculate general changes to source code
       terraform-k8s-cluster: ${{ steps.filter.outputs.terraform-k8s-cluster }} # changes to the k8s cluster
       terraform-k8s: ${{ steps.filter.outputs.terraform-k8s }} # changes to k8s workloads
       discord-commands: ${{ steps.filter.outputs.discord-commands }} # changes to the discord commands
