@@ -68,7 +68,7 @@ jobs:
       - name: Set outputs
         env: 
           GH_SHA_FULL: ${{ github.sha }}
-        id: -dev
+        id: vars-dev
         run: |
           export SHORT_SHA=$(echo "$GH_SHA_FULL" | cut -c1-8)
 
