@@ -4,15 +4,31 @@ variable "DISCORD_TOKEN" {
   sensitive   = true
 }
 
+variable "REDIS_PASSWORD" {
+  description = "The password for redis"
+  type        = string
+  sensitive   = true
+}
+
+variable "MONGO_URI" {
+  description = "The URI for mongo"
+  type        = string
+  sensitive   = true
+}
+
 variable "ENVIRONMENT" {
   description = "The Environment context which all containers are running in (dev/prod)"
   type        = string
-  default     = "prod"
+  default     = "dev"
 }
 
-variable "IMAGE_TAG" {
-  description = "The image tag to use for deployments"
-  default     = "latest"
+variable "BACKEND_IMAGE_TAG" {
+  description = "The image tag to use for backend deployments"
+  type        = string
+}
+
+variable "FRONTEND_IMAGE_TAG" {
+  description = "The image tag to use for frontend deployments"
   type        = string
 }
 

@@ -3,7 +3,7 @@ terraform {
     organization = "Feyre"
 
     workspaces {
-      name = "k8s-workloads"
+      name = "k8s-workloads-ENVIRONMENT_REPLACEMENT" # CI uses sed to set the workspace - gross
     }
   }
   required_version = "=1.0.6"

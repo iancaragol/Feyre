@@ -7,6 +7,12 @@ variable "project_name" {
   type        = string
 }
 
+variable "ENVIRONMENT" {
+  description = "The Environment context which all containers are running in (dev/prod)"
+  type        = string
+  default     = "dev"
+}
+
 # You must pass in the IPs you wish to allow as a variable
 # variable "allowed_ip_list" {
 #   description = "The list of IP addresses that are allowed to access the cluster's management API"
@@ -36,14 +42,6 @@ variable "node_disk_size_gb" {
   description = "The size in GB of the storage on each node"
   default     = 30
   type        = number
-}
-
-variable "appId" {
-  description = "Azure Kubernetes Service Cluster service principal"
-}
-
-variable "password" {
-  description = "Azure Kubernetes Service Cluster password"
 }
 
 # Azure Creds

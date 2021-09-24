@@ -11,6 +11,19 @@ REPO_DIR="$(dirname "$SCRIPT_DIR")" # The root directory of this repository
 
 echo "🔨 Let's build a K8s cluster!"
 
+read -p "Please select your environment (dev/prod)? " DEV_OR_PROD
+if [ "$DEV_OR_PROD" = "prod" ]; then
+  echo "🌎 Environment set to PROD";
+  ENVIRONMENT="prod"
+else
+  echo "🌎 Environment set to DEV";
+  ENVIRONMENT="dev"
+fi
+
+echo "ℹ Altering terraform files for $ENVIRONMENT environment"
+sed -i "s/ENVIRONMENT_REPLACEMENT/$ENVIRONMENT/" $REPO_DIR/terraform/k8s-cluster/versions.tf
+sed -i "s/ENVIRONMENT_REPLACEMENT/$ENVIRONMENT/" $REPO_DIR/terraform/k8s/versions.tf
+
 set +e # Allow failures when checking for dependencies
 
 which tfenv > /dev/null
@@ -42,10 +55,10 @@ fi
 
 TF_VAR_FILE="terraform/k8s-cluster/terraform.auto.tfvars.json"
 if [ -f "$TF_VAR_FILE" ]; then
-    echo "✅ $TF_VAR_FILE exists"
-else 
-    echo "❌ $TF_VAR_FILE does not exist! Please create it and add your Azure credentials. Exiting..."
-    exit 1
+  echo "✅ $TF_VAR_FILE exists"
+else
+  echo "❌ $TF_VAR_FILE does not exist! Please create it and add your Azure credentials. Exiting..."
+  exit 1
 fi
 
 grep -i "aaaaaa-aaaa-aaaa-aaaa-aaaaaaaa\|bbbbbb-bbbb-bbbb-bbbb-bbbbbbbb" $TF_VAR_FILE
@@ -81,14 +94,14 @@ echo "🔨 Time to build and push our images to ACR so they may be used by AKS"
 
 push_to_acr () {
   echo "🚀 Building and Pushing to ACR..."
-  $REPO_DIR/script/build-and-push-azure
+  $REPO_DIR/script/build-and-push-azure $1
 }
 
 # Push images to ACR
 set +e
 while true
 do
-  push_to_acr
+  push_to_acr $ENVIRONMENT
   if [ $? -ne 0 ]; then
     echo "💡 Failed to push to ACR. Trying again... Hint: press 'ctrl+c' to abort the retry loop"
     sleep 5
@@ -106,7 +119,6 @@ k8s_success () {
   PROXY_IP=$(kubectl get -o jsonpath="{.status.loadBalancer.ingress[0].ip}" service -n kong kong-proxy)
 
   echo -e "✅ All manifests applied successfully\n"
-  echo -e "✨ Done! ✨"
 }
 
 k8s_apply () {
@@ -131,3 +143,9 @@ do
     break
   fi
 done
+
+echo "ℹ Swapping back terraform files for $ENVIRONMENT environment"
+sed -i "s/$ENVIRONMENT/ENVIRONMENT_REPLACEMENT/" $REPO_DIR/terraform/k8s-cluster/versions.tf
+sed -i "s/$ENVIRONMENT/ENVIRONMENT_REPLACEMENT/" $REPO_DIR/terraform/k8s/versions.tf
+echo ""
+echo -e "✨ Done! ✨"

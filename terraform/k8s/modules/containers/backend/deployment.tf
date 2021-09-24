@@ -1,11 +1,13 @@
 data "kubectl_path_documents" "backend_deployment_manifest" {
   depends_on = [
-    data.kubectl_file_documents.backend_namespace_manifest
+    data.kubectl_file_documents.backend_namespace_manifest,
+    data.kubectl_path_documents.backend_secret_manifest
   ]
 
   vars = {
     ENVIRONMENT = "${var.ENVIRONMENT}"
     IMAGE_TAG   = "${var.IMAGE_TAG}"
+    ACR_NAME    = "${var.ACR_NAME}"
   }
   pattern = "modules/containers/backend/deployment.yaml"
 }

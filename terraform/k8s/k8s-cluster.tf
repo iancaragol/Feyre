@@ -1,10 +1,10 @@
-data "terraform_remote_state" "aks" {
+data "terraform_remote_state" "k8s_cluster" {
   backend = "remote"
 
   config = {
     organization = "Feyre"
     workspaces = {
-      name = "k8s-cluster"
+      name = "k8s-cluster-${var.ENVIRONMENT}"
     }
   }
 }
@@ -21,10 +21,14 @@ provider "azurerm" {
   subscription_id = var.SUBSCRIPTION_ID
 }
 
+data "azurerm_container_registry" "acr" {
+  name                = data.terraform_remote_state.k8s_cluster.outputs.acr_name
+  resource_group_name = data.terraform_remote_state.k8s_cluster.outputs.resource_group_name
+}
 
 data "azurerm_kubernetes_cluster" "cluster" {
-  name                = data.terraform_remote_state.aks.outputs.kubernetes_cluster_name
-  resource_group_name = data.terraform_remote_state.aks.outputs.resource_group_name
+  name                = data.terraform_remote_state.k8s_cluster.outputs.kubernetes_cluster_name
+  resource_group_name = data.terraform_remote_state.k8s_cluster.outputs.resource_group_name
 }
 
 provider "kubernetes" {

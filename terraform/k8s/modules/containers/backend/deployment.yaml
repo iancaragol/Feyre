@@ -17,10 +17,23 @@ spec:
     spec:
       containers:
         - name: backend
-          image: birkik8sacr.azurecr.io/backend:${IMAGE_TAG}
+          image: ${ACR_NAME}.azurecr.io/backend:${IMAGE_TAG}
           imagePullPolicy: Always
           command: ["python3"]
-          args: ["app.py"]
+          args: ["setup.py", "-s", "backend"]
+          env:
+            - name: REDIS_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: backend-secret
+                  key: REDIS_PASSWORD
+            - name: MONGO_URI
+              valueFrom:
+                secretKeyRef:
+                  name: backend-secret
+                  key: MONGO_URI
+            - name: DB_BYPASS
+              value: "True" # Remove this to use the database
           resources:
             limits:
               cpu: "0.5"
@@ -29,4 +42,4 @@ spec:
               cpu: "0.25"
               memory: "50Mi"
           ports:
-            - containerPort: 80
+            - containerPort: 5000

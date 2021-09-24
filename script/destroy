@@ -17,6 +17,19 @@ else
   exit 1
 fi
 
+read -p "Please select your environment (dev/prod)? " DEV_OR_PROD
+if [ "$DEV_OR_PROD" = "prod" ]; then
+  echo "🌎 Environment set to PROD";
+  ENVIRONMENT="prod"
+else
+  echo "🌎 Environment set to DEV";
+  ENVIRONMENT="dev"
+fi
+
+echo "ℹ Altering terraform files for $ENVIRONMENT environment"
+sed -i "s/ENVIRONMENT_REPLACEMENT/$ENVIRONMENT/" $REPO_DIR/terraform/k8s-cluster/versions.tf
+sed -i "s/ENVIRONMENT_REPLACEMENT/$ENVIRONMENT/" $REPO_DIR/terraform/k8s/versions.tf
+
 which tfenv > /dev/null
 
 if [ $? -ne 0 ]; then
@@ -55,5 +68,11 @@ cd $REPO_DIR/terraform/k8s-cluster
 terraform init || exit 1
 terraform destroy -auto-approve || exit 1
 echo "✅ terraform/k8s-cluster destroyed"
+
+echo "ℹ Swapping back terraform files for $ENVIRONMENT environment"
+sed -i "s/$ENVIRONMENT/ENVIRONMENT_REPLACEMENT/" $REPO_DIR/terraform/k8s-cluster/versions.tf
+sed -i "s/$ENVIRONMENT/ENVIRONMENT_REPLACEMENT/" $REPO_DIR/terraform/k8s/versions.tf
+echo -e "✨ Done! ✨"
+
 echo ""
 echo "✨ Done! ✨"
