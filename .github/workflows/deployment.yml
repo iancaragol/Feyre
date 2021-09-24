@@ -164,8 +164,8 @@ jobs:
         if: github.event_name == 'pull_request'
         working-directory: src
         env:
-          BACKEND_TAG: ${{ steps.vars-dev.outputs.backend_tag  }}
-          FRONTEND_TAG: ${{ steps.vars-dev.outputs.frontend_tag  }}
+          BACKEND_TAG: ${{ needs.vars-dev.outputs.backend_tag  }}
+          FRONTEND_TAG: ${{ needs.vars-dev.outputs.frontend_tag  }}
         run: |
           docker build -t ${{ secrets.DEV_REGISTRY_LOGIN_SERVER }}/frontend:$FRONTEND_TAG frontend
           docker build -t ${{ secrets.DEV_REGISTRY_LOGIN_SERVER }}/backend:$BACKEND_TAG backend
@@ -178,8 +178,8 @@ jobs:
         if: github.event_name == 'push'
         working-directory: src
         env:
-          BACKEND_TAG: ${{ steps.vars-dev.outputs.backend_tag  }}
-          FRONTEND_TAG: ${{ steps.vars-dev.outputs.frontend_tag  }}
+          BACKEND_TAG: ${{ needs.vars-dev.outputs.backend_tag  }}
+          FRONTEND_TAG: ${{ needs.vars-dev.outputs.frontend_tag  }}
         run: |
           docker build -t ${{ secrets.DEV_REGISTRY_LOGIN_SERVER }}/frontend:$FRONTEND_TAG frontend
           docker push ${{ secrets.DEV_REGISTRY_LOGIN_SERVER }}/frontend:$FRONTEND_TAG
@@ -280,8 +280,8 @@ jobs:
         id: plan_k8s
         env:
           # Config
-          TF_VAR_FRONTEND_IMAGE_TAG: ${{ steps.vars-dev.outputs.frontend_tag  }}
-          TF_VAR_BACKEND_IMAGE_TAG: ${{ steps.vars-dev.outputs.backend_tag  }}
+          TF_VAR_FRONTEND_IMAGE_TAG: ${{ needs.vars-dev.outputs.frontend_tag  }}
+          TF_VAR_BACKEND_IMAGE_TAG: ${{ needs.vars-dev.outputs.backend_tag  }}
           TF_VAR_ENVIRONMENT: dev
           # Creds
           TF_VAR_DISCORD_TOKEN: ${{ secrets.DEV_DISCORD_TOKEN }}
@@ -544,8 +544,8 @@ jobs:
         env:
           # Config
           TF_VAR_ENVIRONMENT: dev
-          TF_VAR_FRONTEND_IMAGE_TAG: ${{ steps.vars-dev.outputs.frontend_tag  }}
-          TF_VAR_BACKEND_IMAGE_TAG: ${{ steps.vars-dev.outputs.backend_tag  }}
+          TF_VAR_FRONTEND_IMAGE_TAG: ${{ needs.vars-dev.outputs.frontend_tag  }}
+          TF_VAR_BACKEND_IMAGE_TAG: ${{ needs.vars-dev.outputs.backend_tag  }}
           # Creds
           TF_VAR_DISCORD_TOKEN: ${{ secrets.DEV_DISCORD_TOKEN }}
           # Azure Auth
