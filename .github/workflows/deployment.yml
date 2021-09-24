@@ -47,7 +47,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       short_sha: ${{ steps.vars-dev.outputs.short_sha  }}
-      frontend_tag: ${{ steps.vars-dev.outputs.front_end_tag  }}
+      frontend_tag: ${{ steps.vars-dev.outputs.frontend_tag  }}
       backend_tag: ${{ steps.vars-dev.outputs.backend_tag  }}
     steps:
       - uses: actions/checkout@5a4ac9002d0be2fb38bd78e4b4dbde5606d7042f # pin@v2
@@ -81,7 +81,8 @@ jobs:
           then echo "::set-output name=backend_tag::$SHORT_SHA"; \
           else echo "::set-output name=backend_tag::$(.github/ci/current_tag backend)"; \
           fi
-
+      - name: Exported image_tag variables
+        run: |
           echo "short_sha: ${{ steps.vars-dev.outputs.short_sha}}"
           echo "frontend_tag: ${{ steps.vars-dev.outputs.frontend_tag}}"
           echo "backend_tag: ${{ steps.vars-dev.outputs.backend_tag}}"
