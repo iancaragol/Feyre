@@ -81,6 +81,8 @@ jobs:
           then echo "::set-output name=backend_tag::$SHORT_SHA"; \
           else echo "::set-output name=backend_tag::$(.github/ci/current_tag backend)"; \
           fi
+
+          echo "::set-output name=short_sha::$SHORT_SHA"
       - name: Exported image_tag variables
         run: |
           echo "short_sha: ${{ steps.vars-dev.outputs.short_sha}}"
