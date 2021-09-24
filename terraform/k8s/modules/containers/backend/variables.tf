@@ -14,3 +14,15 @@ variable "ACR_NAME" {
   description = "The name of the Azure Container Registry"
   type = string
 }
+
+variable "REDIS_PASSWORD" {
+  description = "The password for redis"
+  type        = string
+  sensitive   = true
+}
+
+variable "MONGO_URI" {
+  description = "The URI for mongo"
+  type        = string
+  sensitive   = true
+}

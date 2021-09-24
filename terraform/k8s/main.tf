@@ -7,6 +7,10 @@ module "backend" {
   # Environment variables
   IMAGE_TAG   = var.BACKEND_IMAGE_TAG
   ENVIRONMENT = var.ENVIRONMENT
+
+  # Secret variables
+  REDIS_PASSWORD = var.REDIS_PASSWORD
+  MONGO_URI      = var.MONGO_URI
 }
 
 module "frontend" {

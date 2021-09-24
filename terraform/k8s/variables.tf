@@ -4,6 +4,18 @@ variable "DISCORD_TOKEN" {
   sensitive   = true
 }
 
+variable "REDIS_PASSWORD" {
+  description = "The password for redis"
+  type        = string
+  sensitive   = true
+}
+
+variable "MONGO_URI" {
+  description = "The URI for mongo"
+  type        = string
+  sensitive   = true
+}
+
 variable "ENVIRONMENT" {
   description = "The Environment context which all containers are running in (dev/prod)"
   type        = string

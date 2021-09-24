@@ -1,6 +1,7 @@
 data "kubectl_path_documents" "backend_deployment_manifest" {
   depends_on = [
-    data.kubectl_file_documents.backend_namespace_manifest
+    data.kubectl_file_documents.backend_namespace_manifest,
+    data.kubectl_path_documents.backend_secret_manifest
   ]
 
   vars = {

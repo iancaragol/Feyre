@@ -285,6 +285,8 @@ jobs:
           TF_VAR_ENVIRONMENT: dev
           # Creds
           TF_VAR_DISCORD_TOKEN: ${{ secrets.DEV_DISCORD_TOKEN }}
+          TF_VAR_REDIS_PASSWORD: ${{ secrets.DEV_REDIS_PASSWORD }}
+          TF_VAR_MONGO_URI: ${{ secrets.MONGO_URI }}
           # Azure Auth
           TF_VAR_CLIENT_ID: ${{ secrets.CLIENT_ID }}
           TF_VAR_CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
@@ -548,6 +550,8 @@ jobs:
           TF_VAR_BACKEND_IMAGE_TAG: ${{ needs.vars-dev.outputs.backend_tag  }}
           # Creds
           TF_VAR_DISCORD_TOKEN: ${{ secrets.DEV_DISCORD_TOKEN }}
+          TF_VAR_REDIS_PASSWORD: ${{ secrets.DEV_REDIS_PASSWORD }}
+          TF_VAR_MONGO_URI: ${{ secrets.MONGO_URI }}
           # Azure Auth
           TF_VAR_CLIENT_ID: ${{ secrets.CLIENT_ID }}
           TF_VAR_CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}

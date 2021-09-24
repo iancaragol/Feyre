@@ -21,6 +21,17 @@ spec:
           imagePullPolicy: Always
           command: ["python3"]
           args: ["setup.py", "-s", "backend"]
+          env:
+            - name: REDIS_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: backend-secret
+                  key: REDIS_PASSWORD
+            - name: MONGO_URI
+              valueFrom:
+                secretKeyRef:
+                  name: backend-secret
+                  key: MONGO_URI
           resources:
             limits:
               cpu: "0.5"
