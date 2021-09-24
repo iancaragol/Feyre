@@ -32,6 +32,8 @@ spec:
                 secretKeyRef:
                   name: backend-secret
                   key: MONGO_URI
+            - name: DB_BYPASS
+              value: "True" # Remove this to use the database
           resources:
             limits:
               cpu: "0.5"
