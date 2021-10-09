@@ -2,11 +2,11 @@ import datetime
 import traceback
 
 from http import HTTPStatus
-from flask import Blueprint, request
+from flask import Blueprint, request, make_response, jsonify
 from backend_service.api.operation.stats_operation import StatsOperation
 from common.redis_helper import RedisHelper
 
-stats_api = Blueprint('stats', __name__)
+stats_api = Blueprint('stats_api', __name__)
 redis_helper = RedisHelper()
 
 @stats_api.route('/', methods=['GET'])
@@ -28,13 +28,13 @@ def stats():
         user = args["user"]
         redis_helper.add_to_user_set(user)
     else:
-        return "Missing user query parameter", HTTPStatus.BAD_REQUEST
+        return make_response("Missing user query parameter", HTTPStatus.BAD_REQUEST)
 
     if "all" in args:
         show_all = bool(args["all"])
     try:
         result = StatsOperation(show_all = show_all).execute()
-        return result, HTTPStatus.OK
+        return make_response(result, HTTPStatus.OK)
     except Exception as e:
-        return f"An exception occurred when getting stats.\n{e}\n{traceback.format_exc()}", HTTPStatus.INTERNAL_SERVER_ERROR
+        return make_response(f"An exception occurred when getting stats.\n{e}\n{traceback.format_exc()}", HTTPStatus.INTERNAL_SERVER_ERROR)
     

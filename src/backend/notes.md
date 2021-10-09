@@ -22,8 +22,6 @@ On service startup, Sync Service will download all data from the MongoDB and rec
 
 Once per hour, sync service will take all of the data stored in Redis and format it as JSON objects to be stored in the Mongo DB.
 
-Currently the following is stored in redis:
-
 ### References:
 https://livecodestream.dev/post/python-flask-api-starter-kit-and-project-layout/
 https://github.com/bitnami/bitnami-docker-redis#configuration

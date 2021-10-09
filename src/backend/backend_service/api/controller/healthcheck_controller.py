@@ -1,4 +1,7 @@
-from flask import Blueprint
+from http import HTTPStatus
+import json
+from flask import Blueprint, make_response, jsonify
+from werkzeug.wrappers import response
 
 healthcheck_api = Blueprint('healthcheck_api', __name__)
 
@@ -8,4 +11,5 @@ def healthcheck():
     Healthcheck endpoint
     """
 
-    return {"status": 200, "message": "OK"}
+    response = {"status": 200, "message": "OK"}
+    return make_response(response, HTTPStatus.OK)

@@ -18,7 +18,7 @@ services:
     ports:
       - "5000:5000"
     volumes:
-      - ./src/backend:/home/app/
+      - ./src/backend/:/home/app/
     command: setup.py -s backend
     depends_on:
       - redis-primary
@@ -35,7 +35,7 @@ services:
     ports:
       - "5001:5001"
     volumes:
-      - ./src/backend:/home/app/
+      - ./src/backend/:/home/app/
     command: setup.py -s sync
     depends_on:
       - redis-primary

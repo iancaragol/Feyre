@@ -14,11 +14,11 @@ class StatsOperation:
 
     def execute(self):
         """
-        Exceutes the StatsOperation
+        Excutes the StatsOperation
 
         Returns the response body
         """
-        response_body = {"commands": self.get_stats()}
+        response_body = {"stat_block": self.get_stats()}
         response_body["user_count"] = self.get_user_count()
         return response_body
 
@@ -28,7 +28,7 @@ class StatsOperation:
         """
         command_list = self.commands.commands
         if self.show_all:
-            command_list = self.all_commands
+            command_list = self.commands.all_commands
         return self.redis_helper.get_commands_dictionary(command_list)
 
     def get_user_count(self):

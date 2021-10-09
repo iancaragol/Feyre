@@ -2,11 +2,11 @@ import traceback
 
 from datetime import datetime
 from http import HTTPStatus
-from flask import Blueprint, request
+from flask import Blueprint, request, make_response, jsonify
 from backend_service.api.operation.roll_operation import RollOperation, RollOperationException
 from common.redis_helper import RedisHelper
 
-roll_api = Blueprint('roll', __name__)
+roll_api = Blueprint('roll_api', __name__)
 redis_helper = RedisHelper()
 
 @roll_api.route('/', methods=['GET'])
@@ -31,7 +31,7 @@ def roll():
         user = args["user"]
         redis_helper.add_to_user_set(user)
     else:
-        return "Missing user query parameter", HTTPStatus.BAD_REQUEST
+        return make_response("Missing user query parameter", HTTPStatus.BAD_REQUEST)
 
     if "verbose" in args:
         verbose = bool(args["verbose"])
@@ -42,8 +42,9 @@ def roll():
 
         try:
             result = RollOperation(expression = expression, verbose = verbose).execute()
-            return result, HTTPStatus.OK
+            return make_response(result, HTTPStatus.OK)
+
         except RollOperationException as e:
-            return f"An exception occurred when attempting the roll operation with expression = {expression}.\n{e}\n{traceback.format_exc()}", HTTPStatus.INTERNAL_SERVER_ERROR
+            return make_response(f"An exception occurred when attempting the roll operation with expression = {expression}.\n{e}\n{traceback.format_exc()}", HTTPStatus.INTERNAL_SERVER_ERROR)
     else:
-        return "Missing expression query parameter", HTTPStatus.BAD_REQUEST
+        return make_response("Missing expression query parameter", HTTPStatus.BAD_REQUEST)

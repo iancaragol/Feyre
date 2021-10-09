@@ -8,20 +8,19 @@ from pymongo import MongoClient
 from common.redis_helper import RedisHelper
 from datetime import datetime
 
-sync_api = Blueprint('users', __name__)
+users_sync_api = Blueprint('users', __name__)
 redis_helper = RedisHelper()
 
-if not os.environ.get('DB_BYPASS', None):
-    mongo_uri = os.environ['MONGO_URI']
-    mongo_client = MongoClient(mongo_uri)
-    users_collection = mongo_client.backend_db.user_set
-    users_collection.create_index("_ts", expireAfterSeconds = 5184000) # TTL is 60 days
+mongo_uri = os.environ['MONGO_URI']
+mongo_client = MongoClient(mongo_uri)
+users_collection = mongo_client.backend_db.user_set
+users_collection.create_index("_ts", expireAfterSeconds = 5184000) # TTL is 60 days
 
 # This json is updated whenever the new sync occurs
 last_sync = {}
 last_sync["message"] = "user_set has not been synced since service startup."
 
-@sync_api.route('/', methods=['PUT'])
+@users_sync_api.route('/', methods=['PUT'])
 def put_users_set():
     """
     Puts the current user set stored in Redis into the Mongo DB.
@@ -34,7 +33,7 @@ def put_users_set():
     except Exception as e:
         return f"An exception occurred when updating the Mongo DB.\n{e}\n{traceback.format_exc()}", HTTPStatus.INTERNAL_SERVER_ERROR
 
-@sync_api.route('/', methods=['GET'])
+@users_sync_api.route('/', methods=['GET'])
 def get_users():
     """
     Returns user_set as a json
@@ -43,7 +42,7 @@ def get_users():
     
     return users, HTTPStatus.OK
 
-@sync_api.route('/sync', methods=['PUT'])
+@users_sync_api.route('/sync', methods=['PUT'])
 def sync_users_set():
     """
     Syncs Redis and Mongo DB
@@ -74,7 +73,7 @@ def sync_users_set():
     except Exception as e:
         return f"An exception occurred when syncing.\n{e}\n{traceback.format_exc()}", HTTPStatus.INTERNAL_SERVER_ERROR
 
-@sync_api.route('/sync', methods=['GET'])
+@users_sync_api.route('/sync', methods=['GET'])
 def get_last_sync():
     """
     Returns information on the last sync as a json
@@ -119,13 +118,13 @@ def sync_users():
             sync_msg = f"Redis contained the most recent user_set. No need to update Redis set. Updated MongoDB to match Redis. Insert_ID: {insert_id}"
 
         elif (redis_user_set_updated_time_seconds > mongoDB_last_entry_seconds):
-            before_update = redis_helper.red.smembers("user_set")
+            before_update_count = redis_helper.get_user_set_count()
             before_update_time = redis_helper.get_user_set_timestamp_as_datetime().strftime("%m/%d/%Y, %H:%M:%S")
-            user_set = [int(u) for u in mongoDB_last_entry["user_set"]]
+            user_set = redis_helper.get_user_set()
             redis_helper.add_to_user_set(user_set)
             after_update_time = redis_helper.get_user_set_timestamp_as_datetime().strftime("%m/%d/%Y, %H:%M:%S")
 
-            sync_msg = f"MongoDB contained the most recent set. Updated the Redis set to match. Redis user_set contained {len(before_update)} entries and was updated at {before_update_time}. Now it contains {len(mongoDB_last_entry['user_set'])} entries and was updated at {after_update_time}."
+            sync_msg = f"MongoDB contained the most recent set. Updated the Redis set to match. Redis user_set contained {before_update_count} entries and was updated at {before_update_time}. Now it contains {len(mongoDB_last_entry['user_set'])} entries and was updated at {after_update_time}."
 
         else:
             sync_msg = f"Wow! Redis and Mongo DB were perfectly in sync! This is a NO-OP."
@@ -151,7 +150,7 @@ def construct_users_json():
 
     users = {}
     users["user_set"] = redis_helper.get_user_set()
-    users["insert_time"] =now.strftime("%m/%d/%Y, %H:%M:%S") # Friendly time stamp
+    users["insert_time"] = now.strftime("%m/%d/%Y, %H:%M:%S") # Friendly time stamp
     users["insert_timestamp"] = now.timestamp() # This is the one that is always used
 
     return users
