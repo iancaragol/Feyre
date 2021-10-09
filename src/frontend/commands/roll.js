@@ -1,5 +1,6 @@
 // Import SlashCommandBuild to handle slash commands
 const { SlashCommandBuilder } = require('@discordjs/builders');
+const { MessageEmbed } = require('discord.js');
 
 // Import our common backend functions
 const backend = require("./../common/backend");
@@ -27,8 +28,18 @@ module.exports = {
         url = await backend.create_url({path: string_url});
         // Calls the backend with a GET request and returns the JSON response
         let response = await getJSON(url);
+
+        // Temporary, remove this before going to prod
         console.log(response);
+
+        // Need to play around with this, what is the best way of displaying a roll?
+        responseEmbed = new MessageEmbed()
+            .setColor('#544bcc')
+            .addFields(
+                { name: '**Result**', value: response.parent_result[0].total},
+            )
+
         // Sends a reply to the Slash command which triggered this function
-        interaction.reply({ content: `Response: ${JSON.stringify(response)}` });
+        interaction.reply({ embeds: [responseEmbed] });
     }
 };
