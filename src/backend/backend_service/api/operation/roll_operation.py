@@ -5,10 +5,19 @@ from random import randint
 from backend_service.api.model.child_roll_model import ChildRollModel
 from backend_service.api.model.parent_roll_model import ParentRollModel
 
+MAX_DICESIZE = 10000
+
 class RollOperation():
     """
     Operation that takes a dice expression, evaluates it, and returns a list of ParentRollModels
     """
+
+    # TODO(Ian)
+    # Need to handle typos like ++
+    # Need to handle not providing the number of dice like d20
+    # Sometimes operators will be missing
+    # Ex: 1d20k3+5c3 will lose the +
+
     def __init__(self, expression = None, verbose = False):
         self.expression = expression
         self.verbose = verbose
@@ -284,6 +293,9 @@ class RollOperation():
         if self.verbose:
             print(f"number: {number}, size: {size}, keep: {keep}, explode: {explode}") 
 
+        if number > MAX_DICESIZE:
+            raise ValueError(f"The number of dice ({number}) is greater than the maximum of {MAX_DICESIZE}")
+
         for i in range(number):
             if size == 0:
                 roll = 0
@@ -347,6 +359,13 @@ class RollOperationException(Exception):
     def __init__(self, exception, expression):
         self.exception = exception
         self.expression = expression
+        self.message = ""
         
         if str(exception) == "pop from empty list":
             self.message = "Invalid expression string. Two operators (+, -, /, ...) in a row is not supported"
+
+        # Todo(Ian)
+        # This is a bit ugly, can make this cleaner.
+        # Also should emit or log these messages to prometheus
+        if str(exception).startswith("The number of dice"):
+            self.message = str(exception)

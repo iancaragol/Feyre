@@ -45,6 +45,11 @@ def roll():
             return make_response(result, HTTPStatus.OK)
 
         except RollOperationException as e:
-            return make_response(f"An exception occurred when attempting the roll operation with expression = {expression}.\n{e}\n{traceback.format_exc()}", HTTPStatus.INTERNAL_SERVER_ERROR)
+            result = {
+                    "message": f"An exception occurred when attempting the roll operation with expression = {expression}.",
+                    "stack_trace": traceback.format_exc(),
+                    "exception_message": e.message
+                }
+            return make_response(result, HTTPStatus.INTERNAL_SERVER_ERROR)
     else:
         return make_response("Missing expression query parameter", HTTPStatus.BAD_REQUEST)
