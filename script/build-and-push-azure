@@ -32,6 +32,6 @@ docker build -t $ACR_NAME.azurecr.io/backend:dev $REPO_DIR/src/backend
 docker push $ACR_NAME.azurecr.io/backend:dev
 echo "✅ Successfully pushed the backend image"
 
-docker build -t $ACR_NAME.azurecr.io/status_page:dev $REPO_DIR/src/status_page
+$REPO_DIR/script/status-page --build-and-tag-only --tag="$ACR_NAME.azurecr.io/status_page:dev"
 docker push $ACR_NAME.azurecr.io/status_page:dev
 echo "✅ Successfully pushed the status_page image"

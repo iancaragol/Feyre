@@ -6,9 +6,10 @@ set -e
 
 function usage()
 {
-    echo -e "\t ================== script/status-page usage =================="
-    echo -e "\t-h --help                 : displays help message"
-    echo -e "\t-b --build-and-tag-only   : build and tag the images only (CI)"
+  echo -e "\t ========================== script/status-page usage =========================="
+  echo -e "\t-h --help                 : displays help message"
+  echo -e "\t-b --build-and-tag-only   : build and tag the images only (CI)"
+  echo -e "\t-b --tag                  : the tag to use for the docker build (CI)"
 }
 
 while [ "$1" != "" ]; do
@@ -24,6 +25,9 @@ while [ "$1" != "" ]; do
         ;;
       -b | --build-and-tag-only)
         build_and_tag=1
+        ;;
+      -t | --tag)
+        docker_tag=$VALUE
         ;;
       -u | --up-no-build)
         up_no_create=1
@@ -49,11 +53,19 @@ if [[ "$up_no_create" == "1" ]]; then
   exit 0
 fi
 
+# Determine the image tag to use
+if [[ -z $docker_tag ]]; then
+  echo "Using default (local) tag"
+  DOCKER_IMAGE_TAG="status_page"
+else
+  DOCKER_IMAGE_TAG="$docker_tag"
+fi
+
 # Build the base image
-docker build -t louislam/uptime-kuma:base-alpine -f docker/alpine-base.dockerfile .
+docker build -t status_page:base-alpine -f docker/alpine-base.dockerfile .
 
 # Build the image
-docker build -t louislam/uptime-kuma -f dockerfile-alpine .
+docker build -t "$DOCKER_IMAGE_TAG" -f dockerfile-alpine .
 
 if [[ -z $build_and_tag ]]; then
   # Start the docker stack
@@ -63,5 +75,3 @@ if [[ -z $build_and_tag ]]; then
 else
   echo "--build-and-tag-only set.. skipping building the docker stack locally"
 fi
-
-echo -e "\e[32m[#] Done!\e[0m"

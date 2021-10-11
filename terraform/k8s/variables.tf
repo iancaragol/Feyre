@@ -38,6 +38,11 @@ variable "FRONTEND_IMAGE_TAG" {
   type        = string
 }
 
+variable "STATUS_PAGE_IMAGE_TAG" {
+  description = "The image tag to use for status_page deployments"
+  type        = string
+}
+
 # Azure Creds
 variable "CLIENT_SECRET" {
   type = string
