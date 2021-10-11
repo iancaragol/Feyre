@@ -25,6 +25,9 @@ while [ "$1" != "" ]; do
       -b | --build-and-tag-only)
         build_and_tag=1
         ;;
+      -u | --up-no-build)
+        up_no_create=1
+        ;;
       *)
       echo "ERROR: unknown parameter \"$PARAM\""
       usage
@@ -38,6 +41,13 @@ done
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )" # The directory of this script
 REPO_DIR="$(dirname "$SCRIPT_DIR")" # The root directory of this repository
 cd $REPO_DIR/src/status_page
+
+# Just bring the stack up, don't build
+if [[ "$up_no_create" == "1" ]]; then
+  echo "Starting the docker stack locally"
+  docker-compose up --build -d
+  exit 0
+fi
 
 # Build the base image
 docker build -t louislam/uptime-kuma:base-alpine -f docker/alpine-base.dockerfile .
