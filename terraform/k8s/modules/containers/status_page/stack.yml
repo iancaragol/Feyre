@@ -53,7 +53,7 @@ spec:
         component: uptime-kuma
     spec:
       containers:
-      - image: louislam/uptime-kuma:1
+      - image: ${ACR_NAME}.azurecr.io/status_page:${IMAGE_TAG}
         livenessProbe:
           exec:
             command:
@@ -113,7 +113,7 @@ metadata:
   namespace: uptime-kuma
 spec:
   rules:
-  - host: status.feyre.io
+  - host: status${STATUS_PAGE_HOSTNAME}.feyre.io
     http:
       paths:
       - backend:
@@ -125,5 +125,5 @@ spec:
         pathType: Prefix
   tls:
   - hosts:
-    - status.feyre.io
-    secretName: feyre-io-tls
+    - status${STATUS_PAGE_HOSTNAME}.feyre.io
+    secretName: feyre${STATUS_PAGE_HOSTNAME}-io-tls

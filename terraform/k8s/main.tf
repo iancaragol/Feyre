@@ -25,3 +25,14 @@ module "frontend" {
   IMAGE_TAG   = var.FRONTEND_IMAGE_TAG
   ENVIRONMENT = var.ENVIRONMENT
 }
+
+module "status_page" {
+  source = "./modules/containers/status_page"
+
+  # Config
+  ACR_NAME             = data.azurerm_container_registry.acr.name
+  STATUS_PAGE_HOSTNAME = var.STATUS_PAGE_HOSTNAME
+
+  # Environment variables
+  IMAGE_TAG = var.STATUS_PAGE_IMAGE_TAG
+}

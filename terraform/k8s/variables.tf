@@ -22,6 +22,12 @@ variable "ENVIRONMENT" {
   default     = "dev"
 }
 
+variable "STATUS_PAGE_HOSTNAME" {
+  description = "The hostname for the status page (default is blank for prod otherwise use -dev)"
+  type        = string
+  default     = ""
+}
+
 variable "BACKEND_IMAGE_TAG" {
   description = "The image tag to use for backend deployments"
   type        = string
