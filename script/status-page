@@ -1,0 +1,21 @@
+#!/bin/bash
+
+# This is a script to build the status_page image and start it for local development
+
+set -e
+
+# Global Directory Variables
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )" # The directory of this script
+REPO_DIR="$(dirname "$SCRIPT_DIR")" # The root directory of this repository
+cd $REPO_DIR/src/status_page
+
+# Build the base image
+docker build -t louislam/uptime-kuma:base-alpine -f docker/alpine-base.dockerfile .
+
+# Build the image
+docker build -t louislam/uptime-kuma -f dockerfile-alpine .
+
+# Start the docker stack
+docker-compose up --build -d
+
+echo -e "\e[32m[#] status-page container is now running!\e[0m"
