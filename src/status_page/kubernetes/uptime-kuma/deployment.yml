@@ -38,6 +38,13 @@ spec:
               path: /
               port: 3001
               scheme: HTTP
+          resources:
+            limits:
+              cpu: "0.5"
+              memory: "500Mi"
+            requests:
+              cpu: "0.25"
+              memory: "50Mi"
 
       volumes:
         - name: storage
