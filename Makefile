@@ -16,8 +16,5 @@ push-azure:
 build:
 	@script/build
 
-status-page:
-	@script/status-page
-
 destroy:
 	@script/destroy

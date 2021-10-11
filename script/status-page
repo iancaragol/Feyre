@@ -4,6 +4,36 @@
 
 set -e
 
+function usage()
+{
+    echo -e "\t ================== script/status-page usage =================="
+    echo -e "\t-h --help                 : displays help message"
+    echo -e "\t-b --build-and-tag-only   : build and tag the images only (CI)"
+}
+
+while [ "$1" != "" ]; do
+    PARAM=`echo $1 | awk -F= '{print $1}'`
+    VALUE=`echo $1 | awk -F= '{print $2}'`
+    case $PARAM in
+      -h | --help)
+        usage
+        exit
+        ;;
+      status-page)
+        used_make=1
+        ;;
+      -b | --build-and-tag-only)
+        build_and_tag=1
+        ;;
+      *)
+      echo "ERROR: unknown parameter \"$PARAM\""
+      usage
+      exit 1
+      ;;
+    esac
+    shift
+done
+
 # Global Directory Variables
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )" # The directory of this script
 REPO_DIR="$(dirname "$SCRIPT_DIR")" # The root directory of this repository
@@ -15,7 +45,13 @@ docker build -t louislam/uptime-kuma:base-alpine -f docker/alpine-base.dockerfil
 # Build the image
 docker build -t louislam/uptime-kuma -f dockerfile-alpine .
 
-# Start the docker stack
-docker-compose up --build -d
+if [[ -z $build_and_tag ]]; then
+  # Start the docker stack
+  echo "Starting the docker stack locally"
+  docker-compose up --build -d
+  echo -e "\e[32m[#] status-page container is now running!\e[0m"
+else
+  echo "--build-and-tag-only set.. skipping building the docker stack locally"
+fi
 
-echo -e "\e[32m[#] status-page container is now running!\e[0m"
+echo -e "\e[32m[#] Done!\e[0m"
