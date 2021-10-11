@@ -5,6 +5,4 @@ commonLabels:
   app: uptime-kuma
 
 bases:
-   - uptime-kuma
-
-
+  - uptime-kuma

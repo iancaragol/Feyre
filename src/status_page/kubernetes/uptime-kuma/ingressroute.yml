@@ -24,10 +24,10 @@ metadata:
 spec:
   tls:
   - hosts:
-    - example.com
-    secretName: example-com-tls
+    - status.feyre.io
+    secretName: feyre-io-tls
   rules:
-  - host: example.com
+  - host: status.feyre.io
     http:
       paths:
       - path: /
