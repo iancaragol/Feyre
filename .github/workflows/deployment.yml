@@ -54,36 +54,12 @@ jobs:
       backend_tag: ${{ steps.vars-dev.outputs.backend_tag  }}
       status_page_tag: ${{ steps.vars-dev.outputs.status_page_tag  }}
     steps:
-      - uses: actions/checkout@5a4ac9002d0be2fb38bd78e4b4dbde5606d7042f # pin@v2
-      - name: Set up Python 3.9
-        uses: actions/setup-python@dc73133d4da04e56a135ae2246682783cc7c7cb6 # pin@v2
-        with:
-          python-version: 3.9
-      - name: SED - Replace Environment
-        run: |
-          sed -i 's/ENVIRONMENT_REPLACEMENT/dev/' terraform/k8s-cluster/versions.tf 
-          sed -i 's/ENVIRONMENT_REPLACEMENT/dev/' terraform/k8s/versions.tf
-      - uses: azure/login@77f1b2e3fb80c0e8645114159d17008b8a2e475a # pin@v1
-        with:
-          creds: ${{ secrets.DEV_AZURE_CREDENTIALS }}
-      - uses: hashicorp/setup-terraform@3d8debd658c92063839bc97da5c2427100420dec # pin@v1
-        with:
-          terraform_version: 1.0.6
-          cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
-      # Set the Kube Config for the dev environment. This assumes the k8s-cluster is up
-      - uses: azure/k8s-set-context@2f6bfda1e23e1a8cdfcfabc5c9e8894eec34734f # pin@v1
-        with:
-          method: kubeconfig
-          kubeconfig: ${{ secrets.DEV_KUBE_CONFIG }}
-        id: setcontext
-      - name: Terraform init (k8s)
-        working-directory: terraform/k8s
-        run: terraform init
       - name: Set outputs
         env: 
           GH_SHA_FULL: ${{ github.sha }}
         id: vars-dev
         run: |
+          export SHORT_SHA=$(echo "$GH_SHA_FULL" | cut -c1-8)
           echo "::set-output name=frontend_tag::$SHORT_SHA"
           echo "::set-output name=backend_tag::$SHORT_SHA"
           echo "::set-output name=status_page_tag::$SHORT_SHA"
