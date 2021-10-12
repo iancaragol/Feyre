@@ -37,7 +37,7 @@ jobs:
               - 'src/backend/**'
             frontend-src:
               - 'src/frontend/**'
-            status-page-src
+            status-page-src:
               - 'src/status_page/**'
 
   # For setting global vars to use in other steps - dev
