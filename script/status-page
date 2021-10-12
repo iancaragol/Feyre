@@ -10,6 +10,8 @@ function usage()
   echo -e "\t-h --help                 : displays help message"
   echo -e "\t-b --build-and-tag-only   : build and tag the images only (CI)"
   echo -e "\t-b --tag                  : the tag to use for the docker build (CI)"
+  echo -e "\t-u --up-no-build          : start the status-page stack with docker compose"
+  echo -e "Calling this script with no params starts/builds the docker-compose stack"
 }
 
 while [ "$1" != "" ]; do
