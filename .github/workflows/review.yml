@@ -17,7 +17,8 @@ jobs:
           github_token: ${{ secrets.github_token }}
           locale: "US"
           exclude: |
-            ./src/status_page/**
+            src/status_page/*
+            terraform/k8s/modules/cert-manager/*
 
   first-interaction:
     permissions:
