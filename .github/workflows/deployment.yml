@@ -77,9 +77,7 @@ jobs:
           export SHORT_SHA=$(echo "$GH_SHA_FULL" | cut -c1-8)
 
           echo "TEST"
-          echo "$(.github/ci/current_tag frontend)"
-          echo "$(.github/ci/current_tag backend)"
-          echo "$(.github/ci/current_tag status_page)"
+          .github/ci/current_tag frontend
           echo "END TEST"
 
           if [ "${{ needs.changes.outputs.frontend-src }}" == "true" ]; \
