@@ -14,7 +14,7 @@ module "status_page" {
   source = "./modules/containers/status_page"
 
   # Config
-  ACR_NAME             = data.azurerm_container_registry.acr.name
+  ACR_NAME = data.azurerm_container_registry.acr.name
 
   # Environment variables
   IMAGE_TAG = var.STATUS_PAGE_IMAGE_TAG
