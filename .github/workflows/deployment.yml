@@ -177,7 +177,7 @@ jobs:
           FRONTEND_TAG: ${{ needs.vars-dev.outputs.frontend_tag  }}
           STATUS_PAGE_TAG: ${{ needs.vars-dev.outputs.status_page_tag }}
         run: |
-          script/ci-builder -r="${{ secrets.DEV_REGISTRY_LOGIN_SERVER }}" -f="$FRONTEND_TAG" -b="$BACKEND_TAG" -s="$STATUS_PAGE_TAG"
+          script/ci-build -r="${{ secrets.DEV_REGISTRY_LOGIN_SERVER }}" -f="$FRONTEND_TAG" -b="$BACKEND_TAG" -s="$STATUS_PAGE_TAG"
 
       # Builds and pushes images on push workflows
       # TODO: Later on this will push images to the PROD registry and not the DEV one
@@ -188,7 +188,7 @@ jobs:
           FRONTEND_TAG: ${{ needs.vars-dev.outputs.frontend_tag  }}
           STATUS_PAGE_TAG: ${{ needs.vars-dev.outputs.status_page_tag }}
         run: |
-          script/ci-builder -r="${{ secrets.DEV_REGISTRY_LOGIN_SERVER }}" -f="$FRONTEND_TAG" -b="$BACKEND_TAG" -s="$STATUS_PAGE_TAG"
+          script/ci-build -r="${{ secrets.DEV_REGISTRY_LOGIN_SERVER }}" -f="$FRONTEND_TAG" -b="$BACKEND_TAG" -s="$STATUS_PAGE_TAG"
 
   # Runs a Terraform plan for the dev environment
   terraform-plan-development:

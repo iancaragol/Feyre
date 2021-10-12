@@ -8,7 +8,6 @@ set -e
 # Global Directory Variables
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )" # The directory of this script
 REPO_DIR="$(dirname "$SCRIPT_DIR")" # The root directory of this repository
-ACR_NAME="feyrek8sacr$ENVIRONMENT"
 
 function usage()
 {
