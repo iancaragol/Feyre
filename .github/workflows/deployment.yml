@@ -70,6 +70,12 @@ jobs:
         with:
           terraform_version: 1.0.6
           cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
+      # Set the Kube Config for the dev environment. This assumes the k8s-cluster is up
+      - uses: azure/k8s-set-context@2f6bfda1e23e1a8cdfcfabc5c9e8894eec34734f # pin@v1
+        with:
+          method: kubeconfig
+          kubeconfig: ${{ secrets.DEV_KUBE_CONFIG }}
+        id: setcontext
       - name: Terraform init (k8s)
         working-directory: terraform/k8s
         run: terraform init
@@ -86,7 +92,6 @@ jobs:
           mkdir $REPO_DIR/temp
           terraform show -json > $REPO_DIR/temp/terraform-k8s-state.json
           ls -lah $REPO_DIR/temp
-          head -c 25 $REPO_DIR/temp/terraform-k8s-state.json
           python $REPO_DIR/script/tf-tag-finder.py --value frontend --file $REPO_DIR/temp/terraform-k8s-state.json
           rm -rf $REPO_DIR/temp
           echo "END TEST"
