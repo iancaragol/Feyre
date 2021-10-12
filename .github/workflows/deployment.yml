@@ -85,6 +85,7 @@ jobs:
           cd $REPO_DIR/terraform/k8s
           mkdir $REPO_DIR/temp
           terraform show -json > $REPO_DIR/temp/terraform-k8s-state.json
+          ls -lah $REPO_DIR/temp
           python $REPO_DIR/script/tf-tag-finder.py --value frontend --file $REPO_DIR/temp/terraform-k8s-state.json
           rm -rf $REPO_DIR/temp
           echo "END TEST"
