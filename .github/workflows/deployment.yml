@@ -84,33 +84,9 @@ jobs:
           GH_SHA_FULL: ${{ github.sha }}
         id: vars-dev
         run: |
-          REPO_DIR=$(pwd)
-          export SHORT_SHA=$(echo "$GH_SHA_FULL" | cut -c1-8)
-
-          echo "TEST"
-          cd $REPO_DIR/terraform/k8s
-          mkdir $REPO_DIR/temp
-          terraform show -json > $REPO_DIR/temp/terraform-k8s-state.json
-          ls -lah $REPO_DIR/temp
-          python $REPO_DIR/script/tf-tag-finder.py --value frontend --file $REPO_DIR/temp/terraform-k8s-state.json
-          rm -rf $REPO_DIR/temp
-          echo "END TEST"
-
-          if [ "${{ needs.changes.outputs.frontend-src }}" == "true" ]; \
-          then echo "::set-output name=frontend_tag::$SHORT_SHA"; \
-          else echo "::set-output name=frontend_tag::$(.github/ci/current_tag frontend)"; \
-          fi
-
-          if [ "${{ needs.changes.outputs.backend-src }}" == "true" ]; \
-          then echo "::set-output name=backend_tag::$SHORT_SHA"; \
-          else echo "::set-output name=backend_tag::$(.github/ci/current_tag backend)"; \
-          fi
-
-          if [ "${{ needs.changes.outputs.status-page-src }}" == "true" ]; \
-          then echo "::set-output name=status_page_tag::$SHORT_SHA"; \
-          else echo "::set-output name=status_page_tag::$(.github/ci/current_tag status_page)"; \
-          fi
-
+          echo "::set-output name=frontend_tag::$SHORT_SHA"
+          echo "::set-output name=backend_tag::$SHORT_SHA"
+          echo "::set-output name=status_page_tag::$SHORT_SHA"
           echo "::set-output name=short_sha::$SHORT_SHA"
       - name: Exported image_tag variables
         run: |
