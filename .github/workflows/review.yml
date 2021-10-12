@@ -17,7 +17,7 @@ jobs:
           github_token: ${{ secrets.github_token }}
           locale: "US"
           exclude: |
-            ./src/status_page/*
+            ./src/status_page/**
 
   first-interaction:
     permissions:
