@@ -83,8 +83,10 @@ jobs:
 
           echo "TEST"
           cd $REPO_DIR/terraform/k8s
+          mkdir $REPO_DIR/temp
           terraform show -json > $REPO_DIR/temp/terraform-k8s-state.json
-          python $REPO_DIR/script/tf-tag-finder.py --value frontend
+          python $REPO_DIR/script/tf-tag-finder.py --value frontend --file $REPO_DIR/temp/terraform-k8s-state.json
+          rm -rf $REPO_DIR/temp
           echo "END TEST"
 
           if [ "${{ needs.changes.outputs.frontend-src }}" == "true" ]; \
