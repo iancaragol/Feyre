@@ -55,6 +55,10 @@ jobs:
       status_page_tag: ${{ steps.vars-dev.outputs.status_page_tag  }}
     steps:
       - uses: actions/checkout@5a4ac9002d0be2fb38bd78e4b4dbde5606d7042f # pin@v2
+      - name: Set up Python 3.9
+        uses: actions/setup-python@dc73133d4da04e56a135ae2246682783cc7c7cb6 # pin@v2
+        with:
+          python-version: 3.9
       - name: SED - Replace Environment
         run: |
           sed -i 's/ENVIRONMENT_REPLACEMENT/dev/' terraform/k8s-cluster/versions.tf 
@@ -74,12 +78,13 @@ jobs:
           GH_SHA_FULL: ${{ github.sha }}
         id: vars-dev
         run: |
+          REPO_DIR=$(pwd)
           export SHORT_SHA=$(echo "$GH_SHA_FULL" | cut -c1-8)
 
           echo "TEST"
-          cd terraform/k8s
-          terraform show -json | jq -r ".values.outputs.frontend_image_tag.value"
-          .github/ci/current_tag frontend
+          cd $REPO_DIR/terraform/k8s
+          terraform show -json > $REPO_DIR/temp/terraform-k8s-state.json
+          python $REPO_DIR/script/tf-tag-finder.py --value frontend
           echo "END TEST"
 
           if [ "${{ needs.changes.outputs.frontend-src }}" == "true" ]; \
