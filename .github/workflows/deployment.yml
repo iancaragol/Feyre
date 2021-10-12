@@ -78,7 +78,6 @@ jobs:
 
           echo "TEST"
           cd terraform/k8s
-          terraform show -json
           terraform show -json | jq -r ".values.outputs.frontend_image_tag.value"
           .github/ci/current_tag frontend
           echo "END TEST"
