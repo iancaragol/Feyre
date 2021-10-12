@@ -18,6 +18,7 @@ jobs:
       discord-commands: ${{ steps.filter.outputs.discord-commands }} # changes to the discord commands
       backend-src: ${{ steps.filter.outputs.backend-src }} # changes to the backend source code
       frontend-src: ${{ steps.filter.outputs.frontend-src }} # changes to the frontend source code
+      status-page-src: ${{ steps.filter.outputs.status-page-src }} # changes to the status page source code
     steps:
       - uses: actions/checkout@5a4ac9002d0be2fb38bd78e4b4dbde5606d7042f # pin@v2
       - uses: dorny/paths-filter@b2feaf19c27470162a626bd6fa8438ae5b263721 # pin@v2
@@ -36,6 +37,8 @@ jobs:
               - 'src/backend/**'
             frontend-src:
               - 'src/frontend/**'
+            status-page-src
+              - 'src/status_page/**'
 
   # For setting global vars to use in other steps - dev
   # Note: Anywhere you want to use the outputs, you need to use the "needs: vars" yaml tag
@@ -49,6 +52,7 @@ jobs:
       short_sha: ${{ steps.vars-dev.outputs.short_sha  }}
       frontend_tag: ${{ steps.vars-dev.outputs.frontend_tag  }}
       backend_tag: ${{ steps.vars-dev.outputs.backend_tag  }}
+      status_page_tag: ${{ steps.vars-dev.outputs.status_page_tag  }}
     steps:
       - uses: actions/checkout@5a4ac9002d0be2fb38bd78e4b4dbde5606d7042f # pin@v2
       - name: SED - Replace Environment
@@ -82,12 +86,18 @@ jobs:
           else echo "::set-output name=backend_tag::$(.github/ci/current_tag backend)"; \
           fi
 
+          if [ "${{ needs.changes.outputs.status-page-src }}" == "true" ]; \
+          then echo "::set-output name=status_page_tag::$SHORT_SHA"; \
+          else echo "::set-output name=status_page_tag::$(.github/ci/current_tag status_page)"; \
+          fi
+
           echo "::set-output name=short_sha::$SHORT_SHA"
       - name: Exported image_tag variables
         run: |
           echo "short_sha: ${{ steps.vars-dev.outputs.short_sha}}"
           echo "frontend_tag: ${{ steps.vars-dev.outputs.frontend_tag}}"
           echo "backend_tag: ${{ steps.vars-dev.outputs.backend_tag}}"
+          echo "status_page_tag: ${{ steps.vars-dev.outputs.status_page_tag}}"
           
 
   # For running tests against the backend/frontend services
@@ -166,11 +176,14 @@ jobs:
         env:
           BACKEND_TAG: ${{ needs.vars-dev.outputs.backend_tag  }}
           FRONTEND_TAG: ${{ needs.vars-dev.outputs.frontend_tag  }}
+          STATUS_PAGE_TAG: ${{ needs.vars-dev.outputs.status_page_tag }}
         run: |
           docker build -t ${{ secrets.DEV_REGISTRY_LOGIN_SERVER }}/frontend:$FRONTEND_TAG frontend
           docker build -t ${{ secrets.DEV_REGISTRY_LOGIN_SERVER }}/backend:$BACKEND_TAG backend
           docker push ${{ secrets.DEV_REGISTRY_LOGIN_SERVER }}/frontend:$FRONTEND_TAG
           docker push ${{ secrets.DEV_REGISTRY_LOGIN_SERVER }}/backend:$BACKEND_TAG
+          ../script/status-page -b -t="${{ secrets.DEV_REGISTRY_LOGIN_SERVER }}/status_page:$STATUS_PAGE_TAG"
+          docker push ${{ secrets.DEV_REGISTRY_LOGIN_SERVER }}/status_page:$STATUS_PAGE_TAG
 
       # Builds and pushes images on push workflows
       # TODO: Later on this will push images to the PROD registry and not the DEV one
