@@ -15,7 +15,6 @@ module "status_page" {
 
   # Config
   ACR_NAME             = data.azurerm_container_registry.acr.name
-  STATUS_PAGE_HOSTNAME = var.STATUS_PAGE_HOSTNAME
 
   # Environment variables
   IMAGE_TAG = var.STATUS_PAGE_IMAGE_TAG

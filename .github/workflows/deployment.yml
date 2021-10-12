@@ -286,6 +286,7 @@ jobs:
           # Config
           TF_VAR_FRONTEND_IMAGE_TAG: ${{ needs.vars-dev.outputs.frontend_tag  }}
           TF_VAR_BACKEND_IMAGE_TAG: ${{ needs.vars-dev.outputs.backend_tag  }}
+          TF_VAR_STATUS_PAGE_IMAGE_TAG: ${{ needs.vars-dev.outputs.status_page_tag  }}
           TF_VAR_ENVIRONMENT: dev
           # Creds
           TF_VAR_DISCORD_TOKEN: ${{ secrets.DEV_DISCORD_TOKEN }}
@@ -552,6 +553,7 @@ jobs:
           TF_VAR_ENVIRONMENT: dev
           TF_VAR_FRONTEND_IMAGE_TAG: ${{ needs.vars-dev.outputs.frontend_tag  }}
           TF_VAR_BACKEND_IMAGE_TAG: ${{ needs.vars-dev.outputs.backend_tag  }}
+          TF_VAR_STATUS_PAGE_IMAGE_TAG: ${{ needs.vars-dev.outputs.status_page_tag  }}
           # Creds
           TF_VAR_DISCORD_TOKEN: ${{ secrets.DEV_DISCORD_TOKEN }}
           TF_VAR_REDIS_PASSWORD: ${{ secrets.DEV_REDIS_PASSWORD }}
