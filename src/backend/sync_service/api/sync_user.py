@@ -11,10 +11,11 @@ from datetime import datetime
 users_sync_api = Blueprint('users', __name__)
 redis_helper = RedisHelper()
 
-mongo_uri = os.environ['MONGO_URI']
-mongo_client = MongoClient(mongo_uri)
-users_collection = mongo_client.backend_db.user_set
-users_collection.create_index("_ts", expireAfterSeconds = 5184000) # TTL is 60 days
+if not os.environ.get('DB_BYPASS', None):
+    mongo_uri = os.environ['MONGO_URI']
+    mongo_client = MongoClient(mongo_uri)
+    users_collection = mongo_client.backend_db.user_set
+    users_collection.create_index("_ts", expireAfterSeconds = 5184000) # TTL is 60 days
 
 # This json is updated whenever the new sync occurs
 last_sync = {}

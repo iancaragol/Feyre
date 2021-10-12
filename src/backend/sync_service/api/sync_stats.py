@@ -12,10 +12,11 @@ from backend_service.api.operation.stats_operation import StatsOperation
 stats_sync_api = Blueprint('stats', __name__)
 redis_helper = RedisHelper()
 
-mongo_uri = os.environ['MONGO_URI']
-mongo_client = MongoClient(mongo_uri)
-command_collection = mongo_client.backend_db.command_stats
-command_collection.create_index("_ts", expireAfterSeconds = 5184000) # TTL is 60 days
+if not os.environ.get('DB_BYPASS', None):
+    mongo_uri = os.environ['MONGO_URI']
+    mongo_client = MongoClient(mongo_uri)
+    command_collection = mongo_client.backend_db.command_stats
+    command_collection.create_index("_ts", expireAfterSeconds = 5184000) # TTL is 60 days
 
 # This json is updated whenever the new sync occurs
 last_sync = {}
