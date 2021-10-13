@@ -1,0 +1,77 @@
+#!/bin/bash
+
+# This is a script builds, tags, and pushes images to ACR
+# For use in CI only
+
+set -e
+
+# Global Directory Variables
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )" # The directory of this script
+REPO_DIR="$(dirname "$SCRIPT_DIR")" # The root directory of this repository
+
+function usage()
+{
+  echo -e "\t ========================== script/ci-build usage =========================="
+  echo -e "\t-h --help                      : displays help message"
+  echo -e "\t-r --registry                  : the ACR registry"
+  echo -e "\f-f --frontend                  : the frontend container tag"
+  echo -e "\t-b --backend                   : the backend container tag"
+  echo -e "\t-s --status-page               : the status_page container tag"
+}
+
+while [ "$1" != "" ]; do
+    PARAM=`echo $1 | awk -F= '{print $1}'`
+    VALUE=`echo $1 | awk -F= '{print $2}'`
+    case $PARAM in
+      -h | --help)
+        usage
+        exit
+        ;;
+      -r | --registry)
+        registry=$VALUE
+        ;;
+      -f | --frontend)
+        frontend=$VALUE
+        ;;
+      -b | --backend)
+        backend=$VALUE
+        ;;
+      -s | --status)
+        status_page=$VALUE
+        ;;
+      *)
+      echo "ERROR: unknown parameter \"$PARAM\""
+      usage
+      exit 1
+      ;;
+    esac
+    shift
+done
+
+# Build frontend / backend images
+cd $REPO_DIR/src
+if [[ "$frontend" == "" ]]; then
+  echo "frontend:     no changes detected, skipping build + push"
+else
+  echo "frontend:     changes detected, building + push starting"
+  docker build -t $registry/frontend:$frontend frontend
+  docker push $registry/frontend:$frontend
+fi
+
+if [[ "$backend" == "" ]]; then
+  echo "backend:      no changes detected, skipping build + push"
+else
+  echo "backend:      changes detected, building + push starting"
+  docker build -t $registry/backend:$backend backend
+  docker push $registry/backend:$backend
+fi
+
+# Build the status_page image
+cd $REPO_DIR
+if [[ "$status_page" == "" ]]; then
+  echo "status_page:  no changes detected, skipping build + push"
+else
+  echo "status_page:  changes detected, building + push starting"
+  script/status-page -b -t="$registry/status_page:$STATUS_PAGE_TAG"
+  docker push $registry/status_page:$STATUS_PAGE_TAG
+fi

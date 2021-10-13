@@ -18,6 +18,7 @@ jobs:
       discord-commands: ${{ steps.filter.outputs.discord-commands }} # changes to the discord commands
       backend-src: ${{ steps.filter.outputs.backend-src }} # changes to the backend source code
       frontend-src: ${{ steps.filter.outputs.frontend-src }} # changes to the frontend source code
+      status-page-src: ${{ steps.filter.outputs.status-page-src }} # changes to the status page source code
     steps:
       - uses: actions/checkout@5a4ac9002d0be2fb38bd78e4b4dbde5606d7042f # pin@v2
       - uses: dorny/paths-filter@b2feaf19c27470162a626bd6fa8438ae5b263721 # pin@v2
@@ -36,6 +37,8 @@ jobs:
               - 'src/backend/**'
             frontend-src:
               - 'src/frontend/**'
+            status-page-src:
+              - 'src/status_page/**'
 
   # For setting global vars to use in other steps - dev
   # Note: Anywhere you want to use the outputs, you need to use the "needs: vars" yaml tag
@@ -49,45 +52,24 @@ jobs:
       short_sha: ${{ steps.vars-dev.outputs.short_sha  }}
       frontend_tag: ${{ steps.vars-dev.outputs.frontend_tag  }}
       backend_tag: ${{ steps.vars-dev.outputs.backend_tag  }}
+      status_page_tag: ${{ steps.vars-dev.outputs.status_page_tag  }}
     steps:
-      - uses: actions/checkout@5a4ac9002d0be2fb38bd78e4b4dbde5606d7042f # pin@v2
-      - name: SED - Replace Environment
-        run: |
-          sed -i 's/ENVIRONMENT_REPLACEMENT/dev/' terraform/k8s-cluster/versions.tf 
-          sed -i 's/ENVIRONMENT_REPLACEMENT/dev/' terraform/k8s/versions.tf
-      - uses: azure/login@77f1b2e3fb80c0e8645114159d17008b8a2e475a # pin@v1
-        with:
-          creds: ${{ secrets.DEV_AZURE_CREDENTIALS }}
-      - uses: hashicorp/setup-terraform@3d8debd658c92063839bc97da5c2427100420dec # pin@v1
-        with:
-          terraform_version: 1.0.6
-          cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
-      - name: Terraform init (k8s)
-        working-directory: terraform/k8s
-        run: terraform init
       - name: Set outputs
         env: 
           GH_SHA_FULL: ${{ github.sha }}
         id: vars-dev
         run: |
           export SHORT_SHA=$(echo "$GH_SHA_FULL" | cut -c1-8)
-
-          if [ "${{ needs.changes.outputs.frontend-src }}" == "true" ]; \
-          then echo "::set-output name=frontend_tag::$SHORT_SHA"; \
-          else echo "::set-output name=frontend_tag::$(.github/ci/current_tag frontend)"; \
-          fi
-
-          if [ "${{ needs.changes.outputs.backend-src }}" == "true" ]; \
-          then echo "::set-output name=backend_tag::$SHORT_SHA"; \
-          else echo "::set-output name=backend_tag::$(.github/ci/current_tag backend)"; \
-          fi
-
+          echo "::set-output name=frontend_tag::$SHORT_SHA"
+          echo "::set-output name=backend_tag::$SHORT_SHA"
+          echo "::set-output name=status_page_tag::$SHORT_SHA"
           echo "::set-output name=short_sha::$SHORT_SHA"
       - name: Exported image_tag variables
         run: |
           echo "short_sha: ${{ steps.vars-dev.outputs.short_sha}}"
           echo "frontend_tag: ${{ steps.vars-dev.outputs.frontend_tag}}"
           echo "backend_tag: ${{ steps.vars-dev.outputs.backend_tag}}"
+          echo "status_page_tag: ${{ steps.vars-dev.outputs.status_page_tag}}"
           
 
   # For running tests against the backend/frontend services
@@ -162,29 +144,23 @@ jobs:
       # Builds and pushes images on pull request workflows
       - name: "Build image - On Pull Request"
         if: github.event_name == 'pull_request'
-        working-directory: src
         env:
           BACKEND_TAG: ${{ needs.vars-dev.outputs.backend_tag  }}
           FRONTEND_TAG: ${{ needs.vars-dev.outputs.frontend_tag  }}
+          STATUS_PAGE_TAG: ${{ needs.vars-dev.outputs.status_page_tag }}
         run: |
-          docker build -t ${{ secrets.DEV_REGISTRY_LOGIN_SERVER }}/frontend:$FRONTEND_TAG frontend
-          docker build -t ${{ secrets.DEV_REGISTRY_LOGIN_SERVER }}/backend:$BACKEND_TAG backend
-          docker push ${{ secrets.DEV_REGISTRY_LOGIN_SERVER }}/frontend:$FRONTEND_TAG
-          docker push ${{ secrets.DEV_REGISTRY_LOGIN_SERVER }}/backend:$BACKEND_TAG
+          script/ci-build -r="${{ secrets.DEV_REGISTRY_LOGIN_SERVER }}" -f="$FRONTEND_TAG" -b="$BACKEND_TAG" -s="$STATUS_PAGE_TAG"
 
       # Builds and pushes images on push workflows
       # TODO: Later on this will push images to the PROD registry and not the DEV one
       - name: "Build and Push image - On Push"
         if: github.event_name == 'push'
-        working-directory: src
         env:
           BACKEND_TAG: ${{ needs.vars-dev.outputs.backend_tag  }}
           FRONTEND_TAG: ${{ needs.vars-dev.outputs.frontend_tag  }}
+          STATUS_PAGE_TAG: ${{ needs.vars-dev.outputs.status_page_tag }}
         run: |
-          docker build -t ${{ secrets.DEV_REGISTRY_LOGIN_SERVER }}/frontend:$FRONTEND_TAG frontend
-          docker push ${{ secrets.DEV_REGISTRY_LOGIN_SERVER }}/frontend:$FRONTEND_TAG
-          docker build -t ${{ secrets.DEV_REGISTRY_LOGIN_SERVER }}/backend:$BACKEND_TAG backend
-          docker push ${{ secrets.DEV_REGISTRY_LOGIN_SERVER }}/backend:$BACKEND_TAG
+          script/ci-build -r="${{ secrets.DEV_REGISTRY_LOGIN_SERVER }}" -f="$FRONTEND_TAG" -b="$BACKEND_TAG" -s="$STATUS_PAGE_TAG"
 
   # Runs a Terraform plan for the dev environment
   terraform-plan-development:
@@ -282,6 +258,7 @@ jobs:
           # Config
           TF_VAR_FRONTEND_IMAGE_TAG: ${{ needs.vars-dev.outputs.frontend_tag  }}
           TF_VAR_BACKEND_IMAGE_TAG: ${{ needs.vars-dev.outputs.backend_tag  }}
+          TF_VAR_STATUS_PAGE_IMAGE_TAG: ${{ needs.vars-dev.outputs.status_page_tag  }}
           TF_VAR_ENVIRONMENT: dev
           # Creds
           TF_VAR_DISCORD_TOKEN: ${{ secrets.DEV_DISCORD_TOKEN }}
@@ -548,6 +525,7 @@ jobs:
           TF_VAR_ENVIRONMENT: dev
           TF_VAR_FRONTEND_IMAGE_TAG: ${{ needs.vars-dev.outputs.frontend_tag  }}
           TF_VAR_BACKEND_IMAGE_TAG: ${{ needs.vars-dev.outputs.backend_tag  }}
+          TF_VAR_STATUS_PAGE_IMAGE_TAG: ${{ needs.vars-dev.outputs.status_page_tag  }}
           # Creds
           TF_VAR_DISCORD_TOKEN: ${{ secrets.DEV_DISCORD_TOKEN }}
           TF_VAR_REDIS_PASSWORD: ${{ secrets.DEV_REDIS_PASSWORD }}

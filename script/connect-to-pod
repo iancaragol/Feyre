@@ -1,0 +1,43 @@
+#!/bin/bash
+
+# This is a script connect to a pod in k8s
+
+set -e
+
+function usage()
+{
+  echo -e "\t ========================== script/connect-to-pod usage =========================="
+  echo -e "\t-h --help                 : displays help message"
+  echo -e "\n-b --namespace            : the k8s namespace of the pod"
+  echo -e "\p-b --pod                  : the pod name"
+  echo -e "\t-p --port                 : the port to connect to"
+  echo -e "Example: script/connect-to-pod --namespace=<namespace> --pod=<pod_name> --port=<port>"
+}
+
+while [ "$1" != "" ]; do
+    PARAM=`echo $1 | awk -F= '{print $1}'`
+    VALUE=`echo $1 | awk -F= '{print $2}'`
+    case $PARAM in
+      -h | --help)
+        usage
+        exit
+        ;;
+      -n | --namespace)
+        namespace=$VALUE
+        ;;
+      -c | --pod)
+        pod=$VALUE
+        ;;
+      -p | --port)
+        port=$VALUE
+        ;;
+      *)
+      echo "ERROR: unknown parameter \"$PARAM\""
+      usage
+      exit 1
+      ;;
+    esac
+    shift
+done
+
+kubectl --namespace $namespace port-forward $pod $port

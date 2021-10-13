@@ -1,0 +1,79 @@
+#!/bin/bash
+
+# This is a script to build the status_page image and start it for local development
+
+set -e
+
+function usage()
+{
+  echo -e "\t ========================== script/status-page usage =========================="
+  echo -e "\t-h --help                 : displays help message"
+  echo -e "\t-b --build-and-tag-only   : build and tag the images only (CI)"
+  echo -e "\t-b --tag                  : the tag to use for the docker build (CI)"
+  echo -e "\t-u --up-no-build          : start the status-page stack with docker compose"
+  echo -e "Calling this script with no params starts/builds the docker-compose stack"
+}
+
+while [ "$1" != "" ]; do
+    PARAM=`echo $1 | awk -F= '{print $1}'`
+    VALUE=`echo $1 | awk -F= '{print $2}'`
+    case $PARAM in
+      -h | --help)
+        usage
+        exit
+        ;;
+      status-page)
+        used_make=1
+        ;;
+      -b | --build-and-tag-only)
+        build_and_tag=1
+        ;;
+      -t | --tag)
+        docker_tag=$VALUE
+        ;;
+      -u | --up-no-build)
+        up_no_create=1
+        ;;
+      *)
+      echo "ERROR: unknown parameter \"$PARAM\""
+      usage
+      exit 1
+      ;;
+    esac
+    shift
+done
+
+# Global Directory Variables
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )" # The directory of this script
+REPO_DIR="$(dirname "$SCRIPT_DIR")" # The root directory of this repository
+cd $REPO_DIR/src/status_page
+
+# Just bring the stack up, don't build
+if [[ "$up_no_create" == "1" ]]; then
+  echo "Starting the docker stack locally"
+  docker-compose up --build -d
+  exit 0
+fi
+
+# Determine the image tag to use
+if [[ -z $docker_tag ]]; then
+  echo "Using default (local) tag"
+  DOCKER_IMAGE_TAG="status_page"
+else
+  DOCKER_IMAGE_TAG="$docker_tag"
+fi
+
+# Build the base image
+docker build -t status_page:base-alpine -f docker/alpine-base.dockerfile .
+
+# Build the image
+docker build -t "$DOCKER_IMAGE_TAG" -f dockerfile-alpine .
+
+if [[ -z $build_and_tag ]]; then
+  # Start the docker stack
+  echo "Starting the docker stack locally"
+  docker-compose up --build -d
+  echo -e "\e[32m[#] status-page container is now running!\e[0m"
+else
+  echo "--build-and-tag-only set.. skipping building the docker stack locally"
+fi

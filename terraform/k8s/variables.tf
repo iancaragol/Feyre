@@ -22,6 +22,12 @@ variable "ENVIRONMENT" {
   default     = "dev"
 }
 
+variable "STATUS_PAGE_HOSTNAME" {
+  description = "The hostname for the status page (default is blank for prod otherwise use -dev)"
+  type        = string
+  default     = ""
+}
+
 variable "BACKEND_IMAGE_TAG" {
   description = "The image tag to use for backend deployments"
   type        = string
@@ -29,6 +35,11 @@ variable "BACKEND_IMAGE_TAG" {
 
 variable "FRONTEND_IMAGE_TAG" {
   description = "The image tag to use for frontend deployments"
+  type        = string
+}
+
+variable "STATUS_PAGE_IMAGE_TAG" {
+  description = "The image tag to use for status_page deployments"
   type        = string
 }
 
