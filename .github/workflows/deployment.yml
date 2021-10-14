@@ -536,6 +536,7 @@ jobs:
           TF_VAR_SUBSCRIPTION_ID: ${{ secrets.SUBSCRIPTION_ID }}
           TF_VAR_TENANT_ID: ${{ secrets.TENANT_ID }}
         run: terraform apply -auto-approve
+
       # Add me later to get Discord push notifications on deployment! 😊
       # - name: Discord notification
       #   if: github.event_name == 'push'
