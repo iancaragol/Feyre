@@ -5,19 +5,19 @@ metadata:
   namespace: uptime-kuma
   annotations:
     konghq.com/strip-path: "true"
-    # kubernetes.io/tls-acme: "true" # Uncomment to enable TLS
-    # cert-manager.io/cluster-issuer: "letsencrypt-prod" # Uncomment to enable TLS
+    kubernetes.io/tls-acme: "true" # Uncomment to enable TLS
+    cert-manager.io/cluster-issuer: "letsencrypt-prod" # Uncomment to enable TLS
     # konghq.com/plugins: ip-allowlist # Uncomment to enable IP allowlist plugin
 spec:
-  # tls: # Uncomment to enable TLS
-  #   - secretName: "letsencrypt-prod-issuer-account-key" # Uncomment to enable TLS
-  #     hosts: # Uncomment to enable TLS
-  #       - "<www.example.com>" # Uncomment to enable TLS
+  tls: # Uncomment to enable TLS
+    - secretName: "letsencrypt-prod-issuer-account-key" # Uncomment to enable TLS
+      hosts: # Uncomment to enable TLS
+        - "status-dev.feyre.io" # Uncomment to enable TLS
 
   ingressClassName: "kong"
   rules:
-    # - host: <www.example.com> # Uncomment to enable hostname (needed if you enable the external Grafana section below) and indent your YAML
-    - http:
+    - host: status-dev.feyre.io # Uncomment to enable hostname (needed if you enable the external Grafana section below) and indent your YAML
+      http:
         paths:
           - pathType: Prefix
             path: /
