@@ -1,0 +1,127 @@
+{
+    "version": "1.8.0-nightly",
+    "notificationList": [],
+    "monitorList": [
+        {
+            "id": 1,
+            "name": "Feyre Backend",
+            "url": "http://backend.backend:5000/api/backendservice/healthcheck",
+            "hostname": "backend.backend",
+            "port": 5000,
+            "maxretries": 3,
+            "weight": 2000,
+            "active": 1,
+            "type": "http",
+            "interval": 30,
+            "retryInterval": 30,
+            "keyword": null,
+            "ignoreTls": false,
+            "upsideDown": false,
+            "maxredirects": 10,
+            "accepted_statuscodes": [
+                "200"
+            ],
+            "dns_resolve_type": "A",
+            "dns_resolve_server": "1.1.1.1",
+            "dns_last_result": null,
+            "pushToken": null,
+            "notificationIDList": {},
+            "tags": [
+                {
+                    "id": 1,
+                    "monitor_id": 1,
+                    "tag_id": 1,
+                    "value": "",
+                    "name": "Internal",
+                    "color": "#2563EB"
+                },
+                {
+                    "id": 2,
+                    "monitor_id": 1,
+                    "tag_id": 2,
+                    "value": "",
+                    "name": "Core",
+                    "color": "#059669"
+                }
+            ]
+        },
+        {
+            "id": 2,
+            "name": "Feyre Docs Page",
+            "url": "https://docs.feyre.io",
+            "hostname": "docs.feyre.io",
+            "port": null,
+            "maxretries": 0,
+            "weight": 2000,
+            "active": 1,
+            "type": "dns",
+            "interval": 60,
+            "retryInterval": 60,
+            "keyword": null,
+            "ignoreTls": false,
+            "upsideDown": false,
+            "maxredirects": 10,
+            "accepted_statuscodes": [
+                "200-299"
+            ],
+            "dns_resolve_type": "CNAME",
+            "dns_resolve_server": "1.1.1.1",
+            "dns_last_result": "feyre.readthedocs.io",
+            "pushToken": null,
+            "notificationIDList": {},
+            "tags": [
+                {
+                    "id": 3,
+                    "monitor_id": 2,
+                    "tag_id": 3,
+                    "value": "",
+                    "name": "External",
+                    "color": "#4F46E5"
+                },
+                {
+                    "id": 4,
+                    "monitor_id": 2,
+                    "tag_id": 4,
+                    "value": "",
+                    "name": "DNS",
+                    "color": "#4B5563"
+                }
+            ]
+        },
+        {
+            "id": 5,
+            "name": "Ingress Metrics",
+            "url": "http://grafana.monitoring:80/",
+            "hostname": null,
+            "port": null,
+            "maxretries": 0,
+            "weight": 2000,
+            "active": 1,
+            "type": "http",
+            "interval": 60,
+            "retryInterval": 60,
+            "keyword": null,
+            "ignoreTls": false,
+            "upsideDown": false,
+            "maxredirects": 10,
+            "accepted_statuscodes": [
+                "200-299"
+            ],
+            "dns_resolve_type": "A",
+            "dns_resolve_server": "1.1.1.1",
+            "dns_last_result": null,
+            "pushToken": null,
+            "notificationIDList": {},
+            "tags": [
+                {
+                    "id": 5,
+                    "monitor_id": 5,
+                    "tag_id": 5,
+                    "value": "",
+                    "name": "Monitoring",
+                    "color": "#4B5563"
+                }
+            ]
+        }
+    ]
+}
