@@ -4,6 +4,11 @@ from datetime import datetime
 from os import environ
 from common.redis_keys import RedisKeys
 
+if environ.get('ENV_KUBE', None) == 'True':
+    HOST = 'redis.redis'
+else:
+    HOST = 'redis-primary'
+
 class RedisHelper:
     """
     Common class shared across Backend and Sync services
@@ -15,7 +20,7 @@ class RedisHelper:
         if environ['REDIS_PASSWORD']:
             redis_pw = environ['REDIS_PASSWORD']
 
-        self.red = redis.StrictRedis(host="redis-primary", port=6379, db=0, password=redis_pw)
+        self.red = redis.StrictRedis(host=HOST, port=6379, db=0, password=redis_pw)
         self.keys = RedisKeys()
 
     def increment_command(self, command):

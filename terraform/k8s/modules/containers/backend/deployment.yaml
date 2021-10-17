@@ -34,6 +34,8 @@ spec:
                   key: MONGO_URI
             - name: DB_BYPASS
               value: "True" # Remove this to use the database
+            - name: ENV_KUBE
+              value: "true"
           resources:
             limits:
               cpu: "0.5"
