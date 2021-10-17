@@ -19,6 +19,11 @@ class RedisHelper:
         self.keys = RedisKeys()
 
     def increment_command(self, command):
+        """
+        Increment command's usage count by 1 and updates the command's last updated time key
+
+        Returns the updated time
+        """
         updated_time = datetime.now().timestamp()
         self.red.incr(f"c_{command}", amount = 1)
         self.red.set(f"c_:{self.keys.updated_time}", updated_time)
@@ -73,3 +78,71 @@ class RedisHelper:
         self.red.sadd(self.keys.user_set, *value)
         self.red.set(f"{self.keys.user_set}:{self.keys.updated_time}", updated_time)
         return updated_time
+
+    def get_redis_health(self):
+        """
+        Gets health, memory, cpu, and stats information from redis
+
+        Returns a dictionary with health info
+        """
+        redis_health = {}
+        is_available = self.get_redis_availability()
+        redis_health["available"] = is_available
+        
+        if (is_available):
+            redis_health['memory'] = self.get_redis_memory_info()
+            redis_health['cpu'] = self.get_redis_cpu_info()
+            redis_health['stats'] = self.get_redis_stats_info()
+
+        return redis_health
+
+    def get_redis_memory_info(self):
+        """
+        Gets memory info from redis and formats it into a simple dictionary
+
+        Returns a dictionary with memory info
+        """
+        memory_info = self.red.info()
+        succint_memory_info = {}
+        succint_memory_info['used_memory'] = memory_info['used_memory_human']
+        succint_memory_info['used_memory_rss'] = memory_info['used_memory_rss_human']
+        succint_memory_info['total_memory'] = memory_info['total_system_memory_human']
+
+        return succint_memory_info
+
+    def get_redis_cpu_info(self):
+        """
+        Gets cpu info from redis and formats it into a simple dictionary
+
+        Returns a dictionary with cpu info
+        """
+        cpu_info = self.red.info()
+        succint_cpu_info = {}
+        succint_cpu_info['used_cpu'] = cpu_info['used_cpu_user']
+
+        return succint_cpu_info
+
+    def get_redis_stats_info(self):
+        """
+        Gets stats info from redis and formats it into a simple dictionary
+
+        Returns a dictionary with stats info
+        """
+        stats_info = self.red.info()
+        succint_cpu_info = {}
+        succint_cpu_info['total_connections_received'] = stats_info['total_connections_received']
+        succint_cpu_info['total_commands_processed'] = stats_info['total_commands_processed']
+
+        return succint_cpu_info
+
+    def get_redis_availability(self):
+        """
+        Checks if the redis server is available by pinging it.
+
+        Returns True if available, False otherwise
+        """
+        try:
+            self.red.ping()
+        except (redis.exceptions.ConnectionError, ConnectionRefusedError):
+            return False
+        return True

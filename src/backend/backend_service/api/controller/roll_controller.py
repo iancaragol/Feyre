@@ -22,7 +22,17 @@ def roll():
     """
 
     # Increment the roll operation counter
-    redis_helper.increment_command("roll")
+    try:
+        # Maybe Redis can have a queue...
+        # Enqueue the increment
+        # Pop of the queue
+        # Execute the icnrement
+        # If that fails do to connectivity, redo it?
+        redis_helper.increment_command("roll")
+    except:
+        # Need to raise some kind of event for Grafana to pick up?
+        # Something like could not connect to Redis
+        print("Could not connect to Redis", flush=True)
 
     verbose = False
     args = request.args
@@ -30,7 +40,12 @@ def roll():
     # Add the user id to the user set
     if "user" in args:
         user = args["user"]
-        redis_helper.add_to_user_set(user)
+        try:
+            redis_helper.add_to_user_set(user)
+        except:
+            # Need to raise some kind of event for Grafana to pick up?
+            # Something like could not connect to Redis
+            print("Could not connect to Redis", flush=True)
     else:
         return make_response("Missing user query parameter", HTTPStatus.BAD_REQUEST)
 
