@@ -4,7 +4,7 @@ from datetime import datetime
 from os import environ
 from common.redis_keys import RedisKeys
 
-if environ.get('ENV_KUBE', None) == 'True':
+if environ.get('ENV_KUBE', None) == 'true':
     HOST = 'redis.redis'
 else:
     HOST = 'redis-primary'
