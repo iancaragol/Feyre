@@ -3,6 +3,7 @@ FROM node:stretch-slim
 # create nonroot user
 RUN adduser nonroot
 RUN mkdir /home/app/ && chown -R nonroot:nonroot /home/app
+RUN apt update && apt install curl -y
 WORKDIR /home/app
 
 COPY --chown=nonroot:nonroot package-lock.json /home/app/
