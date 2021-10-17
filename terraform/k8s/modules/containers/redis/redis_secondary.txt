@@ -1,0 +1,32 @@
+---
+- name: redis_secondary
+  image: docker.io/bitnami/redis:6.2
+  imagePullPolicy: Always
+  env:
+    - name: REDIS_PASSWORD
+      valueFrom:
+        secretKeyRef:
+          name: redis_secret
+          key: REDIS_PASSWORD
+    - name: REDIS_MASTER_PASSWORD
+      valueFrom:
+        secretKeyRef:
+          name: redis-secret
+          key: REDIS_PASSWORD
+    - name: REDIS_REPLICATION_MODE
+      value: "slave"
+    - name: REDIS_MASTER_HOST
+      value: "redis-primary"
+    - name: REDIS_MASTER_PORT_NUMBER
+      value: "6379"
+    - name: REDIS_DISABLE_COMMANDS
+      value: "FLUSHDB,FLUSHALL"
+  resources:
+    limits:
+      cpu: "0.5"
+      memory: "500Mi"
+    requests:
+      cpu: "0.25"
+      memory: "50Mi"
+  ports:
+    - containerPort: 6379

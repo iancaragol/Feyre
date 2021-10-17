@@ -1,3 +1,7 @@
+# Permissions And Slash Commands
+
+https://discord.com/api/oauth2/authorize?client_id=896435492273393694&permissions=2147559488&scope=bot%20applications.commands
+
 # Backend Service
 
 ## Controller

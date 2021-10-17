@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis
+  namespace: redis
+  labels:
+    name: redis
+spec:
+  type: ClusterIP
+  ports:
+    - targetPort: 6379
+      port: 6379
+  selector:
+    name: redis
