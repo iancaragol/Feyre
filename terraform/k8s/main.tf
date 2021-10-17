@@ -51,12 +51,8 @@ module "frontend" {
 module "redis" {
   source = "./modules/containers/redis"
 
-  # Config
-  ACR_NAME = data.azurerm_container_registry.acr.name
-
   # Secret variables
   REDIS_PASSWORD = var.REDIS_PASSWORD
   # Environment variables
-  IMAGE_TAG   = var.REDIS_IMAGE_TAG
   ENVIRONMENT = var.ENVIRONMENT
 }

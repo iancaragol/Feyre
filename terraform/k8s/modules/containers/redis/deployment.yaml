@@ -16,7 +16,7 @@ spec:
         name: redis
     spec:
       containers:
-        - name: redis_primary
+        - name: redis-primary
           image: docker.io/bitnami/redis:6.2
           imagePullPolicy: Always
           env:
