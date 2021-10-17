@@ -56,3 +56,20 @@ module "redis" {
   # Environment variables
   ENVIRONMENT = var.ENVIRONMENT
 }
+
+module "datasync" {
+  source = "./modules/containers/datasync"
+
+  # Environment variables
+  ENVIRONMENT = var.ENVIRONMENT
+
+  # Config
+  ACR_NAME = data.azurerm_container_registry.acr.name
+
+  # Environment variables
+  IMAGE_TAG   = var.BACKEND_IMAGE_TAG # we use the same image as the backend here
+
+  # Secret variables
+  REDIS_PASSWORD = var.REDIS_PASSWORD
+  MONGO_URI      = var.MONGO_URI
+}
