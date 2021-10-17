@@ -5,6 +5,7 @@ from http import HTTPStatus
 from flask import Blueprint, request, make_response, jsonify
 from backend_service.api.operation.roll_operation import RollOperation, RollOperationException
 from common.redis_helper import RedisHelper
+from urllib.parse import unquote_plus
 
 roll_api = Blueprint('roll_api', __name__)
 redis_helper = RedisHelper()
@@ -46,7 +47,7 @@ def roll():
 
         except RollOperationException as e:
             result = {
-                    "message": f"An exception occurred when attempting the roll operation with expression = {expression}.",
+                    "message": f"An exception occurred when attempting the roll operation with expression = {unquote_plus(expression)}.",
                     "stack_trace": traceback.format_exc(),
                     "exception_message": e.message
                 }
