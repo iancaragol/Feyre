@@ -92,7 +92,7 @@ def sync_users():
 
     If they are perfectly in sync (very unlikely), its a NO-OP
     """
-    now = datetime.now()
+    now = datetime.utcnow()
     now_string = now.strftime("%m/%d/%Y, %H:%M:%S")
     sync_msg = ""
     completed_successfully = True
@@ -147,7 +147,7 @@ def construct_users_json():
     """
     Returns user_set json, data is read from Redis
     """
-    now = datetime.now()
+    now = datetime.utcnow()
 
     users = {}
     users["user_set"] = redis_helper.get_user_set()

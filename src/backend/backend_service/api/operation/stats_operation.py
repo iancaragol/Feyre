@@ -9,7 +9,6 @@ class StatsOperation:
     """
     def __init__(self, show_all):
         self.redis_helper = RedisHelper()
-        self.commands = Commands()
         self.show_all = show_all
 
     def execute(self):
@@ -18,7 +17,7 @@ class StatsOperation:
 
         Returns the response body
         """
-        response_body = {"stat_block": self.get_stats()}
+        response_body = self.get_stats()
         response_body["user_count"] = self.get_user_count()
         return response_body
 
@@ -26,9 +25,9 @@ class StatsOperation:
         """
         Returns a dictionary of command counts
         """
-        command_list = self.commands.commands
+        command_list = Commands.default_commands_list
         if self.show_all:
-            command_list = self.commands.all_commands
+            command_list = Commands.all_commands_list
         return self.redis_helper.get_commands_dictionary(command_list)
 
     def get_user_count(self):
