@@ -1,21 +1,16 @@
 import os
-import pymongo
 import traceback
+import json
 
 from http import HTTPStatus
 from flask import Blueprint, request
-from pymongo import MongoClient
+from common.blob_helper import BlobHelper
 from common.redis_helper import RedisHelper
 from datetime import datetime
 
 users_sync_api = Blueprint('users', __name__)
 redis_helper = RedisHelper()
-
-if not os.environ.get('DB_BYPASS', None):
-    mongo_uri = os.environ['MONGO_URI']
-    mongo_client = MongoClient(mongo_uri)
-    users_collection = mongo_client.backend_db.user_set
-    users_collection.create_index("_ts", expireAfterSeconds = 5184000) # TTL is 60 days
+blob_helper = BlobHelper()
 
 # This json is updated whenever the new sync occurs
 last_sync = {}
@@ -28,11 +23,13 @@ def put_users_set():
     """
     try:
         users = construct_users_json()
-        insert_id = users_collection.insert_one(users).inserted_id
+        up = blob_helper.upload_blob_from_bytes("users", users["filename"], json.dumps(users))
     
-        return f"Inserted users set into backend_db. ID is {insert_id}. insert_time is {users['insert_time']}", HTTPStatus.OK
+        print(up, flush=True)
+
+        return f"Inserted users set into Blob Storage. Filename is {users['filename']}, insert_time is {users['insert_time']}", HTTPStatus.OK
     except Exception as e:
-        return f"An exception occurred when updating the Mongo DB.\n{e}\n{traceback.format_exc()}", HTTPStatus.INTERNAL_SERVER_ERROR
+        return f"An exception occurred when updating the Users Table.\n{e}\n{traceback.format_exc()}", HTTPStatus.INTERNAL_SERVER_ERROR
 
 @users_sync_api.route('/', methods=['GET'])
 def get_users():
@@ -46,17 +43,17 @@ def get_users():
 @users_sync_api.route('/sync', methods=['PUT'])
 def sync_users_set():
     """
-    Syncs Redis and Mongo DB
+    Syncs Redis and Blob Storage
 
     Query Parameters:
         sync=1 : Does a sync operation
 
-    If the sync parameter is set to true, we will check the last update time for user_set in Redis and MongoDB.
+    If the sync parameter is set to true, we will check the last update time for user_set in Redis and Blob Storage.
 
-    If the the number of seconds since Mongo DB last update time is less than Redis then MongoDB holds the most recent set of data. In that case the Redis set needs to be updated.
+    If the the number of seconds since Blob Storage last update time is less than Redis then Blob Storage holds the most recent set of data. In that case the Redis set needs to be updated.
     This should only happen if there redis backups were deleted, or on a cold start where no volumes are mounted
 
-    If Redis > Mongo DB time, then just PUT the contents of user_set in MongoDB
+    If Redis > Blob Storage time, then just PUT the contents of user_set in Blob Storage
     """
     args = request.args
 
@@ -84,11 +81,11 @@ def get_last_sync():
 
 def sync_users():
     """
-    Syncs Redis and Mongo DB by comparing Redis user_set:update_time and MongoDB user_set:insert_timestamp
+    Syncs Redis and Blob Storage by comparing Redis user_set:update_time and Blob Storage user_set:insert_timestamp
 
-    If Redis contains the most recent data set, we update Mongo DB to match Redis
+    If Redis contains the most recent data set, we update Blob Storage to match Redis
 
-    If Mongo DB contains the most recent data set, we update Redis to match Mongo DB
+    If Blob Storage contains the most recent data set, we update Redis to match Blob Storage
 
     If they are perfectly in sync (very unlikely), its a NO-OP
     """
@@ -104,31 +101,30 @@ def sync_users():
         redis_user_set_updated_time_seconds = (now - redis_helper.get_user_set_timestamp_as_datetime()).total_seconds()
         print(f"   [2] Redis user_set was last updated {str(redis_user_set_updated_time_seconds)} seconds ago.", flush = True)
 
-        # Get the last entry into the Mongo DB sorted by _id
-        # The last entry will ALWAYS be the most recent
-        mongoDB_last_entry = users_collection.find_one(sort = [('_id', pymongo.DESCENDING)])
-        mongoDB_last_entry_timestamp = datetime.fromtimestamp(mongoDB_last_entry["insert_timestamp"])
-        mongoDB_last_entry_seconds = (now - mongoDB_last_entry_timestamp).total_seconds()
-        print(f"   [3] MongoDB user_set was last updated {mongoDB_last_entry_seconds} seconds ago.", flush=True)
+        # Temporarily download the most recent blob
+        user_blob_last_entry_name = blob_helper.list_blobs("users", "creation_time", reverse = True)[0].name
+        user_blob_last_entry = json.loads(blob_helper.download_blob_as_bytes("users", user_blob_last_entry_name))
+        user_blob_last_entry_seconds = (now - datetime.fromtimestamp(user_blob_last_entry['insert_timestamp'])).total_seconds()
+        print(f"   [3] BlobStorage last users entry was added {user_blob_last_entry_seconds} seconds ago.", flush=True)
 
         # Compare last update time for Redis and Mongo DB
-        if (redis_user_set_updated_time_seconds < mongoDB_last_entry_seconds):
+        if (redis_user_set_updated_time_seconds < user_blob_last_entry_seconds):
             users = construct_users_json()
-            insert_id = users_collection.insert_one(users).inserted_id
+            user_as_bytes = json.dumps(users)
+            up = blob_helper.upload_blob_from_bytes("users", users["filename"], user_as_bytes)
 
-            sync_msg = f"Redis contained the most recent user_set. No need to update Redis set. Updated MongoDB to match Redis. Insert_ID: {insert_id}"
+            sync_msg = f"Redis contained the most recent user_set. No need to update Redis set. Updated Blob Storage to match Redis. FileName: {users['filename']}, Size: {len(user_as_bytes)}"
 
-        elif (redis_user_set_updated_time_seconds > mongoDB_last_entry_seconds):
+        elif (redis_user_set_updated_time_seconds > user_blob_last_entry_seconds):
             before_update_count = redis_helper.get_user_set_count()
             before_update_time = redis_helper.get_user_set_timestamp_as_datetime().strftime("%m/%d/%Y, %H:%M:%S")
-            user_set = redis_helper.get_user_set()
-            redis_helper.add_to_user_set(user_set)
+            redis_helper.add_to_user_set(user_blob_last_entry["user_set"])
             after_update_time = redis_helper.get_user_set_timestamp_as_datetime().strftime("%m/%d/%Y, %H:%M:%S")
 
-            sync_msg = f"MongoDB contained the most recent set. Updated the Redis set to match. Redis user_set contained {before_update_count} entries and was updated at {before_update_time}. Now it contains {len(mongoDB_last_entry['user_set'])} entries and was updated at {after_update_time}."
+            sync_msg = f"Blob Storage contained the most recent set. Updated the Redis set to match. Redis user_set contained {before_update_count} entries and was updated at {before_update_time}. Now it contains {len(user_blob_last_entry['user_set'])} entries and was updated at {after_update_time}."
 
         else:
-            sync_msg = f"Wow! Redis and Mongo DB were perfectly in sync! This is a NO-OP."
+            sync_msg = f"Wow! Redis and Blob Storage were perfectly in sync! This is a NO-OP."
 
         print("   [4] " + sync_msg, flush = True)
         print("   [5] Sync operation completed.\n\n", flush = True)
@@ -151,7 +147,8 @@ def construct_users_json():
 
     users = {}
     users["user_set"] = redis_helper.get_user_set()
-    users["insert_time"] = now.strftime("%m/%d/%Y, %H:%M:%S") # Friendly time stamp
+    users["insert_time"] = now.strftime("%m-%d-%Y-%H:%M:%S") # File Format Friendly time stamp
     users["insert_timestamp"] = now.timestamp() # This is the one that is always used
+    users["filename"] = users["insert_time"] + "-" + "users.txt"
 
     return users

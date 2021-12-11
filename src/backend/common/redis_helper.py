@@ -96,14 +96,19 @@ class RedisHelper:
         """
         return datetime.fromtimestamp(self.get_user_set_timestamp())
     
-    def add_to_user_set(self, *value):
+    def add_to_user_set(self, value):
         """
         Adds value(s) to the user_set and updates the last update time
 
         Returns the new update time
         """
         updated_time = datetime.utcnow().timestamp()
-        self.red.sadd(RedisKeys.user_set, *value)
+
+        if type(value) is list:
+            self.red.sadd(RedisKeys.user_set, *value)
+        else:
+            self.red.sadd(RedisKeys.user_set, value)
+
         self.red.set(f"{RedisKeys.user_set}:{RedisKeys.updated_time}", updated_time)
         return updated_time
 

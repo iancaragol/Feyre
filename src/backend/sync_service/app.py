@@ -18,8 +18,8 @@ if not os.environ.get('DB_BYPASS', None):
 
 def create_app():
     app = Flask(__name__)
-    app.register_blueprint(users_sync_api, url_prefix='/api/syncService/users')
-    app.register_blueprint(stats_sync_api, url_prefix='/api/syncService/stats')
+    app.register_blueprint(users_sync_api, url_prefix='/api/syncservice/users')
+    app.register_blueprint(stats_sync_api, url_prefix='/api/syncservice/stats')
 
     return app
 

@@ -8,12 +8,9 @@ from azure.core.exceptions import ResourceExistsError, HttpResponseError
 
 class TableHelper:
     def __init__(self):
-        self.partition_key = "Development" #getenv("ENV")
-        # self.connection_string = "DefaultEndpointsProtocol=https;AccountName={};AccountKey={};EndpointSuffix={}".format(
-        #     self.account_name, self.access_key, self.endpoint_suffix
-        # )
+        self.partition_key = environ.get("ENV")
         self.endpoint = environ.get("TABLE_ENDPOINT")
-        self.connection_string = environ.get("TABLE_CONNECTION_STRING")
+        self.connection_string = environ.get("STORAGE_ACCOUNT_CONNECTION_STRING")
 
     def create_table_client(self, table_name : str):
         """
@@ -72,7 +69,44 @@ class TableHelper:
 
         elif table_name == "users":
             # IDK what to do here
+            # Row key is the user_id
             return None
+
+        elif table_name == "characters":
+            # For characters, should get the character list based on user_id
+            return None
+
+        elif table_name == "prefixes":
+            # For prefixes, our row key should be the guild id
+            return None
+
+    def get_all_entities(self, table_name : str):
+        """
+        Gets ALL entities in table_name.
+
+        Returns a list of entity dictionaries
+
+        https://docs.microsoft.com/en-us/rest/api/storageservices/Querying-Tables-and-Entities?redirectedfrom=MSDN
+        """
+        table_client = self.create_table_client(table_name)
+
+        if table_name == "stats":
+            # I guess this is a no op?
+            return None
+
+        elif table_name == "users":
+            # For stats table, we always get the most recent one
+            filter = f"PartitionKey eq '{self.partition_key}'"
+            # results_per_page = 1means we will only get one result per page
+            # This is the same as taking the top value
+            entities = table_client.query_entities(query_filter = filter)  
+            
+            entitity_list = []
+            for e in entities:
+                print(e)
+                entitity_list.append(dict(e))
+
+            return entitity_list
 
         elif table_name == "characters":
             # For characters, should get the character list based on user_id
@@ -100,11 +134,11 @@ class TableHelper:
             return entity_json 
 
         elif table_name == "users":
-            # Not sure what to do here
-            # Users is just a giant list of unique values
-            # So there may be a better way than table to store it?
-            # Or it just has a row_key == user_id
-            return None
+            entity_json[u"PartitionKey"] = self.partition_key # Partition Key is the ENV, so Development/Production
+            entity_json[u"RowKey"] = entity_json["UserId"] # Zero pad the string, so 2 -> 0000..0002
+
+            # Add datetime, so we can graph this data
+            return entity_json 
 
         elif table_name == "characters":
             # For characters, our row key should probably be the user id

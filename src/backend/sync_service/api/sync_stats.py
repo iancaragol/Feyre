@@ -12,9 +12,6 @@ stats_sync_api = Blueprint('stats', __name__)
 redis_helper = RedisHelper()
 table_helper = TableHelper()
 
-#if not os.environ.get('STORAGE_BYPASS', None):
-environment = os.environ.get("ENV")  
-
 # This json is updated whenever the new sync occurs
 last_sync = {}
 last_sync["message"] = "command_stats has not been synced since service startup."
@@ -30,7 +27,7 @@ def put_cmd_stats_set():
     
         return f"Inserted stats set into Table. RowKey is {insert_row_key} insert_time is {statblock['insert_time']}", HTTPStatus.OK
     except Exception as e:
-        return f"An exception occurred when updating the Table.\n{e}\n{traceback.format_exc()}", HTTPStatus.INTERNAL_SERVER_ERROR
+        return f"An exception occurred when updating the Stats Table.\n{e}\n{traceback.format_exc()}", HTTPStatus.INTERNAL_SERVER_ERROR
 
 @stats_sync_api.route('/', methods=['GET'])
 def get_stats():
