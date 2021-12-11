@@ -1,6 +1,7 @@
 version: '3.9'
 
 services:
+  # Frontend service
   frontend:
     container_name: frontend
     env_file: 
@@ -9,6 +10,7 @@ services:
     build: ./src/frontend
     command: app.js
 
+  # Backend Service (Flask)
   backend:
     container_name: backend
     env_file: 
@@ -26,6 +28,7 @@ services:
       - datasync
       - frontend
   
+  # Data sync service (Flask)
   datasync:
     container_name: datasync
     env_file: 
@@ -41,6 +44,7 @@ services:
       - redis-primary
       - redis-secondary
 
+  # Primary redis
   redis-primary:
     image: docker.io/bitnami/redis:6.2
     ports:
@@ -50,6 +54,7 @@ services:
     volumes:
       - 'redis_data:/bitnami/redis/data'
 
+  # Secondary Redis
   redis-secondary:
     image: docker.io/bitnami/redis:6.2
     ports:
@@ -58,6 +63,27 @@ services:
       - redis-primary
     env_file: 
       - ./src/backend/redis_secondary.env
+
+  # Prometheus server
+  prometheus:
+    container_name: prometheus
+    image: prom/prometheus:v2.2.1
+    volumes:
+      - ./src/prometheus/config.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - 9090:9090
+
+  # Grafana for visualization
+  grafana:
+    container_name: grafana
+    image: grafana/grafana:5.1.0
+    volumes:
+      - ./src/grafana/config.ini:/etc/grafana/grafana.ini
+      - ./src/grafana/datasource.yaml:/etc/grafana/provisioning/datasources/default.yaml
+      - ./src/grafana/dashboard.yaml:/etc/grafana/provisioning/dashboards/default.yaml
+      - ./src/grafana/dashboards:/var/lib/grafana/dashboards
+    ports:
+      - 3000:3000
 
 volumes:
   redis_data:
