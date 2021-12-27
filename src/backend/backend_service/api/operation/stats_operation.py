@@ -28,7 +28,16 @@ class StatsOperation:
         command_list = Commands.default_commands_list
         if self.show_all:
             command_list = Commands.all_commands_list
-        return self.redis_helper.get_commands_dictionary(command_list)
+        stats_dict = self.redis_helper.get_commands_dictionary(command_list)
+        stats_dict = self.add_stats_message(stats_dict)
+        return stats_dict
+
+    def add_stats_message(self, stats_dict):
+        message = "```asciidoc\n[Statistics]\n"
+        for k, v in stats_dict.items():
+            message += f"\n{k}: {v}"
+        stats_dict["message"] = message + "```"
+        return stats_dict
 
     def get_user_count(self):
         """

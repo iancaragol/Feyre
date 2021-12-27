@@ -13,12 +13,15 @@ const getJSON = bent('json');
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('health') // The name of the Discord Slash command
-        .setDescription('Returns the healthcheck of the backend'), // The description of the Discord Slash command
+        .setDescription('Check backend service health'), // The description of the Discord Slash command
 
     // The function to execute when the slash command is called (calls our backend)
     async execute(interaction) {
         // Creates the URL to call the backend
-        url = await backend.create_url({path: '/api/backendservice/healthcheck/'});
+        user = interaction.user.id
+        string_url = "/api/backendservice/healthcheck?user=" + user
+        url = await backend.create_url({path: string_url});
+
         // Calls the backend with a GET request and returns the JSON response
         let response = await getJSON(url);
 

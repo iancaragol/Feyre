@@ -16,14 +16,14 @@ const get = bent(status_codes);
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('roll') // The name of the Discord Slash command
-        .setDescription('Rolls a dice expression') // The description of the Discord Slash command
+        .setDescription('Roll any size/type of dice with modifiers!') // The description of the Discord Slash command
         .addStringOption(option =>
             option.setName('expression')
                 .setDescription('The expression to roll. Ex: 1d20+5')
                 .setRequired(true))
         .addBooleanOption(boolean =>
             boolean.setName('debug')
-                .setDescription('Are we cool or what?')
+                .setDescription('Literally does nothing.')
                 .setRequired(false),
         ),
 
@@ -36,7 +36,7 @@ module.exports = {
             user = interaction.user.id
 
             expression = encodeURIComponent(expression)
-            string_url = "/api/backendservice/roll/?user=" + user + "&expression=" + expression
+            string_url = "/api/backendservice/roll?user=" + user + "&expression=" + expression + "&verbose=false"
 
             // Creates the URL to call the backend
             url = await backend.create_url({path: string_url});

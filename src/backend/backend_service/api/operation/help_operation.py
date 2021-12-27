@@ -2,6 +2,7 @@ from common import redis_keys
 from json import dumps
 from common.redis_helper import RedisHelper
 from common.commands import Commands
+from backend_service.api.model.help_models import HelpModels
 
 class HelpOperation:
     """
@@ -23,6 +24,6 @@ class HelpOperation:
 
     def get_help_message(self, command : str):
         if command == "roll":
-            return "Roll Help string!"
+            return HelpModels.roll
         else:
-            return "No filter provided!"
+            return HelpModels.default
