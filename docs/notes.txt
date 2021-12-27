@@ -1,7 +1,17 @@
+Feyre-Dev-Slash:
+
+https://discord.com/api/oauth2/authorize?client_id=896435492273393694&permissions=2147608640&scope=applications.commands%20bot
+
+
 Test Bot Invite:
 https://discord.com/oauth2/authorize?client_id=505120997658329108&permissions=124992&scope=bot
 
+Slash bot invite:
+
+https://discord.com/api/oauth2/authorize?client_id=896435492273393694&permissions=2147575872&scope=bot 
+
 Test permissions: 67648
+Slash permissions: 2147575872
 
 https://discord.com/oauth2/authorize?client_id=505120997658329108&permissions=75840&scope=bot
 

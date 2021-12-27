@@ -55,16 +55,29 @@ module.exports = {
                 // Need to put this in a loop for multiple dice counts.
                 // Or display it differently, probably just the totals.
                 // Otherwise it will hit the max size of an embed and be hard to read
-                total_field = "🎲 -> " + response.parent_result[0].total
-                expression_value = response.parent_result[0].expression + " -> " + response.parent_result[0].md_result
+                responseEmbed = new MessageEmbed().setColor('#00FFDE')
 
-                // Need to play around with this, what is the best way of displaying a roll?
-                responseEmbed = new MessageEmbed()
-                    .setColor('#00FFDE')
-                    //.setDescription(`<@!${user}>`)
-                    .addFields(
+                if (response.parent_result.length > 1)
+                {
+                    for (let i = 0; i < response.parent_result.length; i++)
+                    {
+                        total_field = "🎲 -> " + response.parent_result[i].total
+                        expression_value = response.parent_result[i].expression + " -> " + response.parent_result[i].md_result
+                        responseEmbed.addFields(
+                            { name: total_field, value: expression_value }
+                        )
+                    }
+                }
+                else
+                {
+                    total_field = "🎲 -> " + response.parent_result[0].total
+                    expression_value = response.parent_result[0].expression + " -> " + response.parent_result[0].md_result
+                
+                    responseEmbed.addFields(
                         { name: total_field, value: expression_value }
                     )
+                }
+                
 
                 // Sends a reply to the Slash command which triggered this function
                 interaction.reply({ embeds: [responseEmbed] });

@@ -7,6 +7,7 @@ from sentry_sdk.integrations.flask import FlaskIntegration
 from backend_service.api.controller.roll_controller import roll_api
 from backend_service.api.controller.stats_controller import stats_api
 from backend_service.api.controller.healthcheck_controller import healthcheck_api
+from backend_service.api.controller.help_controller import help_api
 from backend_service.api.controller.sentry_controller import sentry_api
 
 metrics = PrometheusMetrics.for_app_factory()
@@ -18,6 +19,7 @@ def create_app():
     app.register_blueprint(roll_api, url_prefix='/api/backendservice/roll')
     app.register_blueprint(stats_api, url_prefix='/api/backendservice/stats')
     app.register_blueprint(healthcheck_api, url_prefix='/api/backendservice/healthcheck')
+    app.register_blueprint(help_api, url_prefix='/api/backendservice/help')
     app.register_blueprint(sentry_api, url_prefix="/api/backendservice/sentry")
 
     dsn = environ.get("SENTRY_DSN")
