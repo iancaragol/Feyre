@@ -16,12 +16,17 @@ const get = bent(status_codes);
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('stats') // The name of the Discord Slash command
-        .setDescription('Show command usage'),
+        .setDescription('Show command usage')
+        .addBooleanOption(option =>
+            option.setName('all')
+                .setDescription('More detailed stats information')
+                .setRequired(false)),
 
     // The function to execute when the slash command is called (calls our backend)
     async execute(interaction) {
+        all = interaction.options.getBoolean('all')
         user = interaction.user.id
-        string_url = "/api/backendservice/stats?user=" + user
+        string_url = "/api/backendservice/stats?user=" + user + "&all=" + all
         
         url = await backend.create_url({path: string_url});
         let request = await get(url);
@@ -36,4 +41,4 @@ module.exports = {
             interaction.reply("Oops! Something went wrong.");
         }
     }
-};
+}; 

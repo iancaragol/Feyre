@@ -13,7 +13,7 @@ help_router = APIRouter()
 redis_helper = RedisHelper()
 
 @help_router.get('/api/backendservice/help')
-async def help(user : str, command : Optional[str] = None):
+async def help(user : int, command : Optional[str] = None):
     """
     Returns the help string for the command
 

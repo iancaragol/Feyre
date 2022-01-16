@@ -1,19 +1,22 @@
-from os import environ, truncate
 import sentry_sdk
 
 import uvicorn
 from fastapi import FastAPI
+from os import environ, truncate
 
-from flask import Flask
 from starlette_exporter import PrometheusMiddleware, handle_metrics
-from sentry_sdk.integrations.flask import FlaskIntegration
+from prometheus_client.core import REGISTRY
+
 from backend_service.api.router.roll_router import roll_router
 from backend_service.api.router.stats_router import stats_router
 from backend_service.api.router.healthcheck_router import healthcheck_router
 from backend_service.api.router.help_router import help_router
 from backend_service.api.router.sentry_router import sentry_router
 
-# metrics = PrometheusMetrics.for_app_factory()
+from backend_service.collectors.collectors import StatsMetricsCollector
+
+# Register any custom collectors here
+REGISTRY.register(StatsMetricsCollector())
 
 def create_app():
     app = FastAPI()
@@ -24,6 +27,8 @@ def create_app():
     app.include_router(healthcheck_router)
     app.include_router(sentry_router)
 
+    # Remove sentry for now, Feyre generates too many exceptions!
+    
     # dsn = environ.get("SENTRY_DSN")
     # sentry_sdk.init(
     #     dsn=dsn,

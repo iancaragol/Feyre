@@ -82,10 +82,11 @@ module.exports = {
                 // Sends a reply to the Slash command which triggered this function
                 interaction.reply({ embeds: [responseEmbed] });
             }
-            // If the backend could not parse the expression, we should get a 500 Internal Server Error
+            // If the backend could not parse the expression, we should get a 400 BAD REQUEST
+            // For now we get a 500
             else if (request.statusCode == 500)
             {
-                error_string = expression + "\n" + response.exception_message
+                error_string = response.expression + "\n" + response.exception_message
                 responseEmbed = new MessageEmbed()
                 .setColor('#FF0000')
                 //.setDescription(`<@!${user}>`)
@@ -99,7 +100,7 @@ module.exports = {
             // If the status code is something else, we are outside of expected behaviour
             else
             {
-                throw new Error('BackendService did not respond with 200 OK or 500 Internal Server error as expected.')
+                interaction.reply("Oops! I received something other than a 200 OK or 504 BAD REQUEST from the backend!");
             }            
         }
         catch (error)

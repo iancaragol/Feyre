@@ -48,12 +48,13 @@ const rest = new REST({ version: '9' }).setToken(DISCORD_TOKEN);
 
     // Production - Enable commands globally for all guilds
     if (!TEST_GUILD_ID) {
-        await rest.put(
+        resposne = await rest.put(
             Routes.applicationCommands(CLIENT_ID), {
                 body: commands
             },
         );
-        console.log('Successfully registered application commands globally');
+        console.log("Discord API Response:");
+        console.log(response);
     // Development - Enable commands only for the test guild
     } else {
         await rest.put(

@@ -11,7 +11,7 @@ healthcheck_router = APIRouter()
 redis_helper = RedisHelper()
 
 @healthcheck_router.get('/api/backendservice/healthcheck')
-async def healthcheck(user : str):
+async def healthcheck(user : int):
     """
     Healthcheck endpoint
     """

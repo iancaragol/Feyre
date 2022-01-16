@@ -1,22 +1,23 @@
-import os
 import traceback
 
 from http import HTTPStatus
-from flask import Blueprint, request
+
+from fastapi import APIRouter
+from fastapi.responses import Response
+from json import dumps
+
 from datetime import datetime
+from sync_service.api.models.last_sync import LastSync
 from common.redis_helper import RedisHelper
 from common.table_helper import TableHelper
 from backend_service.api.operation.stats_operation import StatsOperation
 
-stats_sync_api = Blueprint('stats', __name__)
+stats_router = APIRouter()
 redis_helper = RedisHelper()
 table_helper = TableHelper()
+last_sync = LastSync()
 
-# This json is updated whenever the new sync occurs
-last_sync = {}
-last_sync["message"] = "command_stats has not been synced since service startup."
-
-@stats_sync_api.route('/', methods=['PUT'])
+@stats_router.put('/api/syncservice/stats')
 def put_cmd_stats_set():
     """
     Puts the current user set stored in Redis into the Stats Table.
@@ -25,21 +26,21 @@ def put_cmd_stats_set():
         statblock = construct_cmd_stats_json()
         insert_row_key = table_helper.insert_entity("stats", statblock)
     
-        return f"Inserted stats set into Table. RowKey is {insert_row_key} insert_time is {statblock['insert_time']}", HTTPStatus.OK
+        return Response(content = f"Inserted stats set into Table. RowKey is {insert_row_key} insert_time is {statblock['insert_time']}", status_code = HTTPStatus.OK)
     except Exception as e:
-        return f"An exception occurred when updating the Stats Table.\n{e}\n{traceback.format_exc()}", HTTPStatus.INTERNAL_SERVER_ERROR
+        return Response(content = f"An exception occurred when updating the Stats Table.\n{e}\n{traceback.format_exc()}", status_code = HTTPStatus.INTERNAL_SERVER_ERROR)
 
-@stats_sync_api.route('/', methods=['GET'])
+@stats_router.get('/api/syncservice/stats')
 def get_stats():
     """
     Returns user_set as a json
     """
     stats = construct_cmd_stats_json()
     
-    return stats, HTTPStatus.OK
+    return Response(content = dumps(stats), status_code = HTTPStatus.OK)
 
-@stats_sync_api.route('/sync', methods=['PUT'])
-def sync_stats_set():
+@stats_router.put('/api/syncservice/stats/sync')
+def sync_stats_set(sync : bool = False):
     """
     Syncs Redis and Stats Table
 
@@ -53,29 +54,29 @@ def sync_stats_set():
 
     If Redis > Stats Table time, then just PUT the contents of command_stats in Stats Table
     """
-    args = request.args
-
-    # sync=1 or sync=true
-    sync = False
-    if "sync" in args:
-        sync = bool(args["sync"])
-
     try:
         if sync:
             sync_result = sync_stats()
-            return f"{sync_result}", HTTPStatus.OK
+            return Response(content = f"{sync_result}", status_code = HTTPStatus.OK)
         else:
-            return f"Sync=true query parameter was not provided. This is a NO-OP.", HTTPStatus.OK
+            return Response(content = f"Sync=true query parameter was not provided. This is a NO-OP.", status_code = HTTPStatus.OK)
     except Exception as e:
         return f"An exception occurred when syncing.\n{e}\n{traceback.format_exc()}", HTTPStatus.INTERNAL_SERVER_ERROR
 
-@stats_sync_api.route('/sync', methods=['GET'])
-def get_last_sync():
+@stats_router.get('/api/syncservice/stats/sync')
+def get_last_sync_json():
     """
     Returns information on the last sync as a json
     """
     
-    return last_sync, HTTPStatus.OK
+    return Response(content = dumps(last_sync.to_dict()), status_code = HTTPStatus.OK)
+
+def get_last_sync():
+    """
+    Helper function, used by the metrics collector to get info on the last sync.
+    """
+    
+    return last_sync
 
 def sync_stats():
     """
@@ -91,6 +92,7 @@ def sync_stats():
     now_string = now.strftime("%m/%d/%Y, %H:%M:%S")
     sync_msg = ""
     completed_successfully = True
+    who_updated = "nobody"
     print(f"   [1] Starting sync_stats operation. Time is {now_string}", flush = True)
 
     try:
@@ -112,12 +114,16 @@ def sync_stats():
         if (redis_stats_set_updated_time_seconds < table_storage_last_entry_seconds):
             stats = construct_cmd_stats_json()
             table_helper.insert_entity("stats", stats)
+            who_updated = "table"
 
             sync_msg = f"Redis contained the most recent command stats. No need to update Redis set. Updated Table to match Redis."
 
         elif (redis_stats_set_updated_time_seconds > table_storage_last_entry_seconds):
             updated_table = update_redis_from_table(table_storage_last_entry)
+            print(updated_table, flush=True)
+            print(redis_stats_dict, flush=True)
             after_update_time = redis_helper.get_commands_dictionary_last_update_time().strftime("%m/%d/%Y, %H:%M:%S")
+            who_updated = "redis"
 
             sync_msg = f"Table contained the most recent command stats. Updated the Redis set to match. Redis command total count was {redis_stats_dict['total']} and was last updated at {redis_stats_dict_update_time}. Now the total count is {updated_table['total']}. It was updated at {after_update_time}."
 
@@ -130,10 +136,12 @@ def sync_stats():
         sync_msg = f"An error occurred when attempting to sync stats.\n{e}\n{traceback.format_exc()}"
         completed_successfully = False
 
-    last_sync["message"] = sync_msg
-    last_sync["completed_successfully"] = completed_successfully
-    last_sync["sync_time"] = now_string
-    last_sync["sync_timestamp"] = now.timestamp()
+    # Update the last sync object
+    last_sync.message = sync_msg
+    last_sync.completed_successfully = completed_successfully
+    last_sync.who_updated = who_updated
+    last_sync.sync_time = now_string
+    last_sync.sync_timestamp = now.timestamp()
 
     return sync_msg
 

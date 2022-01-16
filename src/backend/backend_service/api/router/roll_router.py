@@ -2,6 +2,7 @@ import traceback
 
 from fastapi import APIRouter
 from fastapi.responses import Response
+from json import dumps
 
 from http import HTTPStatus
 from backend_service.api.operation.roll_operation import RollOperation, RollOperationException
@@ -12,7 +13,7 @@ roll_router = APIRouter()
 redis_helper = RedisHelper()
 
 @roll_router.get('/api/backendservice/roll')
-async def roll(user : str, expression : str, verbose : bool):
+async def roll(user : int, expression : str, verbose : bool = False):
     """
     Creates Roll Operations based on query parameters and returns a JSON object containing a list of ParentRollModels
 
@@ -26,7 +27,6 @@ async def roll(user : str, expression : str, verbose : bool):
     # Increment the roll operation counter
     redis_helper.increment_command("roll")
 
-    verbose = False
     # Add the user id to the user set
     if user:
         redis_helper.add_to_user_set(user)
@@ -43,8 +43,9 @@ async def roll(user : str, expression : str, verbose : bool):
             result = {
                     "message": f"An exception occurred when attempting the roll operation with expression = {unquote_plus(expression)}.",
                     "stack_trace": traceback.format_exc(),
-                    "exception_message": e.message
+                    "exception_message": e.message,
+                    "expression": expression
                 }
-            return Response(content = result, status_code = HTTPStatus.INTERNAL_SERVER_ERROR)
+            return Response(content = dumps(result), status_code = HTTPStatus.INTERNAL_SERVER_ERROR)
     else:
         return Response(content = "Missing expression query parameter", status_code = HTTPStatus.BAD_REQUEST)

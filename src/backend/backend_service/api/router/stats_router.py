@@ -1,4 +1,3 @@
-import datetime
 import traceback
 
 from fastapi import APIRouter
@@ -13,7 +12,7 @@ stats_router = APIRouter()
 redis_helper = RedisHelper()
 
 @stats_router.get('/api/backendservice/stats')
-async def stats(user : str, all : bool):
+async def stats(user : int, all : bool = True):
     """
     Returns the stats dictionary
 

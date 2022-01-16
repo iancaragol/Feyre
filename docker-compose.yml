@@ -10,7 +10,7 @@ services:
     build: ./src/frontend
     command: app.js
 
-  # Backend Service (Flask)
+  # Backend Service
   backend:
     container_name: backend
     env_file: 
@@ -28,7 +28,7 @@ services:
       - datasync
       - frontend
   
-  # Data sync service (Flask)
+  # Data sync service
   datasync:
     container_name: datasync
     env_file: 

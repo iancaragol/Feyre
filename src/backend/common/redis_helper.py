@@ -43,14 +43,17 @@ class RedisHelper:
             val = self.red.get(f"{prefix}:{command}")
             if val:
                 stats_dict[command] = int(val.decode("utf-8"))
-        total = int(self.red.get(f"{prefix}:total").decode("utf-8"))
-        stats_dict["total"] = total
+
+        tot = self.red.get(f"{prefix}:total")
+        if tot:
+            total = int(tot.decode("utf-8"))
+            stats_dict["total"] = total
         return stats_dict
 
     def set_commands_dictionary(self, commands_dictionary):
         prefix = RedisKeys.command_prefix
         for k, v in commands_dictionary.items():
-            if k in Commands.all_commands_list:
+            if k in Commands.all_commands_list or k == "total": # Special case, need to make to sure to include the total
                 self.red.set(f"{prefix}:{k}", v)
         updated_time = datetime.utcnow().timestamp()
         self.red.set(f"{RedisKeys.user_set}:{RedisKeys.updated_time}", updated_time)
@@ -60,7 +63,10 @@ class RedisHelper:
         """
         Returns the last update time for the command dictionary as a timestamp
         """
-        return float(self.red.get(f"{RedisKeys.command_counts}:{RedisKeys.updated_time}"))
+        val = self.red.get(f"{RedisKeys.command_counts}:{RedisKeys.updated_time}")
+        if val:
+            return float(self.red.get(f"{RedisKeys.command_counts}:{RedisKeys.updated_time}"))
+        return 0.0
     
     def get_commands_dictionary_last_update_time(self):
         """
@@ -88,7 +94,10 @@ class RedisHelper:
         """
         Returns the timestamp for the user set's last update time
         """
-        return float(self.red.get(f"{RedisKeys.user_set}:{RedisKeys.updated_time}"))
+        val = self.red.get(f"{RedisKeys.user_set}:{RedisKeys.updated_time}")
+        if val:
+            return float(val)
+        return 0.0
 
     def get_user_set_timestamp_as_datetime(self):
         """

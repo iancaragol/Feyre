@@ -1,47 +1,47 @@
-import os
 import traceback
-import json
+
+from fastapi import APIRouter
+from fastapi.responses import Response
+from json import dumps, loads
 
 from http import HTTPStatus
-from flask import Blueprint, request
 from common.blob_helper import BlobHelper
 from common.redis_helper import RedisHelper
 from datetime import datetime
+from sync_service.api.models.last_sync import LastSync
 
-users_sync_api = Blueprint('users', __name__)
+users_router = APIRouter()
 redis_helper = RedisHelper()
 blob_helper = BlobHelper()
+last_sync = LastSync()
 
-# This json is updated whenever the new sync occurs
-last_sync = {}
-last_sync["message"] = "user_set has not been synced since service startup."
 
-@users_sync_api.route('/', methods=['PUT'])
+@users_router.put('/api/syncservice/users')
 def put_users_set():
     """
     Puts the current user set stored in Redis into the Mongo DB.
     """
     try:
         users = construct_users_json()
-        up = blob_helper.upload_blob_from_bytes("users", users["filename"], json.dumps(users))
+        up = blob_helper.upload_blob_from_bytes("users", users["filename"], dumps(users))
     
         print(up, flush=True)
 
-        return f"Inserted users set into Blob Storage. Filename is {users['filename']}, insert_time is {users['insert_time']}", HTTPStatus.OK
+        return Response(content = f"Inserted users set into Blob Storage. Filename is {users['filename']}, insert_time is {users['insert_time']}", status_code = HTTPStatus.OK)
     except Exception as e:
         return f"An exception occurred when updating the Users Table.\n{e}\n{traceback.format_exc()}", HTTPStatus.INTERNAL_SERVER_ERROR
 
-@users_sync_api.route('/', methods=['GET'])
+@users_router.get('/api/syncservice/users')
 def get_users():
     """
     Returns user_set as a json
     """
     users = construct_users_json()
     
-    return users, HTTPStatus.OK
+    return Response(content = dumps(users), status_code = HTTPStatus.OK)
 
-@users_sync_api.route('/sync', methods=['PUT'])
-def sync_users_set():
+@users_router.put('/api/syncservice/users/sync')
+def sync_users_set(sync : bool = False):
     """
     Syncs Redis and Blob Storage
 
@@ -55,29 +55,29 @@ def sync_users_set():
 
     If Redis > Blob Storage time, then just PUT the contents of user_set in Blob Storage
     """
-    args = request.args
-
-    # sync=1 or sync=true
-    sync = False
-    if "sync" in args:
-        sync = bool(args["sync"])
-
     try:
         if sync:
             sync_result = sync_users()
-            return f"{sync_result}", HTTPStatus.OK
+            return Response(content = f"{sync_result}", status_code = HTTPStatus.OK)
         else:
-            return f"Sync=true query parameter was not provided. This is a NO-OP.", HTTPStatus.OK
+            return Response(content = f"Sync=true query parameter was not provided. This is a NO-OP.", status_code = HTTPStatus.OK)
     except Exception as e:
-        return f"An exception occurred when syncing.\n{e}\n{traceback.format_exc()}", HTTPStatus.INTERNAL_SERVER_ERROR
+        return Response(content = f"An exception occurred when syncing.\n{e}\n{traceback.format_exc()}", status_code = HTTPStatus.INTERNAL_SERVER_ERROR)
 
-@users_sync_api.route('/sync', methods=['GET'])
-def get_last_sync():
+@users_router.get('/api/syncservice/users/sync')
+def get_last_sync_as_json():
     """
     Returns information on the last sync as a json
     """
     
-    return last_sync, HTTPStatus.OK
+    return Response(content = dumps(last_sync.to_dict()), status_code = HTTPStatus.OK)
+
+def get_last_sync():
+    """
+    Helper function, used by the metrics collector to get info on the last sync.
+    """
+    
+    return last_sync
 
 def sync_users():
     """
@@ -93,6 +93,7 @@ def sync_users():
     now_string = now.strftime("%m/%d/%Y, %H:%M:%S")
     sync_msg = ""
     completed_successfully = True
+    who_updated = "nobody"
     print(f"   [1] Starting sync_users operation. Time is {now_string}", flush = True)
 
     try:
@@ -103,15 +104,16 @@ def sync_users():
 
         # Temporarily download the most recent blob
         user_blob_last_entry_name = blob_helper.list_blobs("users", "creation_time", reverse = True)[0].name
-        user_blob_last_entry = json.loads(blob_helper.download_blob_as_bytes("users", user_blob_last_entry_name))
+        user_blob_last_entry = loads(blob_helper.download_blob_as_bytes("users", user_blob_last_entry_name))
         user_blob_last_entry_seconds = (now - datetime.fromtimestamp(user_blob_last_entry['insert_timestamp'])).total_seconds()
         print(f"   [3] BlobStorage last users entry was added {user_blob_last_entry_seconds} seconds ago.", flush=True)
 
         # Compare last update time for Redis and Mongo DB
         if (redis_user_set_updated_time_seconds < user_blob_last_entry_seconds):
             users = construct_users_json()
-            user_as_bytes = json.dumps(users)
+            user_as_bytes = dumps(users)
             up = blob_helper.upload_blob_from_bytes("users", users["filename"], user_as_bytes)
+            who_updated = "table"
 
             sync_msg = f"Redis contained the most recent user_set. No need to update Redis set. Updated Blob Storage to match Redis. FileName: {users['filename']}, Size: {len(user_as_bytes)}"
 
@@ -120,6 +122,7 @@ def sync_users():
             before_update_time = redis_helper.get_user_set_timestamp_as_datetime().strftime("%m/%d/%Y, %H:%M:%S")
             redis_helper.add_to_user_set(user_blob_last_entry["user_set"])
             after_update_time = redis_helper.get_user_set_timestamp_as_datetime().strftime("%m/%d/%Y, %H:%M:%S")
+            who_updated = "redis"
 
             sync_msg = f"Blob Storage contained the most recent set. Updated the Redis set to match. Redis user_set contained {before_update_count} entries and was updated at {before_update_time}. Now it contains {len(user_blob_last_entry['user_set'])} entries and was updated at {after_update_time}."
 
@@ -132,10 +135,12 @@ def sync_users():
         sync_msg = f"An error occurred when attempting to sync.\n{e}\n{traceback.format_exc()}"
         completed_successfully = False
 
-    last_sync["message"] = sync_msg
-    last_sync["completed_successfully"] = completed_successfully
-    last_sync["sync_time"] = now_string
-    last_sync["sync_timestamp"] = now.timestamp()
+    # Update the last sync object
+    last_sync.message = sync_msg
+    last_sync.completed_successfully = completed_successfully
+    last_sync.who_updated = who_updated
+    last_sync.sync_time = now_string
+    last_sync.sync_timestamp = now.timestamp()
 
     return sync_msg
 

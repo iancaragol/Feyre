@@ -6,6 +6,7 @@ from backend_service.api.model.child_roll_model import ChildRollModel
 from backend_service.api.model.parent_roll_model import ParentRollModel
 
 MAX_DICESIZE = 10000
+MAX_COUNT = 10
 
 class RollOperation():
     """
@@ -63,6 +64,8 @@ class RollOperation():
         if 'c' in tokens[-1]: # Special case, with Count. Ex: 1d6+1c3 = 1d6 THREE TIMES
             popped = tokens.pop()
             count = int(popped.replace('c', ''))
+            if count >= MAX_COUNT:
+                raise ValueError(f"Count operator cannot be greater than {MAX_COUNT}. The provided count operator was {count}")
         
         # Repeat entire roll for # of count
         # If count was only one, then the list will have length 1
@@ -359,13 +362,13 @@ class RollOperationException(Exception):
     def __init__(self, exception, expression):
         self.exception = exception
         self.expression = expression
-        self.message = ""
+        self.message = str(exception)
         
+        # Additional handling for any specific errors
+        # The messagae string will be returned to the user
+        # So want to make sure it is somewhat descriptive
         if str(exception) == "pop from empty list":
             self.message = "Invalid expression string. Two operators (+, -, /, ...) in a row is not supported"
 
-        # Todo(Ian)
-        # This is a bit ugly, can make this cleaner.
-        # Also should emit or log these messages to prometheus
-        if str(exception).startswith("The number of dice"):
-            self.message = str(exception)
+        if str(exception).startswith("invalid literal") or str(exception).startswith("list index out of range"):
+            self.message = "Invalid expressions string. Does it contain any extra characters? \nCheck /help roll for some examples."
