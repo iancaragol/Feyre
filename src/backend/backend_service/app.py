@@ -1,6 +1,8 @@
+from time import sleep
 import sentry_sdk
 
 import uvicorn
+import requests
 from fastapi import FastAPI
 from os import environ, truncate
 
@@ -46,7 +48,31 @@ def create_app():
     print("[#] Created new app", flush = True)
     return app
 
+def check_sync_state():
+    """
+    Checks to make sure sync service is up and running, and that it synced as part of start up.
+    """
+    print("[#] Checking sync service to make sure it is ready...", flush = True)
+    has_synced = False
+    i = 0
+    while (not has_synced):
+        try:
+            user_sync = requests.get('http://datasync:5001/api/syncservice/users/sync').json()
+            stats_sync = requests.get('http://datasync:5001/api/syncservice/stats/sync').json()
+
+            if (bool(user_sync["completed_successfully"]) and bool(stats_sync["completed_successfully"])):
+                has_synced = True
+                print("[#] Sync complete!", flush = True)
+            else:
+                print(f"[#] Sync service has not finished syncing yet... This is iteration {i}", flush = True)
+                sleep(10)
+
+        except ConnectionRefusedError:
+            print("[#] Sync service is not serving requests yet!", flush = True)
+        i+=1
+        
 def main():
+    check_sync_state()
     app = create_app()
     print("[#] Starting app...", flush = True)
     uvicorn.run(app, host="0.0.0.0", port=5000)

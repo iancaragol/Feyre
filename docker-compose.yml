@@ -46,6 +46,7 @@ services:
 
   # Primary redis
   redis-primary:
+    container_name: redis-primary
     image: docker.io/bitnami/redis:6.2
     ports:
       - '6379'
@@ -56,6 +57,7 @@ services:
 
   # Secondary Redis
   redis-secondary:
+    container_name: redis-secondary
     image: docker.io/bitnami/redis:6.2
     ports:
       - '6379'

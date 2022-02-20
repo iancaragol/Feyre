@@ -15,7 +15,6 @@ redis_helper = RedisHelper()
 blob_helper = BlobHelper()
 last_sync = LastSync()
 
-
 @users_router.put('/api/syncservice/users')
 def put_users_set():
     """

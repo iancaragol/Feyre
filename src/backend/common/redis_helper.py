@@ -30,6 +30,25 @@ class RedisHelper:
         self.red.set(f"{RedisKeys.command_counts}:{RedisKeys.updated_time}", updated_time)
         return updated_time
 
+    def get(self, key):
+        """
+        Gets a value directly from Redis
+
+        Parameter:
+            key: The Key of the Value
+        """
+        return self.red.get(key)
+
+    def set(self, key, value):
+        """
+        Sets a value in Redis
+
+        Parameter:
+            key: The key
+            value: The value
+        """
+        return self.red.set(key, value)
+
     def get_commands_dictionary(self, command_list):
         """
         Returns a dictionary of command counts

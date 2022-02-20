@@ -10,6 +10,7 @@ from starlette_exporter import PrometheusMiddleware, handle_metrics
 from sync_service.api.routers.sync_stats import stats_router, sync_stats
 from sync_service.api.routers.sync_user import users_router, sync_users
 from sync_service.collectors.collectors import TimeSinceSyncMetricsCollector, CompletedSuccesfullyMetricsCollector
+from common.redis_helper import RedisHelper, RedisKeys
 
 sync_interval_seconds = 7200 # 2 Hours
 
@@ -38,7 +39,19 @@ def create_app():
     print("[#] Created new app", flush = True)
     return app
     
+def sync_on_start():
+    """
+    Sync on start up, this way if a new Redis instance has been created it will be synced right away
+    """
+
+    sync_stats()
+    sync_users()
+
 def main():
     app = create_app()
+
+    print("[#] Checking Redis status...", flush = True)
+    sync_on_start()
+
     print("[#] Starting app...", flush = True)
     uvicorn.run(app, host="0.0.0.0", port=5001)

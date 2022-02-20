@@ -21,3 +21,5 @@ class LastSync:
         d["who_updated"] = self.who_updated
         d["sync_time"] = self.sync_time
         d["sync_timestamp"] = self.sync_timestamp
+
+        return d
