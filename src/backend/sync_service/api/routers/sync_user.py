@@ -132,6 +132,7 @@ def sync_users():
         print("   [5] Sync operation completed.\n\n", flush = True)
     except Exception as e:
         sync_msg = f"An error occurred when attempting to sync.\n{e}\n{traceback.format_exc()}"
+        print(sync_msg, flush = True)
         completed_successfully = False
 
     # Update the last sync object
