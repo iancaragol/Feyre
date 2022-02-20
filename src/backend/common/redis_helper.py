@@ -67,6 +67,8 @@ class RedisHelper:
         if tot:
             total = int(tot.decode("utf-8"))
             stats_dict["total"] = total
+        else:
+            stats_dict["total"] = 0
         return stats_dict
 
     def set_commands_dictionary(self, commands_dictionary):
