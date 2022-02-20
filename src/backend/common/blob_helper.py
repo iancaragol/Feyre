@@ -4,7 +4,7 @@ from azure.storage.blob import BlobServiceClient
 class BlobHelper:
     def __init__(self):
         self.partition_key = environ.get("ENV")
-        self.endpoint = environ.get("USERS_BLOB_ENDPOINT")
+        self.endpoint = environ.get("BLOB_ENDPOINT")
         self.connection_string = environ.get("STORAGE_ACCOUNT_CONNECTION_STRING")
 
     def create_container_client(self, container_name : str):

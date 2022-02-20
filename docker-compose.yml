@@ -5,8 +5,8 @@ services:
   frontend:
     container_name: frontend
     env_file: 
-      - ./src/frontend/.env
-    restart: always
+      - ./src/frontend/frontend.env
+    restart: unless-stopped
     build: ./src/frontend
     command: app.js
 
@@ -15,7 +15,7 @@ services:
     container_name: backend
     env_file: 
       - ./src/backend/backend.env
-    restart: always
+    restart: unless-stopped
     build: ./src/backend
     ports:
       - "5000:5000"
@@ -33,7 +33,7 @@ services:
     container_name: datasync
     env_file: 
       - ./src/backend/backend.env
-    restart: always
+    restart: unless-stopped
     build: ./src/backend
     ports:
       - "5001:5001"
@@ -48,10 +48,11 @@ services:
   redis-primary:
     container_name: redis-primary
     image: docker.io/bitnami/redis:6.2
+    restart: unless-stopped
     ports:
       - '6379'
     env_file: 
-      - ./src/backend/redis_primary.env
+      - ./src/backend/redis-primary.env
     volumes:
       - 'redis_data:/bitnami/redis/data'
 
@@ -59,33 +60,43 @@ services:
   redis-secondary:
     container_name: redis-secondary
     image: docker.io/bitnami/redis:6.2
+    restart: unless-stopped
     ports:
       - '6379'
     depends_on:
       - redis-primary
     env_file: 
-      - ./src/backend/redis_secondary.env
+      - ./src/backend/redis-secondary.env
 
-  # Prometheus server
+  # Prometheus
+  # Prometheus.yml is configured to point to Grafana Cloud
   prometheus:
     container_name: prometheus
-    image: prom/prometheus:v2.2.1
+    image: prom/prometheus:latest
+    restart: unless-stopped
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--enable-feature=expand-external-labels'
+    env_file: 
+      - ./src/prometheus/prometheus.env
     volumes:
-      - ./src/prometheus/config.yml:/etc/prometheus/prometheus.yml
+      - ./src/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
     ports:
       - 9090:9090
 
   # Grafana for visualization
-  grafana:
-    container_name: grafana
-    image: grafana/grafana:5.1.0
-    volumes:
-      - ./src/grafana/config.ini:/etc/grafana/grafana.ini
-      - ./src/grafana/datasource.yaml:/etc/grafana/provisioning/datasources/default.yaml
-      - ./src/grafana/dashboard.yaml:/etc/grafana/provisioning/dashboards/default.yaml
-      - ./src/grafana/dashboards:/var/lib/grafana/dashboards
-    ports:
-      - 3000:3000
+  # Commented out because we are using Grafana Cloud instead
+  #grafana:
+  #  container_name: grafana
+  #  image: grafana/grafana:5.1.0
+  #  volumes:
+  #    - ./src/grafana/config.ini:/etc/grafana/grafana.ini
+  #    - ./src/grafana/datasource.yaml:/etc/grafana/provisioning/datasources/default.yaml
+  #    - ./src/grafana/dashboard.yaml:/etc/grafana/provisioning/dashboards/default.yaml
+  #    - ./src/grafana/dashboards:/var/lib/grafana/dashboards
+  #  ports:
+  #    - 3000:3000
 
 volumes:
   redis_data:

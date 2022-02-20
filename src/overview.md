@@ -1,6 +1,23 @@
-# Permissions And Slash Commands
+# Overview
 
-https://discord.com/api/oauth2/authorize?client_id=896435492273393694&permissions=2147559488&scope=bot%20applications.commands
+### Permissions
+https://discord.com/api/oauth2/authorize?client_id=CLIENT_ID&permissions=2147559488&scope=bot%20applications.commands
+
+### Style Guide:
+https://google.github.io/styleguide/pyguide.html
+
+### Deployment
+
+1. Clone the Feyre repro
+2. Install dependencies (docker, docker-compose)
+3. Update all environment files (backend.env, frontend.env, prometheus.env, redis-primary.env, redis-secondary.env)
+4. Start containers (docker-compose up --build d)
+
+### Regristration
+
+If deploying a new command, then that command will need to be registered. Run the following to run register.js in the frontend container
+
+`docker-compose run --rm frontend "register.js" && echo "\e[32m[#] Registered all slash commands in the src/frontend/commands folder!\e[0m"`
 
 # Backend Service
 
@@ -20,32 +37,11 @@ The model is where any properties that are used by the operation are stored. The
 
 # Sync Service
 
-Sync service runs in a separate docker container and periodically syncronizes the local Redis store with the Mongo DB.
+Sync service runs in a separate docker container and periodically syncronizes the local Redis store with Azure Storage.
 
-On service startup, Sync Service will download all data from the MongoDB and recreate it in Redis UNLESS the data stored in Redis is more up-to-date. (Meaning the SyncService crashed, while BackendService continued writing to Redis)
+On service startup, Sync Service will download all data from the Azure Storage and recreate it in Redis UNLESS the data stored in Redis is more up-to-date. (Meaning the SyncService crashed, while BackendService continued writing to Redis)
 
-Once per hour, sync service will take all of the data stored in Redis and format it as JSON objects to be stored in the Mongo DB.
-
-### References:
-https://livecodestream.dev/post/python-flask-api-starter-kit-and-project-layout/
-https://github.com/bitnami/bitnami-docker-redis#configuration
-
-### Style Guide:
-https://google.github.io/styleguide/pyguide.html
-
-#### Adding a new command
-
-#### Step 1:
-    Create the controller, model, and operations
-
-#### Step 2:
-    Add the new command to Commands.py
-
-#### Step 3:
-    Register the new controller's blueprint in app.py
-
-#### Step 4:
-    If command needs to be synced with Mongo DB, implement the sync_command API
+Once per hour, sync service will take all of the data stored in Redis and mirror it in Azure Storage.
 
 # Redis Models
 

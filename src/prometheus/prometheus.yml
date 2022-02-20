@@ -25,3 +25,9 @@ scrape_configs:
       - targets: ['datasync:5001']
         labels:
           alias: "datasync"
+
+remote_write:
+- url: https://prometheus-prod-10-prod-us-central-0.grafana.net/api/prom/push
+  basic_auth:
+    username: ${GRAFNA_USER_ID}
+    password: ${GRAFANA_API_KEY}
