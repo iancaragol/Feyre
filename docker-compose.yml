@@ -72,16 +72,12 @@ services:
   # Prometheus.yml is configured to point to Grafana Cloud
   prometheus:
     container_name: prometheus
-    image: prom/prometheus:latest
+    build: ./src/prometheus
     restart: unless-stopped
-    command:
-      - '--config.file=/etc/prometheus/prometheus.yml'
-      - '--storage.tsdb.path=/prometheus'
-      - '--enable-feature=expand-external-labels'
     env_file: 
       - ./src/prometheus/prometheus.env
     volumes:
-      - ./src/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./src/prometheus/config.yml:/etc/prometheus/config.yml
     ports:
       - 9090:9090
 

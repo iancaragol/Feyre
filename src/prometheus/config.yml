@@ -1,8 +1,8 @@
 global:
-  scrape_interval:     15s
+  scrape_interval: 1m
 
   external_labels:
-      monitor: 'feyre-backend-app'
+      monitor: 'feyre'
 
 rule_files:
 
@@ -11,23 +11,28 @@ scrape_configs:
 
     static_configs:
       - targets: ['localhost:9090']
+        labels:
+          instance: "prometheus"
+          env: ${ENV}
 
   - job_name: 'backend'
     metrics_path: /metrics
     static_configs:
       - targets: ['backend:5000']
         labels:
-          alias: "backend"
+          instance: "backend"
+          env: ${ENV}
 
   - job_name: 'datasync'
     metrics_path: /metrics
     static_configs:
       - targets: ['datasync:5001']
         labels:
-          alias: "datasync"
+          instance: "datasync"
+          env: ${ENV}
 
 remote_write:
 - url: https://prometheus-prod-10-prod-us-central-0.grafana.net/api/prom/push
   basic_auth:
-    username: ${GRAFNA_USER_ID}
+    username: ${GRAFANA_USER_ID}
     password: ${GRAFANA_API_KEY}
