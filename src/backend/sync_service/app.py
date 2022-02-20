@@ -10,7 +10,6 @@ from starlette_exporter import PrometheusMiddleware, handle_metrics
 from sync_service.api.routers.sync_stats import stats_router, sync_stats
 from sync_service.api.routers.sync_user import users_router, sync_users
 from sync_service.collectors.collectors import TimeSinceSyncMetricsCollector, CompletedSuccesfullyMetricsCollector
-from common.redis_helper import RedisHelper, RedisKeys
 
 sync_interval_seconds = 7200 # 2 Hours
 

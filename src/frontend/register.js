@@ -48,7 +48,7 @@ const rest = new REST({ version: '9' }).setToken(DISCORD_TOKEN);
 
     // Production - Enable commands globally for all guilds
     if (!TEST_GUILD_ID) {
-        resposne = await rest.put(
+        response = await rest.put(
             Routes.applicationCommands(CLIENT_ID), {
                 body: commands
             },

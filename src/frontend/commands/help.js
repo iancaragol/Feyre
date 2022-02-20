@@ -30,19 +30,6 @@ module.exports = {
     async execute(interaction) {
         command = interaction.options.getString('command')
 
-        // Here we notify the backend, but this should probably be a no-op.
-        // It doesnt make a lot of sense to go all the way to the backend just to create an embed
-        user = interaction.user.id
-        string_url = "/api/backendservice/help?user=" + user
-        if (command)
-        {
-            string_url = string_url + "&command=" + command
-        }
-        
-        url = await backend.create_url({path: string_url});
-        let request = await get(url);
-        let response = await request.json()
-
         if (!command)
         {
             interaction.reply({ embeds: [help_embeds.helpEmbed], components: [help_embeds.helpRow] });
@@ -56,15 +43,17 @@ module.exports = {
             // TODO: Improve this
             interaction.reply("Could not find that command!");
         }
-        /*
-        if (request.statusCode == 200)
+        
+        // Here we notify the backend, just to keep track of the help count
+        user = interaction.user.id
+        string_url = "/api/backendservice/help?user=" + user
+        if (command)
         {
-            interaction.reply(response.message)
+            string_url = string_url + "&command=" + command
         }
-        else if (request.statusCode == 500)
-        {
-            interaction.reply({emve}");
-        }
-        */
+        
+        url = await backend.create_url({path: string_url});
+        let request = await get(url);
+        let response = await request.json()
     }
 };

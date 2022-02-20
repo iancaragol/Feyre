@@ -3,6 +3,13 @@
 ### Permissions
 https://discord.com/api/oauth2/authorize?client_id=CLIENT_ID&permissions=2147559488&scope=bot%20applications.commands
 
+Staging bot:
+https://discord.com/api/oauth2/authorize?client_id=505120997658329108&permissions=2147559488&scope=bot%20applications.commands
+
+Dev bot:
+https://discord.com/api/oauth2/authorize?client_id=896435492273393694&permissions=2147559488&scope=bot%20applications.commands
+
+
 ### Style Guide:
 https://google.github.io/styleguide/pyguide.html
 
