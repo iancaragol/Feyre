@@ -14,6 +14,10 @@ async function create_url({protocol = 'http', host = null, path = null, port = 5
         // If the environment is prod, use the "name" set via docker-compose
         host = "backend";
     }
+    else if (process.env.ENVIRONMENT == "staging" && host === null) {
+        // If the environment is staging, use the "name" set via docker-compose
+        host = 'backend';
+    }
     else if (process.env.ENVIRONMENT == "dev" && host === null) {
         // If the environment is dev, use the "name" set via docker-compose
         host = 'backend';
