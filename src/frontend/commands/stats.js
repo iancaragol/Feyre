@@ -5,6 +5,9 @@ const { MessageEmbed } = require('discord.js');
 // Import our common backend functions
 const backend = require("../common/backend");
 
+// Import our embed color constants
+const embedColors = require('./../common/embed_colors')
+
 // Status codes that can be returned by the backend
 let status_codes = [200, 500, 504]
 

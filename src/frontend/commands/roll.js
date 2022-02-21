@@ -5,6 +5,9 @@ const { MessageEmbed } = require('discord.js');
 // Import our common backend functions
 const backend = require("./../common/backend");
 
+// Import our embed color constants
+const embedColors = require('./../common/embed_colors')
+
 // Status codes that can be returned by the backend
 let status_codes = [200, 500, 504]
 
@@ -28,19 +31,10 @@ module.exports = {
                 .setRequired(false),
         ),
 
-    async execute_msg(message)
+    async execute_roll(expression, user, guild = 0, debug = false)
     {
-        responseEmbed = new MessageEmbed().setColor('#00FFDE')
-        return responseEmbed
-    },
-
-    // The function to execute when the slash command is called (calls our backend)
-    async execute_interaction(interaction) {
         try
         {
-            expression = interaction.options.getString('expression')
-            user = interaction.user.id
-
             expression = encodeURIComponent(expression)
             string_url = "/api/backendservice/roll?user=" + user + "&expression=" + expression + "&verbose=false"
 
@@ -51,9 +45,6 @@ module.exports = {
             let request = await get(url);
             let response = await request.json()
             
-            // Temporary, remove this before going to prod
-            // console.log(response);
-
             // Backend should respond with a 200 OK if the dice expression is valid
             if (request.statusCode == 200)
             {
@@ -61,7 +52,7 @@ module.exports = {
                 // Need to put this in a loop for multiple dice counts.
                 // Or display it differently, probably just the totals.
                 // Otherwise it will hit the max size of an embed and be hard to read
-                responseEmbed = new MessageEmbed().setColor('#00FFDE')
+                responseEmbed = new MessageEmbed().setColor(embedColors.successEmbedColor)
 
                 if (response.parent_result.length > 1)
                 {
@@ -84,40 +75,64 @@ module.exports = {
                     )
                 }
                 
-
-                // Sends a reply to the Slash command which triggered this function
-                interaction.reply({ embeds: [responseEmbed] });
+                return responseEmbed;
             }
             // If the backend could not parse the expression, we should get a 400 BAD REQUEST
             // For now we get a 500
             else if (request.statusCode == 500)
             {
                 error_string = response.expression + "\n" + response.exception_message
-                responseEmbed = new MessageEmbed()
-                .setColor('#FF0000')
-                //.setDescription(`<@!${user}>`)
+                responseEmbed = new MessageEmbed().setColor(embedColors.errorEmbedColor)
                 .addFields(
                     { name: "Invalid Dice Expression", value: error_string }
                 )
 
-                // Sends a reply to the Slash command which triggered this function
-                interaction.reply({ embeds: [responseEmbed] });
+                return responseEmbed;
             }
             // If the status code is something else, we are outside of expected behaviour
             else
             {
-                interaction.reply("Oops! I received something other than a 200 OK or 504 BAD REQUEST from the backend!");
+                responseEmbed = new MessageEmbed().setColor(embedColors.errorEmbedColor)
+                .addFields(
+                    { name: "Unexpected Response", value: request.statusCode }
+                )
+
+                return responseEmbed;
             }            
         }
         catch (error)
         {
-            console.log("Caught Exception")
-            debug = interaction.options.getBoolean('debug')
-
+            console.log("Caught Unhandled Exception in ROLL")
+            console.log(error)
             if (debug)
             {
-                interaction.reply(error.toString())
+                responseEmbed = new MessageEmbed().setColor(embedColors.errorEmbedColor)
+                .addFields(
+                    { name: "Unhandled Exception", value: error.toString() }
+                )
+
+                return responseEmbed;
             }
         }
+    },
+
+    // Executes the command from message context
+    async execute_message(content, user, guild)
+    {
+        var expression = "1d20"
+        var debug = false
+    
+        return await this.execute_roll(expression, user, guild, debug);
+    },
+
+    // Executes the command from an interaction (slash command) context
+    async execute_interaction(interaction) {
+        expression = interaction.options.getString('expression')
+        debug = interaction.options.getString('debug')
+        user = interaction.user.id
+        guild = interaction.guild.id
+
+        var response = await this.execute_roll(expression, user, guild, debug)
+        return await interaction.reply({ embeds: [response]})
     }
 };

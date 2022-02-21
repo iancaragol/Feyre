@@ -1,21 +1,25 @@
 const { MessageEmbed, MessageActionRow, MessageButton } = require('discord.js');
-const help = require('../commands/help');
-var embedColor = '#00FFDE'
+const embedColors = require('./embed_colors')
+
+var embedColor = embedColors.helpEmbedColor
 var documentationUrl = "https://feyre.readthedocs.io/en/latest/"
 
-// Help Embed
+// ================================================
+//                      HELP
+// ================================================
 var helpEmbed = new MessageEmbed()
-helpEmbed.setColor(embedColor)
+helpEmbed.setColor(embedColors.helpEmbedColor)
 helpEmbed.setTitle("Feyre - Help")
 
-var helpDescription = `All commands use **/**
+var helpDescription = `All commands use **/** or **@Feyre**
  
-To learn more about a command you can do /help <command>
-Ex: /help roll`
+To learn more about a command you can type **/help <command>**
+**Ex: /help roll**`
 helpEmbed.setDescription(helpDescription)
 
 helpEmbed.setThumbnail("https://www.kindpng.com/picc/m/689-6892346_d20-png-transparent-png-download.png")
 
+// Main body
 var commandFieldBody = `**roll** - Roll complicated dice expressions
 
 **stats** - Feyre usage statistics
@@ -34,7 +38,19 @@ helpRow.addComponents(
     .setURL(documentationUrl)
 )
 
-// Roll Embed
+// ================================================
+//                COMMAND NOT FOUND
+// ================================================
+var notfoundEmbed = new MessageEmbed()
+notfoundEmbed.setColor(embedColors.errorEmbedColor)
+notfoundEmbed.setTitle("Command not found")
+
+var notfoundEmbedDescription = `I could not find that command. Try /help for a list of commands!`
+notfoundEmbed.setDescription(notfoundEmbedDescription)
+
+// ================================================
+//                      ROLL
+// ================================================
 var rollEmbed = new MessageEmbed()
 rollEmbed.setColor(embedColor)
 rollEmbed.setTitle("roll")
@@ -102,4 +118,4 @@ rollEmbed.addField("Keep / Drop Operator", keepOperatorField)
 rollEmbed.addField("Advantage / Disadvantage", advantageOperatorField)
 rollEmbed.addField("Explode Operator", explodeOperatorField)
 
-module.exports = { helpEmbed, helpRow, rollEmbed };
+module.exports = { helpEmbed, helpRow, notfoundEmbed, rollEmbed };

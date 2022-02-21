@@ -16,7 +16,7 @@ sync_interval_seconds = 7200 # 2 Hours
 REGISTRY.register(TimeSinceSyncMetricsCollector())
 REGISTRY.register(CompletedSuccesfullyMetricsCollector())
 
-if not environ.get('DB_BYPASS', None):
+if (not environ.get('DB_BYPASS', None)):
     scheduler = BackgroundScheduler()
 
     # Add all sync jobs here!
@@ -26,6 +26,8 @@ if not environ.get('DB_BYPASS', None):
     scheduler.start()
     # Shut down the scheduler when exiting the app
     atexit.register(lambda: scheduler.shutdown())
+
+
 
 def create_app():
     app = FastAPI()
@@ -42,9 +44,12 @@ def sync_on_start():
     """
     Sync on start up, this way if a new Redis instance has been created it will be synced right away
     """
-
-    sync_stats()
-    sync_users()
+    if (environ.get('ENV', None) != "development"):
+        print("[#] Not dev environment. Syncing!", flush = True)
+        sync_stats()
+        sync_users()
+    else:
+        print("[#] Dev environment. Skipping sync...", flush = True)
 
 def main():
     app = create_app()

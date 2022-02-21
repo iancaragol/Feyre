@@ -26,26 +26,12 @@ module.exports = {
                 .setRequired(false),
         ),
 
-    // The function to execute when the slash command is called (calls our backend)
-    async execute_interaction(interaction) {
-        command = interaction.options.getString('command')
+    async execute_help(command, user, guild)
+    {
+        // Trim any whitespace
+        command = command.trim()
 
-        if (!command)
-        {
-            interaction.reply({ embeds: [help_embeds.helpEmbed], components: [help_embeds.helpRow] });
-        }
-        else if (command == 'roll')
-        {
-            interaction.reply({ embeds: [help_embeds.rollEmbed]});
-        }
-        else
-        {
-            // TODO: Improve this
-            interaction.reply("Could not find that command!");
-        }
-        
         // Here we notify the backend, just to keep track of the help count
-        user = interaction.user.id
         string_url = "/api/backendservice/help?user=" + user
         if (command)
         {
@@ -54,6 +40,31 @@ module.exports = {
         
         url = await backend.create_url({path: string_url});
         let request = await get(url);
-        let response = await request.json()
+        
+        if (!command)
+        {
+            return { embeds: [help_embeds.helpEmbed], components: [help_embeds.helpRow] };
+        }
+        else if (command == 'roll')
+        {
+            return { embeds: [help_embeds.rollEmbed]};
+        }
+        else
+        {
+            return {embeds: [help_embeds.notfoundEmbed]};
+        }
+    },
+
+    async execute_message(content, user, guild)
+    {    
+        return await this.execute_help(content, user, guild);
+    },
+
+    // The function to execute when the slash command is called (calls our backend)
+    async execute_interaction(interaction) {
+        command = interaction.options.getString('command')
+        user = interaction.user.id
+        guild = interaction.guild.id
+        interaction.reply(await this.execute_help(command, user, guild));
     }
 };

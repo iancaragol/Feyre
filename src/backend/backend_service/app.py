@@ -53,6 +53,11 @@ def check_sync_state():
     Checks to make sure sync service is up and running, and that it synced as part of start up.
     """
     print("[#] Checking sync service to make sure it is ready...", flush = True)
+
+    if (environ.get('ENV', None) == "development"):
+        print("[#] This is a dev environment. Skipping!", flush = True)
+        return
+
     has_synced = False
     i = 0
     while (not has_synced):

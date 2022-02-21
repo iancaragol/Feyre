@@ -46,13 +46,40 @@ client.on('messageCreate', async message => {
     }
 
     console.log("Got a message: ", message.content);
+
+    // Remove the @bot
     var content = message.content.replace(mentionRegex, '').trim()
     console.log("New content: ", content);
+
+    // There is probably some cool way to reduce all of these if statements
+    // But leave it like this for now
+    // TODO(IAN)
+    // Determine what commands should suppor this functionality
+    // Thinking just roll?
     if (content.startsWith("ping"))
     {
         const command = client.commands.get("ping")
-        await message.channel.send(await command.execute_message(content))
-    }  
+        var response = await command.execute_message(content, message.author.id, message.guild.id)
+
+        await message.channel.send({ embeds: [response]})
+    }
+    else if (content.startsWith("roll"))
+    {
+        const command = client.commands.get("roll")
+        var response = await command.execute_message(content, message.author.id, message.guild.id)
+
+        await message.channel.send({ embeds: [response]})
+    }
+    else if (content.startsWith("help"))
+    {
+        const command = client.commands.get("help")
+        content = content.slice(4).trim() // Remove the "help"
+        var response = await command.execute_message(content, message.author.id, message.guild.id)
+
+        // Slightly different response
+        // Already has the {embeds}
+        await message.channel.send(response)
+    }   
 });
 
 // Reply to Slash Commands

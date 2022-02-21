@@ -5,6 +5,9 @@ const { MessageEmbed } = require('discord.js');
 // Import our common backend functions
 const backend = require("./../common/backend");
 
+// Import our embed color constants
+const embedColors = require('./../common/embed_colors')
+
 // Setup our HTTP library
 const bent = require('bent');
 const getJSON = bent('json');
@@ -42,10 +45,8 @@ module.exports = {
             redisstr += `->     Connections Received: ${response.redis.stats.total_connections_received}\n`;
         }
 
-        // Need to play around with this, what is the best way of displaying a roll?
         responseEmbed = new MessageEmbed()
-        .setColor('#00FFDE')
-        //.setDescription(`<@!${user}>`)
+        .setColor(embedColors.successEmbedColor)
         .addFields(
             { name: "Backend", value: backendstr },
             { name: "Redis", value: redisstr },
