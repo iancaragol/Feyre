@@ -119,7 +119,7 @@ module.exports = {
     // Executes the command from message context
     async execute_message(content, user, guild)
     {
-        var expression = "1d20"
+        var expression = content
         var debug = false
     
         return await this.execute_roll(expression, user, guild, debug);

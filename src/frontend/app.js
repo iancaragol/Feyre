@@ -65,6 +65,7 @@ client.on('messageCreate', async message => {
     }
     else if (content.startsWith("roll"))
     {
+        content = content.slice(4).trim() // Remove the "roll"
         const command = client.commands.get("roll")
         var response = await command.execute_message(content, message.author.id, message.guild.id)
 
