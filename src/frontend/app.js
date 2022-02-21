@@ -12,10 +12,13 @@ const DISCORD_TOKEN = process.env.DISCORD_TOKEN;
 const { Client, Intents, Collection } = require('discord.js');
 
 // Create a new client instance
-const client = new Client({ intents: [Intents.FLAGS.GUILDS] });
+const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.DIRECT_MESSAGES, Intents.FLAGS.GUILD_MESSAGES] });
 
 // Load all commands from the commands folder
 const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
+
+// Regex to remove <@!id>
+const mentionRegex = RegExp('<@!.*>');
 
 // Creating a collection for commands in client
 const commands = [];
@@ -34,7 +37,25 @@ client.once('ready', () => {
 // Login to Discord
 client.login(DISCORD_TOKEN);
 
-// Main
+// Reply to @bot messages
+client.on('messageCreate', async message => {
+    // Only respond to @bot from not another bot
+    if (!message.mentions.has(client.user) || message.author.bot)
+    {
+        return;
+    }
+
+    console.log("Got a message: ", message.content);
+    var content = message.content.replace(mentionRegex, '').trim()
+    console.log("New content: ", content);
+    if (content.startsWith("ping"))
+    {
+        const command = client.commands.get("ping")
+        await message.channel.send(await command.execute_message(content))
+    }  
+});
+
+// Reply to Slash Commands
 client.on('interactionCreate', async interaction => {
 
     console.log("Processing command:", interaction.commandName);
@@ -43,7 +64,7 @@ client.on('interactionCreate', async interaction => {
     if (!command) return;
 
     try {
-        await command.execute(interaction);
+        await command.execute_interaction(interaction);
     } catch (error) {
         if (error) console.error(error);
         await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });

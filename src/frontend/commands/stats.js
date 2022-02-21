@@ -23,7 +23,7 @@ module.exports = {
                 .setRequired(false)),
 
     // The function to execute when the slash command is called (calls our backend)
-    async execute(interaction) {
+    async execute_interaction(interaction) {
         all = interaction.options.getBoolean('all') || false
         user = interaction.user.id
         string_url = "/api/backendservice/stats?user=" + user + "&all=" + all

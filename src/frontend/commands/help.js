@@ -27,7 +27,7 @@ module.exports = {
         ),
 
     // The function to execute when the slash command is called (calls our backend)
-    async execute(interaction) {
+    async execute_interaction(interaction) {
         command = interaction.options.getString('command')
 
         if (!command)

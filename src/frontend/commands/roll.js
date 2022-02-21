@@ -10,6 +10,7 @@ let status_codes = [200, 500, 504]
 
 // Setup our HTTP library
 const bent = require('bent');
+const { execute_interaction } = require('./stats');
 const get = bent(status_codes);
 
 // Export the module which handles the slash command
@@ -27,9 +28,14 @@ module.exports = {
                 .setRequired(false),
         ),
 
+    async execute_msg(message)
+    {
+        responseEmbed = new MessageEmbed().setColor('#00FFDE')
+        return responseEmbed
+    },
+
     // The function to execute when the slash command is called (calls our backend)
-    async execute(interaction) {
-        console.log("Execute")
+    async execute_interaction(interaction) {
         try
         {
             expression = interaction.options.getString('expression')

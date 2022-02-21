@@ -16,7 +16,7 @@ module.exports = {
         .setDescription('Check backend service health'), // The description of the Discord Slash command
 
     // The function to execute when the slash command is called (calls our backend)
-    async execute(interaction) {
+    async execute_interaction(interaction) {
         // Creates the URL to call the backend
         user = interaction.user.id
         string_url = "/api/backendservice/healthcheck?user=" + user
