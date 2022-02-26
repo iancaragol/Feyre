@@ -21,7 +21,6 @@ async def roll(user : int, expression : str, verbose : bool = False):
         verbose: (true/false) Enables print statements for that specific dice roll
         expression: (string) The Dice Expression to be rolled
         user: (int) The user who rolled the dice
-    ---
     """
 
     # Increment the roll operation counter

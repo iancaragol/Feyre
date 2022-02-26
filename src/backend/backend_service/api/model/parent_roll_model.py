@@ -43,10 +43,7 @@ class ParentRollModel:
 
         j = 0
         for i in range(len(self.tokens)):
-            # print(self.tokens[i], flush=True)
             if (len(self.tokens[i]) > 1 and not self.tokens[i].isnumeric()): # If token is not an operator
-                # print(f"i = {i}", flush=True)
-                # print(f"j = {j}", flush=True)
                 final_result_str += self.create_roll_list_md_str(self.child_rolls[j])
                 j += 1
             else:

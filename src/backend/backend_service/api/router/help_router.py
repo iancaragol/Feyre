@@ -19,7 +19,6 @@ async def help(user : int, command : Optional[str] = None):
 
     Query Parameters:
         all: (true/false) Returns all stats instead of a subset
-    ---
     """
     redis_helper.increment_command("help")
 

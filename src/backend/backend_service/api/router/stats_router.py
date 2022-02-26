@@ -18,7 +18,6 @@ async def stats(user : int, all : bool = True):
 
     Query Parameters:
         all: (true/false) Returns all stats instead of a subset
-    ---
     """
     redis_helper.increment_command("stats")
 
