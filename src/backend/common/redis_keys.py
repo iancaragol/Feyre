@@ -47,3 +47,16 @@ class RedisKeys:
     # Ex:
     # [101203123, 10239024124, 437854554]
     user_set = "user_set"
+
+    @staticmethod
+    def get_it_key(guild : int, channel: int):
+        """
+        Takes the guild and channel and returns the initiative tracker key
+        """
+
+        # Prefix for any initiaitve trackers
+        # Used alongside guild and channel
+        # it_guild_channel
+        initiative_tracker_prefix = "it"
+
+        return f"{initiative_tracker_prefix}:{guild}:{channel}"

@@ -2,6 +2,9 @@ import redis
 
 from datetime import datetime
 from os import environ
+from json import loads, dumps
+
+from backend_service.api.model.initiative_tracker_model import InitiativeTracker
 from common.commands import Commands
 from common.redis_keys import RedisKeys
 
@@ -23,7 +26,16 @@ class RedisHelper:
 
         self.red = redis.StrictRedis(host=HOST, port=6379, db=0, password=redis_pw)
 
-    def increment_command(self, command):
+    def increment_command(self, command : str):
+        """
+        Increments the # of times <command> has been used and the <total> counter. Updates the <commands updated time> value
+
+        Parameter:
+            command: The command to increment
+
+        Returns:
+            The time of the update
+        """
         updated_time = datetime.now().timestamp()
         self.red.incr(f"{RedisKeys.command_prefix}:{command}", amount = 1)
         self.red.incr(f"{RedisKeys.command_prefix}:total", amount = 1)
@@ -36,6 +48,9 @@ class RedisHelper:
 
         Parameter:
             key: The Key of the Value
+
+        Returns:
+            The value at key
         """
         return self.red.get(key)
 
@@ -46,8 +61,23 @@ class RedisHelper:
         Parameter:
             key: The key
             value: The value
+
+        Returns:
+            True/False if the set was successful
         """
         return self.red.set(key, value)
+
+    def delete(self, key):
+        """
+        Delets value at key from redis
+
+        Parameter:
+            key: The key
+
+        Returns:
+            True/False if the set was successful
+        """
+        return self.red.delete(key)
 
     def get_commands_dictionary(self, command_list):
         """
@@ -204,3 +234,42 @@ class RedisHelper:
         except (redis.exceptions.ConnectionError, ConnectionRefusedError):
             return False
         return True
+
+    def get_initiative_tracker(self, guild : int, channel : int):
+        """
+        Gets the initiative tracker <guild, channel> and returns it as a JSON
+
+        Returns:
+            JSON of initiative tracker model if present
+            NONE if not present
+        """
+        key = RedisKeys.get_it_key(guild = guild, channel = channel)
+        tracker = self.get(key = key)
+
+        if tracker:
+            return loads(tracker)
+        else:
+            return None
+
+    def put_initiative_tracker(self, guild: int, channel: int, tracker : str):
+        """
+        Puts the tracker as a JSON into Redis
+
+        Parameters:
+            guild: guild for the tracker
+            channel: channel for the tracker
+            tracker: tracker object converted to JSON
+        """
+        key = RedisKeys.get_it_key(guild = guild, channel = channel)
+        self.set(key = key, value = tracker)
+
+    def delete_initiative_tracker(self, guild: int, channel: int):
+        """
+        Deletes the tracker from redis
+
+        Parameters:
+            guild: guild for the tracker
+            channel: channel for the tracker
+        """
+        key = RedisKeys.get_it_key(guild = guild, channel = channel)
+        self.delete(key=key)
