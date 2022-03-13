@@ -105,7 +105,7 @@ class InitiativeOperation():
                 break
             
         tracker.characters.append(character)
-        tracker.characters.sort(key=lambda c: c.initiative_value)
+        tracker.characters.sort(key=lambda c: c.initiative_value, reverse=True)
 
     def get_tracker(self):
         """

@@ -16,7 +16,7 @@ class InitiativeTracker:
             self.channel = it_dict["channel"]
             self.turn = it_dict["turn"]
             self.characters = []
-            
+
             for c in it_dict["characters"]:
                 char = Character(char_dict=c)
                 self.characters.append(char)
@@ -24,7 +24,7 @@ class InitiativeTracker:
             self.guild = guild
             self.channel = channel
             self.characters = []
-            self.turn = 0
+            self.turn = 1
 
     def to_dict(self):
         """
@@ -34,7 +34,7 @@ class InitiativeTracker:
             "guild" : self.guild,
             "channel" : self.channel,
             "characters" : [],
-            "turn" : self.turn
+            "turn" : self.turn,
         }
 
         for c in self.characters:

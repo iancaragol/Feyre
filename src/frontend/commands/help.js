@@ -29,12 +29,12 @@ module.exports = {
     async execute_help(command, user, guild)
     {
         // Trim any whitespace
-        command = command.trim()
 
         // Here we notify the backend, just to keep track of the help count
         string_url = "/api/backendservice/help?user=" + user
         if (command)
         {
+            command = command.trim()
             string_url = string_url + "&command=" + command
         }
         
