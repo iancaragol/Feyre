@@ -1,6 +1,6 @@
 // Import SlashCommandBuild to handle slash commands
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const { MessageEmbed } = require('discord.js');
+const { MessageEmbed, MessageActionRow, MessageButton, IntegrationApplication } = require('discord.js');
 
 // Import our common backend functions
 const backend = require("./../common/backend");
@@ -11,11 +11,33 @@ const embedColors = require('./../common/embed_colors')
 // Status codes that can be returned by the backend
 let status_codes = [200, 500, 504]
 
+// Button row for all initiative messages
+const initButtons = new MessageActionRow()
+    .addComponents(
+        new MessageButton()
+            .setCustomId('init_join')
+            .setLabel('➕ Join')
+            .setStyle('PRIMARY'),
+        new MessageButton()
+            .setCustomId('init_next')
+            .setLabel('⚔️ Next')
+            .setStyle('SUCCESS'),
+        // new MessageButton()
+        //     .setCustomId('init_refresh')
+        //     .setLabel('Refresh')
+        //     .setStyle('SECONDARY'),
+        // new MessageButton()
+        //     .setCustomId('init_leave')
+        //     .setLabel('Leave')
+        //     .setStyle('DANGER'),
+    );
+
 // Setup our HTTP library
 const bent = require('bent');
-const { execute_interaction } = require('./stats');
 const get = bent('GET', status_codes)
 const put = bent('PUT', status_codes);
+const patch = bent('PATCH', status_codes);
+const del = bent('DELETE', status_codes);
 
 // Export the module which handles the slash command
 module.exports = {
@@ -34,6 +56,17 @@ module.exports = {
             subcommand
                 .setName('get')
                 .setDescription('Gets the initiative tracker for this channel and reposts it.')
+        )
+        .addSubcommand(subcommand =>
+            subcommand
+                .setName('remove')
+                .setDescription('Remove a character initiative')
+                .addStringOption(option => option.setName('character').setDescription('Name of your character').setRequired(false))
+        )
+        .addSubcommand(subcommand =>
+            subcommand
+                .setName('reset')
+                .setDescription('Creates a brand new tracker')
         ),
 
     async execute_init(type, user, guild, channel, character = null, roll = null, count = null, debug = false)
@@ -43,9 +76,15 @@ module.exports = {
             // Ex: /initiative?user=12345&guild=4&channel=4&character_name=Carol&initiative_expression=1d20
             string_url = `/api/backendservice/initiative?user=${user}&guild=${guild}&channel=${channel}`
 
-            if (character && roll)
+            // If we are joining, and character and roll are provided then those
+            // Values need to be included in the PUT Query
+            if (type === 'join' && character && roll)
             {
                 string_url += `&character_name=${encodeURIComponent(character)}&initiative_expression=${encodeURIComponent(roll)}`
+            }
+            if (type === 'remove' && character)
+            {
+                string_url += `&character_name=${encodeURIComponent(character)}`
             }
 
             // Creates the URL to call the backend
@@ -54,14 +93,28 @@ module.exports = {
             let request;
             let response;
 
-            if(type === 'get')
+            // Get maes a GET request to return the initiative tracker without modification
+            if (type === 'get')
             {
                 request = await get(url);
                 response = await request.json();
             }
-            else if(type === 'join')
+            // Join makes a PUT request to add a character to the initiative tracker
+            else if (type === 'join')
             {
                 request = await put(url);
+                response = await request.json();
+            }
+            // Next makes a PATCH request to increment the turn by one
+            else if (type === 'next')
+            {
+                request = await patch(url);
+                response = await request.json();
+            }
+            // Remove makes a DELETE request to delete the character
+            else if (type === 'remove')
+            {
+                request = await del(url);
                 response = await request.json();
             }
 
@@ -71,24 +124,27 @@ module.exports = {
             if (request.statusCode == 200)
             {
                 responseEmbed = new MessageEmbed().setColor(embedColors.successEmbedColor)
-                responseEmbed.setTitle("Initiative")
-                responseEmbed.setDescription(`Round: ${response.turn + 1}`)
+                responseEmbed.setTitle("[                Initiative                 ]")
                 turnOrderString = ""
                 
                 for (let i = 0; i < response.characters.length; i++)
                 {
-                    if (i + 1 % response.turn == 0)
+                    if (response.turn % response.characters.length == i)
                     {
-                        turnOrderString += `**[ ${response.characters[i].name} ]**\n`
+                        turnOrderString += `**➤ ${response.characters[i].name} (${response.characters[i].initiative_value})**\n`
                     }
                     else
                     {
-                        turnOrderString += `${response.characters[i].name}\n`
+                        turnOrderString += `${response.characters[i].name} (${response.characters[i].initiative_value})\n`
                     }
                 }
 
+                responseEmbed.setDescription(
+                    turnOrderString.trim()
+                )
+
                 responseEmbed.addField(
-                    "Turn Order", turnOrderString
+                    "Round: ", String(response.turn)
                 )
 
                 return responseEmbed;
@@ -152,13 +208,36 @@ module.exports = {
         character = interaction.options.getString('character')
         count = interaction.options.getString('count')
 
+        // JOIN and GET both return the INIT Tracker so they need buttons
         if (interaction.options.getSubcommand() === 'join') {
             var response = await this.execute_init('join', user, guild, channel, character, roll, count)
-            return await interaction.reply({ embeds: [response]})
+            return await interaction.reply({ embeds: [response],  components: [initButtons] })
         }
         else if (interaction.options.getSubcommand() === 'get') {
             var response = await this.execute_init('get', user, guild, channel, character, roll, count)
-            return await interaction.reply({ embeds: [response]})
+            return await interaction.reply({ embeds: [response], components: [initButtons] })
+        }
+        else if (interaction.options.getSubcommand() === 'remove') {
+            var response = await this.execute_init('remove', user, guild, channel, character, roll, count)
+            return await interaction.reply({ embeds: [response], components: [initButtons] })
+        }
+    },
+
+    // Handles interactions from button presses
+    async execute_button(interaction) {
+        user = interaction.user.id
+        guild = interaction.guild.id
+        channel = interaction.channel.id
+
+        if (interaction.customId == 'init_next')
+        {
+            var response = await this.execute_init('next', user, guild, channel)
+            return await interaction.update({ embeds: [response], components: [initButtons] })
+        }
+        else if (interaction.customId == 'init_join')
+        {
+            var response = await this.execute_init('join', user, guild, channel)
+            return await interaction.update({ embeds: [response], components: [initButtons] })
         }
     }
 };

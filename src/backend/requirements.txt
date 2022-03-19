@@ -10,3 +10,4 @@ prometheus-flask-exporter==0.18.6
 starlette_exporter==0.11.0
 fastapi==0.70.1
 uvicorn==0.16.0
+aioodbc==0.3.3

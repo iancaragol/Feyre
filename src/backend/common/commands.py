@@ -10,6 +10,7 @@ class Commands:
     # It is a SUBSET of all_commands
     default_commands_list = [
         "roll",
+        "init"
         "stats",
         "help"
     ]
@@ -17,6 +18,7 @@ class Commands:
     # This is the list of ALL commands feyre supports
     all_commands_list = [
         "roll",
+        "init",
         "stats",
         "help"
     ]

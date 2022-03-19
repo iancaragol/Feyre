@@ -54,7 +54,7 @@ client.on('messageCreate', async message => {
     // There is probably some cool way to reduce all of these if statements
     // But leave it like this for now
     // TODO(IAN)
-    // Determine what commands should suppor this functionality
+    // Determine what commands should support this functionality
     // Thinking just roll?
     if (content.startsWith("ping"))
     {
@@ -85,7 +85,6 @@ client.on('messageCreate', async message => {
 
 // Reply to Slash Commands
 client.on('interactionCreate', async interaction => {
-
     console.log("Processing command:", interaction.commandName);
     if (!interaction.isCommand()) return;
     const command = client.commands.get(interaction.commandName);
@@ -96,5 +95,20 @@ client.on('interactionCreate', async interaction => {
     } catch (error) {
         if (error) console.error(error);
         await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
+    }
+});
+
+// Reply to Buttons
+client.on('interactionCreate', async interaction => {
+	if (!interaction.isButton()) return;
+	// console.log(interaction);
+    // All buttons are labeled with command_button
+    // Like this: init_join
+    const command = client.commands.get(interaction.customId.split('_')[0]); 
+
+    // If the button is on an init message
+    if(interaction.customId.startsWith('init'))
+    {
+        await command.execute_button(interaction);
     }
 });

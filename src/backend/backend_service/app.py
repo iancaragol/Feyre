@@ -15,6 +15,7 @@ from backend_service.api.router.healthcheck_router import healthcheck_router
 from backend_service.api.router.help_router import help_router
 from backend_service.api.router.sentry_router import sentry_router
 from backend_service.api.router.initiative_router import initiative_router
+from backend_service.api.router.character_router import character_router
 
 from backend_service.collectors.collectors import StatsMetricsCollector
 
@@ -30,6 +31,7 @@ def create_app():
     app.include_router(healthcheck_router)
     app.include_router(sentry_router)
     app.include_router(initiative_router)
+    app.include_router(character_router)
 
     # Remove sentry for now, Feyre generates too many exceptions!
     

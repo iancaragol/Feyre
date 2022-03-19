@@ -42,7 +42,7 @@ async def initiative_put(user : int, guild : int, channel : int, character_name 
         return Response(content = "Missing user query parameter", status_code = HTTPStatus.BAD_REQUEST)
 
     try:
-        result = InitiativeOperation(user = user, guild = guild, channel = channel, character_name = character_name, initiative_expression = initiative_expression).execute_put()
+        result = await InitiativeOperation(user = user, guild = guild, channel = channel, character_name = character_name, initiative_expression = initiative_expression).execute_put()
         return Response(content = result, status_code = HTTPStatus.OK)
 
     except Exception as e:
@@ -74,7 +74,7 @@ async def initiative_get(user : int, guild : int, channel):
         return Response(content = "Missing user query parameter", status_code = HTTPStatus.BAD_REQUEST)
 
     try:
-        result = InitiativeOperation(user = user, guild = guild, channel = channel).execute_get()
+        result = await InitiativeOperation(user = user, guild = guild, channel = channel).execute_get()
 
         if result == None:
             return Response(status_code = HTTPStatus.NO_CONTENT)
@@ -109,7 +109,7 @@ async def initiative_patch(user : int, guild : int, channel):
         return Response(content = "Missing user query parameter", status_code = HTTPStatus.BAD_REQUEST)
 
     try:
-        result = InitiativeOperation(user = user, guild = guild, channel = channel).execute_patch()
+        result = await InitiativeOperation(user = user, guild = guild, channel = channel).execute_patch()
 
         if result == None:
             return Response(content = None, status_code = HTTPStatus.NO_CONTENT)
@@ -124,7 +124,7 @@ async def initiative_patch(user : int, guild : int, channel):
         return Response(content = dumps(result), status_code = HTTPStatus.INTERNAL_SERVER_ERROR)
 
 @initiative_router.delete('/api/backendservice/initiative')
-async def initiative_delete(user : int, guild : int, channel):
+async def initiative_delete(user : int, guild : int, channel, character_name : Optional[str] = None):
     """
     Delets the initiative tracker
 
@@ -144,8 +144,8 @@ async def initiative_delete(user : int, guild : int, channel):
         return Response(content = "Missing user query parameter", status_code = HTTPStatus.BAD_REQUEST)
 
     try:
-        result = InitiativeOperation(user = user, guild = guild, channel = channel).execute_delete()
-        return Response(status_code = HTTPStatus.NO_CONTENT)
+        result = await InitiativeOperation(user = user, guild = guild, channel = channel).execute_delete(character_name = character_name)
+        return Response(content = result, status_code = HTTPStatus.OK)
 
     except Exception as e:
         result = {
