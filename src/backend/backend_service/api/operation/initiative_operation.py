@@ -57,7 +57,7 @@ class InitiativeOperation():
 
         # If they provided the character and modifier then just use that!
         if self.character_name and self.initiative_expression:
-            character = Character(self.user, self.character_name, self.initiative_expression)
+            character = Character(user = self.user, name = self.character_name, initiative_expression = self.initiative_expression)
             await self.add_character(tracker=tracker, character=character)
         # Otherwise need to query the database
         else:
@@ -66,7 +66,7 @@ class InitiativeOperation():
             await self.add_character(tracker=tracker, character=character)
 
         # Put the tracker back into Redis
-        self.put_tracker(tracker)
+        await self.put_tracker(tracker)
 
         return dumps(tracker.to_dict())
         
@@ -80,7 +80,7 @@ class InitiativeOperation():
 
         # Should probably add some error handling here in case the tracker does not exist
         # Although if the request comes from the frontend the tracker will need to exist
-        tracker = self.get_tracker()
+        tracker = await self.get_tracker()
         tracker.turn += 1
         await self.put_tracker(tracker)
         return dumps(tracker.to_dict())
@@ -99,8 +99,8 @@ class InitiativeOperation():
         tracker = self.get_tracker()
 
         if character_name:
-            self.remove_character(tracker, character_name)
-            self.put_tracker(tracker)
+            await self.remove_character(tracker, character_name)
+            await self.put_tracker(tracker)
             return dumps(tracker.to_dict())
         else:
             return self.redis_helper.delete_initiative_tracker(self.guild, self.channel)
