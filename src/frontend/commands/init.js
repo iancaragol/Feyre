@@ -117,6 +117,12 @@ module.exports = {
                 request = await del(url);
                 response = await request.json();
             }
+            else if (type === 'reset')
+            {
+                request = await del(url);
+                request = await get(url);
+                response = await request.json();
+            }
 
             console.log(response)
             
@@ -219,6 +225,10 @@ module.exports = {
         }
         else if (interaction.options.getSubcommand() === 'remove') {
             var response = await this.execute_init('remove', user, guild, channel, character, roll, count)
+            return await interaction.reply({ embeds: [response], components: [initButtons] })
+        }
+        else if (interaction.options.getSubcommand() === 'reset') {
+            var response = await this.execute_init('reset', user, guild, channel, character, roll, count)
             return await interaction.reply({ embeds: [response], components: [initButtons] })
         }
     },

@@ -3,6 +3,7 @@ import traceback
 from json import dumps, loads
 from random import randint
 from unicodedata import name
+from unittest import result
 
 from backend_service.api.operation.roll_operation import RollOperation
 from backend_service.api.operation.character_operation import CharacterOperation
@@ -36,7 +37,7 @@ class InitiativeOperation():
         if tracker:
             return dumps(tracker.to_dict())
         else:
-            tracker = self.new_tracker()
+            tracker = await self.new_tracker()
             return dumps(tracker.to_dict())
 
     async def execute_put(self):
@@ -85,7 +86,7 @@ class InitiativeOperation():
         await self.put_tracker(tracker)
         return dumps(tracker.to_dict())
 
-    async def execute_delete(self, user = None, character_name = None):
+    async def execute_delete(self, character_name = None):
         """
         If character_name and user is provided, then just delete that character
 
@@ -96,14 +97,15 @@ class InitiativeOperation():
 
             True/False if the whole tracker was deleted
         """
-        tracker = self.get_tracker()
 
         if character_name:
+            tracker = await self.get_tracker()
             await self.remove_character(tracker, character_name)
             await self.put_tracker(tracker)
             return dumps(tracker.to_dict())
         else:
-            return self.redis_helper.delete_initiative_tracker(self.guild, self.channel)
+            
+            return dumps({"result": self.redis_helper.delete_initiative_tracker(self.guild, self.channel)})
 
     async def get_selected_char(self, user):
         """

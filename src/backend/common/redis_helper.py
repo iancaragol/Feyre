@@ -272,4 +272,4 @@ class RedisHelper:
             channel: channel for the tracker
         """
         key = RedisKeys.get_it_key(guild = guild, channel = channel)
-        self.delete(key=key)
+        return self.delete(key=key)
