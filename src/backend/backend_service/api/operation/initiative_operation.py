@@ -37,7 +37,7 @@ class InitiativeOperation():
         if tracker:
             return dumps(tracker.to_dict())
         else:
-            tracker = await self.new_tracker()
+            tracker = await self.new_tracker(guild = self.guild, channel = self.channel)
             return dumps(tracker.to_dict())
 
     async def execute_put(self):
@@ -174,4 +174,5 @@ class InitiativeOperation():
         """
        
         tracker = InitiativeTracker(guild=guild, channel=channel)
+        await self.put_tracker(tracker = tracker)
         return tracker
