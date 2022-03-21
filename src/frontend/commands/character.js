@@ -28,7 +28,7 @@ module.exports = {
                 .setName('add')
                 .setDescription('Create a new character')
                 .addStringOption(option => option.setName('name').setDescription('Name of your character').setRequired(false))
-                .addStringOption(option => option.setName('initiatiave').setDescription('Dice expression or Initiative roll value').setRequired(false))
+                .addStringOption(option => option.setName('initiative').setDescription('Dice expression or Initiative roll value').setRequired(false))
         )
         .addSubcommand(subcommand =>
             subcommand
@@ -48,11 +48,14 @@ module.exports = {
         {
             string_url = `/api/backendservice/character?user=${user}`
 
+            console.log(characterName)
+            console.log(characterInit)
+
             // If we are joining, and character and roll are provided then those
             // Values need to be included in the PUT Query
             if (type === 'add' && characterName && characterInit)
             {
-                string_url += `&character_name=${encodeURIComponent(character)}&initiative_expression=${encodeURIComponent(characterInit)}`
+                string_url += `&character_name=${encodeURIComponent(characterName)}&initiative_expression=${encodeURIComponent(characterInit)}`
             }
             else if ((type === 'remove' || type === 'select') && characterId)
             {
@@ -91,7 +94,7 @@ module.exports = {
                 response = await request.json();
             }
 
-            console.log(response)
+            // console.log(response)
             
             // Backend should respond with a 200 OK
             if (request.statusCode == 200)
@@ -105,28 +108,33 @@ module.exports = {
 
                 for (let i = 0; i < response.characters.length; i++)
                 {
-                    if (response.characters[i].is_active)
+                    var character = response.characters[i]
+
+                    if (character.is_active)
                     {
-                        characterList += `**➤ ${response.characters[i].id}. ${response.characters[i].name} (${response.characters[i].initiative_expression})**\n`
+                        characterList += `**➤ ${character.id}. ${character.name} (${character.initiative_expression})**\n`
                     }
                     else
                     {
-                        characterList += `${response.characters[i].id}. ${response.characters[i].name} (${response.characters[i].initiative_expression})\n`
+                        characterList += `${character.id}. ${character.name} (${character.initiative_expression})\n`
                     }
 
                     buttonRow.addComponents(
                         new MessageButton()
-                            .setCustomId(`character_${i+1}`)
-                            .setLabel(`${i+1}`)
+                            .setCustomId(`character_${character.id}`)
+                            .setLabel(`${character.id}`)
                             .setStyle('SECONDARY')
                     )
 
-                    if (i == 4) // On the 5th iteration we need to create a new button row!
+                    // On the 5th iteration we need to create a new button row!
+                    // Unless its the last iteration, in which case we do not want to add an empty button
+                    if (i == 4 && i + 1 != response.characters.length) 
                     {
                         buttons.push(buttonRow)
                         buttonRow = new MessageActionRow()
                     }
                 }
+
                 buttons.push(buttonRow)
 
                 responseEmbed.setDescription(
@@ -205,7 +213,7 @@ module.exports = {
         }
 
         // I feel like this is really bad, but we rollin' with it
-        if (response.length > 1)
+        if (response.length == 2)
         {
             return await interaction.reply({ embeds: [response[0]], components: response[1] })
         }
