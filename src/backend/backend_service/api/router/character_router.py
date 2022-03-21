@@ -80,7 +80,7 @@ async def character_patch(user : int, character_id : int):
         return Response(content = dumps(result), status_code = HTTPStatus.INTERNAL_SERVER_ERROR)
 
 @character_router.put('/api/backendservice/character')
-async def character_put(user : int, character_name : str, init_mod : str):
+async def character_put(user : int, character_name : str, initiative_expression : str):
     """
     Gets all character's for the user
 
@@ -98,7 +98,7 @@ async def character_put(user : int, character_name : str, init_mod : str):
         return Response(content = "Missing user query parameter", status_code = HTTPStatus.BAD_REQUEST)
 
     try:
-        result = await CharacterOperation(user = user, character_name = character_name, init_mod = init_mod).execute_put()
+        result = await CharacterOperation(user = user, character_name = character_name, init_mod = initiative_expression).execute_put()
 
         if result == None:
             return Response(status_code = HTTPStatus.NO_CONTENT)

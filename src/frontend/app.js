@@ -106,8 +106,8 @@ client.on('interactionCreate', async interaction => {
     // Like this: init_join
     const command = client.commands.get(interaction.customId.split('_')[0]); 
 
-    // If the button is on an init message
-    if(interaction.customId.startsWith('init'))
+    if(interaction.customId.startsWith('init') ||
+       interaction.customId.startsWith('character'))
     {
         await command.execute_button(interaction);
     }

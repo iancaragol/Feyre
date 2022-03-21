@@ -11,7 +11,7 @@ const CLIENT_ID = BigInt(process.env.CLIENT_ID);
 // Then copy the ID of the command you want to delete
 // Put it here
 // Then run this script like you would register
-const commandToDelete = "952660384085577808"
+const commandToDelete = "955238164811886602"
 
 const rest = new REST({ version: '9' }).setToken(DISCORD_TOKEN);
 
