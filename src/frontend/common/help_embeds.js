@@ -13,14 +13,16 @@ helpEmbed.setTitle("Feyre - Help")
 
 var helpDescription = `All commands use **/** or **@Feyre**
  
-To learn more about a command you can type **/help <command>**
-**Ex: /help roll**`
+To learn more about a command you can type **/help command:<command>**
+**Ex: /help command:roll**`
 helpEmbed.setDescription(helpDescription)
 
 helpEmbed.setThumbnail("https://www.kindpng.com/picc/m/689-6892346_d20-png-transparent-png-download.png")
 
 // Main body
 var commandFieldBody = `**roll** - Roll complicated dice expressions
+**init** - Initiative tracking!
+**character** - Manage your characters for the initiative tracker
 
 **stats** - Feyre usage statistics
 **health** - Feyre service health`
@@ -118,4 +120,98 @@ rollEmbed.addField("Keep / Drop Operator", keepOperatorField)
 rollEmbed.addField("Advantage / Disadvantage", advantageOperatorField)
 rollEmbed.addField("Explode Operator", explodeOperatorField)
 
-module.exports = { helpEmbed, helpRow, notfoundEmbed, rollEmbed };
+// ================================================
+//                      INIT
+// ================================================
+var initEmbed = new MessageEmbed()
+initEmbed.setColor(embedColor)
+initEmbed.setTitle("init")
+
+var initDescription = 
+`/init keeps track of initiative (turn order) for each channel!
+
+Change the turn by hitting the **[Next]** button!
+
+Example:
+/init reset
+/init get
+/init join character:Gandalf initiative:1d20-5`
+
+var initCreation = 
+`**[ /init get ]**
+/init get will get the active tracker for the channel.
+`
+var initJoin = 
+`**[ /init join character:Name initiative:expression ] or [ Join ]**
+To join with your active character (see /help command:character) just press the join button.
+
+To add a specific character specify its name and initiative dice expression.
+
+Example:
+/init join character:Frodo initiative:1d20+3
+`
+var initLeave = 
+`**[ /init remove character:Name ]**
+Removes the character with Name from initiative
+
+Example:
+/init remove character:Frodo
+`
+
+var initReset = 
+`**[ /init reset ]**
+Creates a BRAND NEW initiative tracker for the channel
+
+Example:
+/init reset
+`
+
+initEmbed.setDescription(initDescription)
+initEmbed.addField("Getting the channel's tracker", initCreation)
+initEmbed.addField("Joining initiative", initJoin)
+initEmbed.addField("Leaving initiative", initLeave)
+initEmbed.addField("Reset initiative", initReset)
+
+// ================================================
+//                    Character
+// ================================================
+var charEmbed = new MessageEmbed()
+charEmbed.setColor(embedColor)
+charEmbed.setTitle("character")
+
+var charDescription = 
+`/character allows you to quickly join initiative
+
+Keep track of up to 9 characters and their initiative modifiers. When you click **Join** on an initiative tracker, you will join with your active character!
+
+Example:
+/character list
+/character add name:Gandalf initiative:1d20-5`
+
+var charList = 
+`**[ /character list ]**
+Lists all of your characters. Select your active character by clicking the button with its ID!
+`
+var charAdd = 
+`**[ /character add character:Name initiative:expression ]**
+Adds a new character with Name to your list. When you join initiative that character's initiative expression will be rolled!
+
+Example:
+/character add name:Frodo initiative:1d20+3
+`
+var charRemove = 
+`**[ /character remove id:id ]**
+Removes the character with id from initiative. Use /character list to get each character's id
+
+Example:
+/character list
+/character remove id:3
+`
+
+charEmbed.setDescription(charDescription)
+charEmbed.addField("List your characters", charList)
+charEmbed.addField("Add a new character to your list", charAdd)
+charEmbed.addField("Remove a character from your list", charRemove)
+
+
+module.exports = { helpEmbed, helpRow, notfoundEmbed, rollEmbed, initEmbed, charEmbed };

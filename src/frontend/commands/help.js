@@ -49,6 +49,14 @@ module.exports = {
         {
             return { embeds: [help_embeds.rollEmbed]};
         }
+        else if (command == 'init')
+        {
+            return { embeds: [help_embeds.initEmbed]};
+        }
+        else if (command == 'character')
+        {
+            return { embeds: [help_embeds.charEmbed]};
+        }
         else
         {
             return {embeds: [help_embeds.notfoundEmbed]};
