@@ -16,7 +16,8 @@ COPY --chown=nonroot:nonroot scripts/delete.js .
 COPY --chown=nonroot:nonroot scripts/register.js .
 COPY --chown=nonroot:nonroot common/ common/
 COPY --chown=nonroot:nonroot commands/ commands/
-COPY --chown=nonroot:nonroot app.js .
+COPY --chown=nonroot:nonroot bot.js .
+COPY --chown=nonroot:nonroot index.js .
 
 ENTRYPOINT [ "node" ]
-CMD [ "app.js" ]
+CMD [ "index.js" ]
