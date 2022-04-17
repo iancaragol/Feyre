@@ -2,7 +2,7 @@ const { MessageEmbed, MessageActionRow, MessageButton } = require('discord.js');
 const embedColors = require('./embed_colors')
 
 var embedColor = embedColors.helpEmbedColor
-var documentationUrl = "https://feyre.readthedocs.io/en/latest/"
+var documentationUrl = "http://docs.feyre.io"
 
 // ================================================
 //                      HELP
@@ -11,13 +11,14 @@ var helpEmbed = new MessageEmbed()
 helpEmbed.setColor(embedColors.helpEmbedColor)
 helpEmbed.setTitle("Feyre - Help")
 
-var helpDescription = `All commands use **/** or **@Feyre**
+var helpDescription = `All commands use **/**
  
 To learn more about a command you can type **/help command:<command>**
-**Ex: /help command:roll**`
+**Ex:**
+**/help command:roll**`
 helpEmbed.setDescription(helpDescription)
 
-helpEmbed.setThumbnail("https://www.kindpng.com/picc/m/689-6892346_d20-png-transparent-png-download.png")
+helpEmbed.setThumbnail("https://raw.githubusercontent.com/iancaragol/Feyre/main/docs/assets/feyre-icon.png")
 
 // Main body
 var commandFieldBody = `**roll** - Roll complicated dice expressions

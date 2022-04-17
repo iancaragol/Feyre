@@ -7,6 +7,10 @@
 ⭐ Check how to use the commands [here](commands.md) ⭐
 
 ---
+## Looing for the old docs?
+This area is a work in progress. Checkout the hold docs [here](https://feyre.readthedocs.io/en/latest/)
+
+---
 
 ## Add Feyre to your server
 
