@@ -1,3 +1,29 @@
+<h2 align="center"><img src="docs/assets/feyre-icon.png" alt="errbot" align="center" width="200px" /></h2>
+<h1 align="center" style="font-size:50px; font-family:'Times New Roman'"><i>feyre</i></h1>
+
+<p align="center" style="font-size:18px">
+  A streamlined discord bot for rolling dice, keeping track of turn order, and more!
+</p>
+<br>
+<h5 align="center"><img src="docs/assets/invite.svg" alt="errbot" align="center" width="200px" /></h5>
+<br>
+
+<p align="center">
+  <img src="docs/assets/python.svg" alt="backend python"/>
+  <img src="docs/assets/javascript.svg" alt="frontend javascript"/>
+  <img src="docs/assets/redis.svg" alt="redis"/>
+  <img src="docs/assets/FastAPI.svg" alt="Fast API"/>
+</p>
+
+<hr>
+
+## 🚧🚧🚧 
+## Feyre is currently being re-written and re-deployed. Some of this info may be out of date!
+## See [developer updates](http://docs.feyre.io/developer-updates/) for more info on the changes!
+## 🚧🚧🚧
+
+---
+
 # Feyre 🎲
 
 A streamlined and intuitive Discord bot for playing D&D and other role-playing games.

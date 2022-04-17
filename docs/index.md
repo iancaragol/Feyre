@@ -1,3 +1,5 @@
+<h2 align="center"><img src="assets/feyre-icon.png" alt="errbot" align="center" width="200px" /></h2>
+
 # Feyre
 
 **A discord bot for playing D&D, Pathfinder, and more!**

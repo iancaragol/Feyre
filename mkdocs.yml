@@ -4,7 +4,7 @@ edit_uri: blob/main/docs/
 theme:
   icon:
       repo: fontawesome/brands/github
-  logo: assets/errbot.png
+  logo: assets/feyre-icon.png
   name: material
   palette:
     - media: "(prefers-color-scheme: light)" 
