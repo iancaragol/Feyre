@@ -28,6 +28,8 @@ Returns documentation for all commands.
 
 **/roll can be used to roll dice of any size with complicated expressions.**
 
+![type:video](./assets/videos/roll demo.mp4)
+
 ### Dice Expression
 
 A specific roll can be represented with a dice expression. Dice expressions can be thought of as formula. They consist of **Dice**, **Operations** and **Arithmetic Operators**. You can combine these to create a dice expression that suites any scenario!

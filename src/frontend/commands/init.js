@@ -130,7 +130,7 @@ module.exports = {
             if (request.statusCode == 200)
             {
                 responseEmbed = new MessageEmbed().setColor(embedColors.successEmbedColor)
-                responseEmbed.setTitle("[                Initiative                 ]")
+                responseEmbed.setTitle("[              Initiative              ]")
                 turnOrderString = ""
                 
                 for (let i = 0; i < response.characters.length; i++)

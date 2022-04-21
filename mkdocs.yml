@@ -1,6 +1,14 @@
 site_name: Feyre
 repo_url: https://github.com/iancaragol/Feyre
 edit_uri: blob/main/docs/
+plugins:
+    - mkdocs-video:
+        is_video: True
+        video_autoplay: True
+        css_style:
+          width: "100%"
+          height: "22.172vw"
+          outline: "none"
 theme:
   icon:
       repo: fontawesome/brands/github
