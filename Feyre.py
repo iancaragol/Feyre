@@ -461,6 +461,8 @@ async def on_ready():
 
     await bot.change_presence(activity = discord.Game(name="feyre.io | !help"))
 
+    save_data.start()
+
     try:
         if os.environ['ISS'].upper() == 'TRUE':
             print("[#] Starting stream to initial state...")
