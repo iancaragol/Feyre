@@ -152,7 +152,7 @@ def construct_users_json():
 
     users = {}
     users["user_set"] = redis_helper.get_user_set()
-    users["insert_time"] = now.strftime("%m-%d-%Y-%H:%M:%S") # File Format Friendly time stamp
+    users["insert_time"] = now.strftime("%m-%d-%Y-%H_%M_%S") # File Format Friendly time stamp
     users["insert_timestamp"] = now.timestamp() # This is the one that is always used
     users["filename"] = users["insert_time"] + "-" + "users.txt"
 

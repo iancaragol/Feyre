@@ -72,7 +72,13 @@ module.exports = {
     async execute_interaction(interaction) {
         command = interaction.options.getString('command')
         user = interaction.user.id
-        guild = interaction.guild.id
+        guild = 0
+        
+        if (interaction.guild)
+        {
+            guild = interaction.guild.id
+        }
+
         interaction.reply(await this.execute_help(command, user, guild));
     }
 };
