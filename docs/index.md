@@ -1,4 +1,7 @@
-<h2 align="center"><img src="assets/images/feyre-icon.png" alt="errbot" align="center" width="200px" /></h2>
+<h2 align="center">
+<img src="assets/images/feyre-icon.png" alt="feyre-icon" align="center" width="200px" />
+</br>
+</h2>
 
 # Feyre
 
@@ -7,21 +10,21 @@
 ⭐ Check how to use the commands [here](commands.md) ⭐
 
 ---
-## Looing for the old docs?
-This area is a work in progress. Checkout the hold docs [here](https://feyre.readthedocs.io/en/latest/)
+## Looking for the old docs?
+This area is a work in progress. Old docs are [here](https://feyre.readthedocs.io/en/latest/)
 
 ---
 
 ## Add Feyre to your server
 
-Invite Feyre to your server with this link!
+Invite Feyre to your server with this [link](http://invite.feyre.io)
 
 ---
 
 ## Features
 ### **Robust Dice Rolling 🎲**
 
-GIF of new Dice Roller goes here
+![type:video](./assets/videos/roll demo.mp4)
 
 * Use *dice expressions* to roll for any scenario
 * Roll the same *dice expression* multiple times with the 'count' modifier
@@ -30,7 +33,7 @@ GIF of new Dice Roller goes here
 
 ### **Initiative Tracking ⚔️**
 
-GIF of INITIATIVE TRACKING
+![type:video](./assets/videos/initiative demo.mp4)
 
 * Easily keep track of turns and join using your active character
 * Never forget your initiative, the tracker is saved for you

@@ -5,7 +5,7 @@
   A streamlined discord bot for rolling dice, keeping track of turn order, and more!
 </p>
 <br>
-<h5 align="center"><img src="docs/badges/assets/invite.svg" alt="errbot" align="center" width="200px" /></h5>
+<h5 align="center"><a href="http://invite.feyre.io"><img src="docs/assets/badges/invite.svg" alt="errbot" align="center" width="200px" /></a></h5>
 <br>
 
 <p align="center">

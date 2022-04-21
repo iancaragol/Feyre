@@ -3,10 +3,15 @@
 **Have any questions? Reach out on the Feyre discord channel!**
 
 ---
+## 4/21/22 - Message Content deadline moved to August 31st 2022
+
+Good news! Message Content was delayed until August 31st, Discord was probably nervous about losing hundreds of un-updated bots.
+
+Even though deadline was moved back, I will continue the work to depreciate the old version of Feyre and migrate to slash commands over the next month.
 
 ## 4/16/22 - The Great Rewrite & Slash Commands
 
-On 4/30/2022 Discord will be requiring all Verified bots to apply for the Message Content intent in order to read the content of messages. You can read more about this change here:
+On 4/30/2022 Discord will be requiring all Verified bots to apply for the Message Content intent in order to read the content of messages. You can read more about this change [here](https://support-dev.discord.com/hc/en-us/articles/4404772028055-Message-Content-Privileged-Intent-FAQ#:~:text=MESSAGE%20CONTENT%20IS%20BECOMING%20A,in%2075%20or%20more%20servers.) 
 
 To summarize, most bots (including Feyre) rely on reading Message Content in order parse commands. For example, to parse a command like `!roll`, Feyre will look at all messages starting with an `!`, then if that `!` is followed by `roll`, it will treat the message as a roll command. Even though Feyre has been a verified bot for almost 3 years, it does not meet the strict requirements for the Message Content intent. This means that Feyre has no choice but to move to Slash Commands.
 
