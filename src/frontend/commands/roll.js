@@ -83,9 +83,8 @@ module.exports = {
             {
                 error_string = response.expression + "\n" + response.exception_message
                 responseEmbed = new MessageEmbed().setColor(embedColors.errorEmbedColor)
-                .addFields(
-                    { name: "Invalid Dice Expression", value: error_string }
-                )
+                .setTitle("Invalid Dice Expression")
+                .setDescription(error_string)
 
                 return responseEmbed;
             }
@@ -130,7 +129,12 @@ module.exports = {
         expression = interaction.options.getString('expression')
         debug = interaction.options.getString('debug')
         user = interaction.user.id
-        guild = interaction.guild.id
+        guild = 0
+        
+        if (interaction.guild)
+        {
+            guild = interaction.guild.id
+        }
 
         var response = await this.execute_roll(expression, user, guild, debug)
         return await interaction.reply({ embeds: [response]})

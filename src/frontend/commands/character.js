@@ -227,8 +227,8 @@ module.exports = {
         channel = interaction.channel.id
 
         characterId = parseInt(interaction.customId.split('_')[1])
-        console.log("ID")
-        console.log(characterId)
+        // console.log("ID")
+        // console.log(characterId)
 
         var response = await this.execute_character('select', user, guild, channel, null, characterId, null)
         return await interaction.update({ embeds: [response[0]], components: response[1] })

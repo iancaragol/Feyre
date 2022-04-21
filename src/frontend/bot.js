@@ -45,11 +45,11 @@ client.on('messageCreate', async message => {
         return;
     }
 
-    console.log("Got a message: ", message.content);
+    console.log("Got an @ message");
 
     // Remove the @bot
     var content = message.content.replace(mentionRegex, '').trim()
-    console.log("New content: ", content);
+    // console.log("New content: ", content);
 
     // There is probably some cool way to reduce all of these if statements
     // But leave it like this for now

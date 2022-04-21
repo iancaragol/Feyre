@@ -47,19 +47,19 @@ module.exports = {
         }
         else if (command == 'roll')
         {
-            return { embeds: [help_embeds.rollEmbed]};
+            return { embeds: [help_embeds.rollEmbed], components: [help_embeds.rollRow] };
         }
         else if (command == 'init')
         {
-            return { embeds: [help_embeds.initEmbed]};
+            return { embeds: [help_embeds.initEmbed], components: [help_embeds.initRow] };
         }
         else if (command == 'character')
         {
-            return { embeds: [help_embeds.charEmbed]};
+            return { embeds: [help_embeds.charEmbed], components: [help_embeds.charRow] };
         }
         else
         {
-            return {embeds: [help_embeds.notfoundEmbed]};
+            return {embeds: [help_embeds.notfoundEmbed], components: [help_embeds.helpRow]};
         }
     },
 

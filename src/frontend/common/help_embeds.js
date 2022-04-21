@@ -2,7 +2,8 @@ const { MessageEmbed, MessageActionRow, MessageButton } = require('discord.js');
 const embedColors = require('./embed_colors')
 
 var embedColor = embedColors.helpEmbedColor
-var documentationUrl = "http://docs.feyre.io"
+var documentationUrl = "http://docs.feyre.io/commands/"
+var inviteLink = "http://docs.feyre.io/#add-feyre-to-your-server"
 
 // ================================================
 //                      HELP
@@ -38,7 +39,11 @@ helpRow.addComponents(
     new MessageButton()
     .setLabel('Documentation')
     .setStyle('LINK')
-    .setURL(documentationUrl)
+    .setURL(documentationUrl),
+    new MessageButton()
+    .setLabel('Invite')
+    .setStyle('LINK')
+    .setURL(inviteLink)
 )
 
 // ================================================
@@ -121,6 +126,19 @@ rollEmbed.addField("Keep / Drop Operator", keepOperatorField)
 rollEmbed.addField("Advantage / Disadvantage", advantageOperatorField)
 rollEmbed.addField("Explode Operator", explodeOperatorField)
 
+// Documentation button
+var rollRow = new MessageActionRow()
+rollRow.addComponents(
+    new MessageButton()
+    .setLabel('Documentation')
+    .setStyle('LINK')
+    .setURL(documentationUrl + "#roll"),
+    new MessageButton()
+    .setLabel('Invite')
+    .setStyle('LINK')
+    .setURL(inviteLink)
+)
+
 // ================================================
 //                      INIT
 // ================================================
@@ -173,6 +191,19 @@ initEmbed.addField("Joining initiative", initJoin)
 initEmbed.addField("Leaving initiative", initLeave)
 initEmbed.addField("Reset initiative", initReset)
 
+// Documentation button
+var initRow = new MessageActionRow()
+initRow.addComponents(
+    new MessageButton()
+    .setLabel('Documentation')
+    .setStyle('LINK')
+    .setURL(documentationUrl + "#initiative-tracking"),
+    new MessageButton()
+    .setLabel('Invite')
+    .setStyle('LINK')
+    .setURL(inviteLink)
+)
+
 // ================================================
 //                    Character
 // ================================================
@@ -214,5 +245,17 @@ charEmbed.addField("List your characters", charList)
 charEmbed.addField("Add a new character to your list", charAdd)
 charEmbed.addField("Remove a character from your list", charRemove)
 
+// Documentation button
+var charRow = new MessageActionRow()
+charRow.addComponents(
+    new MessageButton()
+    .setLabel('Documentation')
+    .setStyle('LINK')
+    .setURL(documentationUrl + "#character"),
+    new MessageButton()
+    .setLabel('Invite')
+    .setStyle('LINK')
+    .setURL(inviteLink)
+)
 
-module.exports = { helpEmbed, helpRow, notfoundEmbed, rollEmbed, initEmbed, charEmbed };
+module.exports = { helpEmbed, helpRow, notfoundEmbed, rollEmbed,rollRow, initEmbed, initRow, charEmbed, charRow };

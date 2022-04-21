@@ -124,7 +124,7 @@ module.exports = {
                 response = await request.json();
             }
 
-            console.log(response)
+            // console.log(response)
             
             // Backend should respond with a 200 OK
             if (request.statusCode == 200)
@@ -158,11 +158,10 @@ module.exports = {
             // Oops! Internal server error
             else if (request.statusCode == 500)
             {
-                error_string = "There should be some error handling here..."
+                error_string = "Something went wrong. See /help init for examples."
                 responseEmbed = new MessageEmbed().setColor(embedColors.errorEmbedColor)
-                .addFields(
-                    { name: "Oops! Something broke.", value: error_string }
-                )
+                .setTitle("Oops!")
+                .setDescription(error_string)
 
                 return responseEmbed;
             }
@@ -184,9 +183,8 @@ module.exports = {
             if (debug)
             {
                 responseEmbed = new MessageEmbed().setColor(embedColors.errorEmbedColor)
-                .addFields(
-                    { name: "Unhandled Exception", value: error.toString() }
-                )
+                .setTitle("Unhandled Exception")
+                .setDescription(error.toString())
 
                 return responseEmbed;
             }
@@ -197,9 +195,8 @@ module.exports = {
     async execute_message(content, user, guild)
     {
         responseEmbed = new MessageEmbed().setColor(embedColors.errorEmbedColor)
-        .addFields(
-            { name: "Not supported.", value: "Sorry, initiative tracking requires using slash (/) commands. See /help init for details!" }
-        )
+        .setTitle("DMs are not supported")
+        .setDescription("Sorry, initiative tracking requires using slash (/) commands. See /help init for details!")
         
         return responseEmbed;
     },
@@ -207,6 +204,17 @@ module.exports = {
     // Executes the command from an interaction (slash command) context
     async execute_interaction(interaction) {
         user = interaction.user.id
+
+        // If command was executed in DM context
+        if (interaction.guild == null)
+        {   
+            response = new MessageEmbed().setColor(embedColors.errorEmbedColor)
+            .setTitle("DMs are not supported")
+            .setDescription("Sorry, the initiative tracker can not be used in Direct Messages. See /help init for details!")
+
+            return await interaction.reply({ embeds: [response]})
+        }
+
         guild = interaction.guild.id
         channel = interaction.channel.id
 

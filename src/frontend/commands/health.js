@@ -28,7 +28,7 @@ module.exports = {
         // Calls the backend with a GET request and returns the JSON response
         let response = await getJSON(url);
 
-        console.log(response);
+        // console.log(response);
         
         var backendstr = response.backend;
         var redisstr = `**Available:** ${response.redis.available}\n`;

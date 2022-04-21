@@ -15,7 +15,7 @@ module.exports = {
     // Executes the command from message context
     async execute_message(content, user, guild) {
         var responseEmbed = new MessageEmbed().setColor(embedColors.successEmbedColor)
-        responseEmbed.setDescription("pong")
+        responseEmbed.setTitle("pong")
 
         return responseEmbed
     },
@@ -23,7 +23,7 @@ module.exports = {
     // Exucutes the command from an interaction (slash command) context
     async execute_interaction(interaction) {
         var responseEmbed = new MessageEmbed().setColor(embedColors.successEmbedColor)
-        responseEmbed.setDescription("pong")
+        responseEmbed.setTitle("pong")
 
         interaction.reply({ embeds: [responseEmbed] });
     }
