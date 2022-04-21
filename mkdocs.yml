@@ -12,7 +12,7 @@ plugins:
 theme:
   icon:
       repo: fontawesome/brands/github
-  logo: assets/feyre-icon.png
+  logo: assets/images/feyre-icon.png
   name: material
   palette:
     - media: "(prefers-color-scheme: light)" 

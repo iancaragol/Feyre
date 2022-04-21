@@ -13,7 +13,7 @@
 `/help command:roll`
 
 
-< Help Gif >
+![type:video](./assets/videos/help-demo.mp4)
 
 Returns documentation for all commands.
 
@@ -120,6 +120,8 @@ To explode *ON* a specific dice, you can use the explode ON operator 'eo' follow
 
 **/init keeps track of initiative (turn order) for each channel.**
 
+![type:video](./assets/videos/initiative demo.mp4)
+
 #### Starting Initiative
 ```
 /init get
@@ -146,13 +148,13 @@ For example, if I want to join with my character, `Sir Oliver the Timid`, who ha
 
 If you have a character selected with the `/char` command you can join with that character by pressing the **+** button or `/init join`
 
-**GIF GOES HERE**
+<img src="../assets/images/init-join.png" width="350">
 
 #### Next Turn
 
 Press the **⚔️ Next** button to move to the next turn
 
-**GIF GOES HERE**
+<img src="../assets/images/init-next.png" width="350">
 
 #### Leaving Initiative (dying)
 ```
@@ -172,7 +174,9 @@ Oops, looks like you died! You can leave initiative like this:
 /character remove id:ID
 ```
 
-Keep track of up to 9 characters and their initiative modifiers. When you click Join on an initiative tracker, you will join with your active character!
+**Keep track of up to 9 characters and their initiative modifiers. When you click Join on an initiative tracker, you will join with your active character!**
+
+![type:video](./assets/videos/character demo.mp4)
 
 #### Select your active character
 ```
