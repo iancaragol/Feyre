@@ -21,6 +21,12 @@ Invite Feyre to your server with this [link](http://invite.feyre.io)
 
 ---
 
+## Join the Feyre Community Server
+
+Have any questions or ideas for Feyre? Join the community server [here](https://discord.com/invite/zjyrtWZ)
+
+---
+
 ## Features
 ### **Robust Dice Rolling 🎲**
 
