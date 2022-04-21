@@ -396,6 +396,14 @@ async def save_data():
     print("Saved!")
 
 @bot.command()
+async def saveall(ctx):
+    if(ctx.author.id == 112041042894655488):
+        print("Saving to disk...")
+        await save_to_disk()
+        User = bot.get_user(112041042894655488)
+        await User.send("Saved everything!")
+
+@bot.command()
 async def quit(ctx):
     if(ctx.author.id == 112041042894655488):
         print("Saving to disk...")
