@@ -69,7 +69,7 @@ services:
       - ./src/backend/redis-secondary.env
 
   # Prometheus
-  # Prometheus.yml is configured to point to Grafana Cloud
+  # Prometheus config.yml is configured to point to Grafana Cloud
   prometheus:
     container_name: prometheus
     build: ./src/prometheus
@@ -80,6 +80,17 @@ services:
       - ./src/prometheus/config.yml:/etc/prometheus/config.yml
     ports:
       - 9090:9090
+
+  # Promtail is used to send our logs to Grafana cloud
+  # Promtail config.yml is configured to point to Grafana Cloud Loki instance
+  promtail:
+    container_name: promtail
+    image: grafana/promtail:2.4.2
+    volumes:
+      - ./src/promtail/config.yml:/etc/promtail/config.yml
+    command: -config.file=/etc/promtail/config.yml -config.expand-env=true
+    env_file:
+      - ./src/promtail/promtail.env
 
   # Grafana for visualization
   # Commented out because we are using Grafana Cloud instead

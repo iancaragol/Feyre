@@ -17,10 +17,11 @@ class InitiativeOperation():
     Operation that edits an initiative tracker resource
     """
 
-    def __init__(self, user : int, guild : int, channel : int, character_name : str = None, initiative_expression : str = None):
+    def __init__(self, user : int = None, guild : int = None, channel : int = None, message_id :int = None, character_name : str = None, initiative_expression : str = None):
         self.user = user
         self.guild = guild
         self.channel = channel
+        self.message_id = message_id
         self.character_name = character_name
         self.initiative_expression = initiative_expression
         self.redis_helper = RedisHelper()
@@ -82,9 +83,26 @@ class InitiativeOperation():
         # Should probably add some error handling here in case the tracker does not exist
         # Although if the request comes from the frontend the tracker will need to exist
         tracker = await self.get_tracker()
-        tracker.turn += 1
-        await self.put_tracker(tracker)
-        return dumps(tracker.to_dict())
+        if tracker:
+            tracker.turn += 1
+            await self.put_tracker(tracker)
+            return dumps(tracker.to_dict())
+        return None
+    
+    async def execute_patch_message_id(self):
+        """
+        Updates the tracker's message id
+
+        Returns:
+            The update initiative tracker as a dictionary
+        """
+
+        tracker = await self.get_tracker()
+        if tracker:
+            tracker.message_id = self.message_id
+            await self.put_tracker(tracker)
+            return dumps(tracker.to_dict())
+        return None
 
     async def execute_delete(self, character_name = None):
         """

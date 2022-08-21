@@ -88,6 +88,41 @@ async def initiative_get(user : int, guild : int, channel):
             }
         return Response(content = dumps(result), status_code = HTTPStatus.INTERNAL_SERVER_ERROR)
 
+@initiative_router.patch('/api/backendservice/initiative/update')
+async def initiative_patch_messageid(guild : int, channel : int, messageId : int):
+    """
+    Patches the message ID so that the JSON of the initiative tracker always contains the last message
+    That was posted for this tracker.
+
+    When the frontend receives a tracker JSON, it should have the messageid unless it is brand new.
+    Any future initiative operations that post in the chat will cause the frontend
+    to delete its old message using that message id, then post a new one
+
+        Frontend GET Tracker ----> Backend (200 OK)
+        <---- Frontend posts message
+        Frontend Patch Messag ----> Backend (200 OK) 
+
+    Query Parameters:
+        guild: (int) The guild where the tracker was created
+        channel: (int) The channel  where the tracker was created
+        message: (int) The message id of the message that was last posted
+    """
+
+    try:
+        result = await InitiativeOperation(guild = guild, channel = channel, message_id = messageId).execute_patch_message_id()
+
+        if result == None:
+            return Response(content = None, status_code = HTTPStatus.NO_CONTENT)
+        return Response(content = result, status_code = HTTPStatus.OK)
+
+    except Exception as e:
+        result = {
+                "message": f"An exception occurred when attempting the initiative operations.",
+                "stack_trace": traceback.format_exc(),
+                "exception_message": str(e)
+            }
+        return Response(content = dumps(result), status_code = HTTPStatus.INTERNAL_SERVER_ERROR)
+
 @initiative_router.patch('/api/backendservice/initiative')
 async def initiative_patch(user : int, guild : int, channel):
     """

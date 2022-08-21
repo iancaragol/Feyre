@@ -7,8 +7,9 @@ class InitiativeTracker:
     Attributes:
         guild: (int) The guild of the tracker
         channel: (int) The channel of the tracker
-        characters: [character] Ordered list of characterss
+        characters: [character] Ordered list of characters
         turn: (int) The current turn, characters[i] is the current character
+        message_id: (int) The integer id of the last message that the frontend posted for this tracker
     """
     def __init__(self, guild : int = None, channel : int = None, it_dict : dict = None):
         if it_dict:
@@ -16,6 +17,7 @@ class InitiativeTracker:
             self.channel = it_dict["channel"]
             self.turn = it_dict["turn"]
             self.characters = []
+            self.message_id = it_dict["message_id"]
 
             for c in it_dict["characters"]:
                 char = Character(char_dict=c)
@@ -25,6 +27,7 @@ class InitiativeTracker:
             self.channel = channel
             self.characters = []
             self.turn = 1
+            self.message_id = None
 
     def to_dict(self):
         """
@@ -35,6 +38,7 @@ class InitiativeTracker:
             "channel" : self.channel,
             "characters" : [],
             "turn" : self.turn,
+            "message_id" : self.message_id
         }
 
         for c in self.characters:

@@ -39,6 +39,8 @@ const put = bent('PUT', status_codes);
 const patch = bent('PATCH', status_codes);
 const del = bent('DELETE', status_codes);
 
+// API Endpoint for initiative
+
 // Export the module which handles the slash command
 module.exports = {
     data: new SlashCommandBuilder()
@@ -69,126 +71,129 @@ module.exports = {
                 .setDescription('Creates a brand new tracker')
         ),
 
-    async execute_init(type, user, guild, channel, character = null, roll = null, count = null, debug = false)
+    async execute_init_get(user, guild, channel) {
+        string_url = `/api/backendservice/initiative?user=${user}&guild=${guild}&channel=${channel}`
+        url = await backend.create_url({path: string_url});
+
+        request = await get(url);
+        response = await request.json();
+
+        return response
+    },
+
+    async execute_init_join(user, guild, channel, character, roll)
     {
-        try
+        string_url = `/api/backendservice/initiative?user=${user}&guild=${guild}&channel=${channel}`
+        string_url += `&character_name=${encodeURIComponent(character)}&initiative_expression=${encodeURIComponent(roll)}`
+        url = await backend.create_url({path: string_url});
+
+        request = await put(url);
+        response = await request.json();
+
+        return response
+    },
+
+    async execute_init_remove(user, guild, channel, character)
+    {
+        string_url = `/api/backendservice/initiative?user=${user}&guild=${guild}&channel=${channel}`
+        string_url += `&character_name=${encodeURIComponent(character)}`
+        url = await backend.create_url({path: string_url});
+
+        request = await del(url);
+        response = await request.json();
+
+        return response
+    },
+
+    async execute_init_next(user, guild, channel)
+    {
+        string_url = `/api/backendservice/initiative?user=${user}&guild=${guild}&channel=${channel}`
+        url = await backend.create_url({path: string_url});
+
+        request = await patch(url);
+        response = await request.json();
+
+        return response
+    },
+
+    async execute_init_reset(user, guild, channel)
+    {
+        string_url = `/api/backendservice/initiative?user=${user}&guild=${guild}&channel=${channel}`
+        url = await backend.create_url({path: string_url});
+
+        request = await del(url);
+        request = await get(url);
+        response = await request.json();
+
+        return response
+    },
+
+    async execute_init_message_update(guild, channel, messageId) {
+        string_url = `/api/backendservice/initiative/update?guild=${guild}&channel=${channel}&messageId=${messageId}`
+        url = await backend.create_url({path: string_url});
+
+        request = await patch(url);
+        response = await request.json();
+
+        console.log("TEMP")
+        console.log(response)
+
+        return response
+    },
+
+    async create_init_embed(response)
+    {
+        // Backend should respond with a 200 OK
+        if (request.statusCode == 200)
         {
-            // Ex: /initiative?user=12345&guild=4&channel=4&character_name=Carol&initiative_expression=1d20
-            string_url = `/api/backendservice/initiative?user=${user}&guild=${guild}&channel=${channel}`
+            console.log(response)
 
-            // If we are joining, and character and roll are provided then those
-            // Values need to be included in the PUT Query
-            if (type === 'join' && character && roll)
-            {
-                string_url += `&character_name=${encodeURIComponent(character)}&initiative_expression=${encodeURIComponent(roll)}`
-            }
-            if (type === 'remove' && character)
-            {
-                string_url += `&character_name=${encodeURIComponent(character)}`
-            }
-
-            // Creates the URL to call the backend
-            url = await backend.create_url({path: string_url});
-
-            let request;
-            let response;
-
-            // Get maes a GET request to return the initiative tracker without modification
-            if (type === 'get')
-            {
-                request = await get(url);
-                response = await request.json();
-            }
-            // Join makes a PUT request to add a character to the initiative tracker
-            else if (type === 'join')
-            {
-                request = await put(url);
-                response = await request.json();
-            }
-            // Next makes a PATCH request to increment the turn by one
-            else if (type === 'next')
-            {
-                request = await patch(url);
-                response = await request.json();
-            }
-            // Remove makes a DELETE request to delete the character
-            else if (type === 'remove')
-            {
-                request = await del(url);
-                response = await request.json();
-            }
-            else if (type === 'reset')
-            {
-                request = await del(url);
-                request = await get(url);
-                response = await request.json();
-            }
-
-            // console.log(response)
+            responseEmbed = new MessageEmbed().setColor(embedColors.successEmbedColor)
+            responseEmbed.setTitle("[              Initiative              ]")
+            turnOrderString = ""
             
-            // Backend should respond with a 200 OK
-            if (request.statusCode == 200)
+            for (let i = 0; i < response.characters.length; i++)
             {
-                responseEmbed = new MessageEmbed().setColor(embedColors.successEmbedColor)
-                responseEmbed.setTitle("[              Initiative              ]")
-                turnOrderString = ""
-                
-                for (let i = 0; i < response.characters.length; i++)
+                if (response.turn % response.characters.length == i)
                 {
-                    if (response.turn % response.characters.length == i)
-                    {
-                        turnOrderString += `**➤ ${response.characters[i].name} (${response.characters[i].initiative_value})**\n`
-                    }
-                    else
-                    {
-                        turnOrderString += `${response.characters[i].name} (${response.characters[i].initiative_value})\n`
-                    }
+                    turnOrderString += `**➤ ${response.characters[i].name} (${response.characters[i].initiative_value})**\n`
                 }
-
-                responseEmbed.setDescription(
-                    turnOrderString.trim()
-                )
-
-                responseEmbed.addField(
-                    "Round: ", String(response.turn)
-                )
-
-                return responseEmbed;
+                else
+                {
+                    turnOrderString += `${response.characters[i].name} (${response.characters[i].initiative_value})\n`
+                }
             }
-            // Oops! Internal server error
-            else if (request.statusCode == 500)
-            {
-                error_string = "Something went wrong. See /help init for examples."
-                responseEmbed = new MessageEmbed().setColor(embedColors.errorEmbedColor)
-                .setTitle("Oops!")
-                .setDescription(error_string)
 
-                return responseEmbed;
-            }
-            // If the status code is something else, we are outside of expected behaviour
-            else
-            {
-                responseEmbed = new MessageEmbed().setColor(embedColors.errorEmbedColor)
-                .addFields(
-                    { name: "Unexpected Response", value: request.statusCode }
-                )
+            responseEmbed.setDescription(
+                turnOrderString.trim()
+            )
 
-                return responseEmbed;
-            }            
+            responseEmbed.addField(
+                "Round: ", String(response.turn)
+            )
+
+            return responseEmbed;
         }
-        catch (error)
+        // Oops! Internal server error
+        else if (request.statusCode == 500)
         {
-            console.log("Caught Unhandled Exception in INIT")
-            console.log(error)
-            if (debug)
-            {
-                responseEmbed = new MessageEmbed().setColor(embedColors.errorEmbedColor)
-                .setTitle("Unhandled Exception")
-                .setDescription(error.toString())
+            error_string = "Something went wrong. See /help init for examples."
+            responseEmbed = new MessageEmbed().setColor(embedColors.errorEmbedColor)
+            .setTitle("Oops!")
+            .setDescription(error_string)
 
-                return responseEmbed;
-            }
+            return responseEmbed;
         }
+        // If the status code is something else, we are outside of expected behaviour
+        else
+        {
+            responseEmbed = new MessageEmbed().setColor(embedColors.errorEmbedColor)
+            .addFields(
+                { name: "Unexpected Response", value: request.statusCode }
+            )
+
+            return responseEmbed;
+        }            
     },
 
     // Executes the command from message context
@@ -206,8 +211,7 @@ module.exports = {
         user = interaction.user.id
 
         // If command was executed in DM context
-        if (interaction.guild == null)
-        {   
+        if (interaction.guild == null) {   
             response = new MessageEmbed().setColor(embedColors.errorEmbedColor)
             .setTitle("DMs are not supported")
             .setDescription("Sorry, the initiative tracker can not be used in Direct Messages. See /help init for details!")
@@ -224,20 +228,42 @@ module.exports = {
 
         // JOIN and GET both return the INIT Tracker so they need buttons
         if (interaction.options.getSubcommand() === 'join') {
-            var response = await this.execute_init('join', user, guild, channel, character, roll, count)
-            return await interaction.reply({ embeds: [response],  components: [initButtons] })
+            // Make the request to the backend to get the tracker
+            var response = await this.execute_init_join(user, guild, channel, character, roll, count)
+
+            // Delete the old messsage
+            if (response.message_id) {
+                console.log("Delete reply ")
+                console.log(response.message_id)
+                //await interaction,channel.fetchMessage(response.message_id)
+                //                         .then(msg => msg.delete());
+                
+                await interaction.webhook.deleteMessage(response.message_id)
+            }
+
+            responseEmbed = await this.create_init_embed(response)
+
+            // Respond and update the initiative tracker with the message's id
+            return await interaction.reply({ embeds: [responseEmbed],  components: [initButtons], fetchReply: true  })
+                                    .then((reply) => this.execute_init_message_update(reply.guild.id, reply.channel.id, reply.id))
         }
         else if (interaction.options.getSubcommand() === 'get') {
-            var response = await this.execute_init('get', user, guild, channel, character, roll, count)
-            return await interaction.reply({ embeds: [response], components: [initButtons] })
+            var response = await this.execute_init_get(user, guild, channel)
+            responseEmbed = await this.create_init_embed(response)
+
+            return await interaction.reply({ embeds: [responseEmbed], components: [initButtons] })
         }
         else if (interaction.options.getSubcommand() === 'remove') {
-            var response = await this.execute_init('remove', user, guild, channel, character, roll, count)
-            return await interaction.reply({ embeds: [response], components: [initButtons] })
+            var response = await this.execute_init_remove(user, guild, channel, character)
+            responseEmbed = await this.create_init_embed(response)
+
+            return await interaction.reply({ embeds: [responseEmbed], components: [initButtons] })
         }
         else if (interaction.options.getSubcommand() === 'reset') {
-            var response = await this.execute_init('reset', user, guild, channel, character, roll, count)
-            return await interaction.reply({ embeds: [response], components: [initButtons] })
+            var response = await this.execute_init_reset(user, guild, channel)
+            responseEmbed = await this.create_init_embed(response)
+
+            return await interaction.reply({ embeds: [responseEmbed], components: [initButtons] })
         }
     },
 
@@ -249,13 +275,15 @@ module.exports = {
 
         if (interaction.customId == 'init_next')
         {
-            var response = await this.execute_init('next', user, guild, channel)
-            return await interaction.update({ embeds: [response], components: [initButtons] })
+            var response = await this.execute_init_next(user, guild, channel)
+            responseEmbed = await this.create_init_embed(response)
+            return await interaction.update({ embeds: [responseEmbed], components: [initButtons] })
         }
         else if (interaction.customId == 'init_join')
         {
-            var response = await this.execute_init('join', user, guild, channel)
-            return await interaction.update({ embeds: [response], components: [initButtons] })
+            var response = await this.execute_init_join(user, guild, channel, null, null)
+            responseEmbed = await this.create_init_embed(response)
+            return await interaction.update({ embeds: [responseEmbed], components: [initButtons] })
         }
     }
 };
