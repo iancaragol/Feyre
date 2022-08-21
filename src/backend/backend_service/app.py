@@ -1,6 +1,8 @@
 from time import sleep
-import sentry_sdk
 
+import time
+import logging
+from logging.handlers import RotatingFileHandler
 import uvicorn
 import requests
 from fastapi import FastAPI
@@ -21,6 +23,22 @@ from backend_service.collectors.collectors import StatsMetricsCollector
 
 # Register any custom collectors here
 REGISTRY.register(StatsMetricsCollector())
+
+def log_setup():
+    """
+    Creates a rotating logger
+    """
+    logger = logging.getLogger("BACKEND_LOGGER")
+    logger.setLevel(logging.INFO)
+    
+    # add a rotating handler
+    handler = RotatingFileHandler("./logs/backend.log",
+                                  maxBytes=20000)
+
+    formatter = logging.Formatter('%(asctime)s | %(levelname)s | %(message)s')
+    handler.setFormatter(formatter)
+
+    logger.addHandler(handler)
 
 def create_app():
     app = FastAPI()
@@ -81,6 +99,7 @@ def check_sync_state():
         i+=1
         
 def main():
+    log_setup()
     check_sync_state()
     app = create_app()
     print("[#] Starting app...", flush = True)

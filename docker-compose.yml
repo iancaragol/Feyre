@@ -9,6 +9,8 @@ services:
     restart: unless-stopped
     build: ./src/frontend
     command: index.js
+    volumes:
+      - log-volume:/home/app/logs
 
   # Backend Service
   backend:
@@ -20,7 +22,7 @@ services:
     ports:
       - "5000:5000"
     volumes:
-      - ./src/backend/:/home/app/
+      - log-volume:/home/app/logs
     command: setup.py -s backend
     depends_on:
       - redis-primary
@@ -38,7 +40,7 @@ services:
     ports:
       - "5001:5001"
     volumes:
-      - ./src/backend/:/home/app/
+      - log-volume:/home/app/logs
     command: setup.py -s sync
     depends_on:
       - redis-primary
@@ -88,6 +90,7 @@ services:
     image: grafana/promtail:2.4.2
     volumes:
       - ./src/promtail/config.yml:/etc/promtail/config.yml
+      - log-volume:/home/app/logs
     command: -config.file=/etc/promtail/config.yml -config.expand-env=true
     env_file:
       - ./src/promtail/promtail.env
@@ -108,3 +111,4 @@ services:
 volumes:
   redis_data:
     driver: local
+  log-volume:

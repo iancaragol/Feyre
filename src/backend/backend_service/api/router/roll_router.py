@@ -1,4 +1,5 @@
 import traceback
+import logging
 
 from fastapi import APIRouter
 from fastapi.responses import Response
@@ -11,6 +12,7 @@ from urllib.parse import unquote_plus
 
 roll_router = APIRouter()
 redis_helper = RedisHelper()
+logger = logging.getLogger("BACKEND_LOGGER")
 
 @roll_router.get('/api/backendservice/roll')
 async def roll(user : int, expression : str, verbose : bool = False):
@@ -23,6 +25,8 @@ async def roll(user : int, expression : str, verbose : bool = False):
         user: (int) The user who rolled the dice
     """
 
+    logger.info(f"[ROLL] Received roll request. user: {user}, expression: {expression}, verbose: {verbose}")
+
     # Increment the roll operation counter
     redis_helper.increment_command("roll")
 
@@ -30,6 +34,7 @@ async def roll(user : int, expression : str, verbose : bool = False):
     if user:
         redis_helper.add_to_user_set(user)
     else:
+        logger.error(f"[ROLL] Roll request is missing user paramter.")
         return Response(content = "Missing user query parameter", status_code = HTTPStatus.BAD_REQUEST)
 
     # Create and exectute a Roll Operation and return the result in the response body
@@ -45,6 +50,7 @@ async def roll(user : int, expression : str, verbose : bool = False):
                     "exception_message": e.message,
                     "expression": expression
                 }
+            logger.error(f"[ROLL] Exception occurred in RollOperation with user: {user}, expression: {expression}, verbose: {verbose}. Exception Message: {e.message}")
             return Response(content = dumps(result), status_code = HTTPStatus.INTERNAL_SERVER_ERROR)
     else:
         return Response(content = "Missing expression query parameter", status_code = HTTPStatus.BAD_REQUEST)
