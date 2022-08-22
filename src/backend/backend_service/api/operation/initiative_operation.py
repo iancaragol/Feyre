@@ -1,4 +1,5 @@
 import traceback
+import logging
 
 from json import dumps, loads
 from random import randint
@@ -11,13 +12,14 @@ from backend_service.api.operation.character_operation import CharacterOperation
 from backend_service.api.model.character_model import Character
 from backend_service.api.model.initiative_tracker_model import InitiativeTracker
 from common.redis_helper import RedisHelper
+from common.logger import LoggerNames
 
 class InitiativeOperation():
     """
     Operation that edits an initiative tracker resource
     """
 
-    def __init__(self, user : int = None, guild : int = None, channel : int = None, message_id :int = None, character_name : str = None, initiative_expression : str = None):
+    def __init__(self, logger : logging.Logger, user : int = None, guild : int = None, channel : int = None, message_id :int = None, character_name : str = None, initiative_expression : str = None):
         self.user = user
         self.guild = guild
         self.channel = channel
@@ -25,6 +27,7 @@ class InitiativeOperation():
         self.character_name = character_name
         self.initiative_expression = initiative_expression
         self.redis_helper = RedisHelper()
+        self.logger = logger
 
     async def execute_get(self):
         """
@@ -63,8 +66,9 @@ class InitiativeOperation():
             await self.add_character(tracker=tracker, character=character)
         # Otherwise need to query the database
         else:
-            print("Query the database and get the user's character!", flush = True)
+            self.logger.info(f"[INIT > PUT] Getting selected character for user {self.user}")
             character = await self.get_selected_char(user=self.user)
+            self.logger.info(f"[INIT > PUT] Got character: {character.name} with initiative {character.initiative_expression}")
             await self.add_character(tracker=tracker, character=character)
 
         # Put the tracker back into Redis

@@ -1,4 +1,5 @@
 import redis
+import logging
 
 from datetime import datetime
 from os import environ
@@ -7,6 +8,7 @@ from json import loads, dumps
 from backend_service.api.model.initiative_tracker_model import InitiativeTracker
 from common.commands import Commands
 from common.redis_keys import RedisKeys
+from common.logger import LoggerNames, logger_setup
 
 if environ.get('ENV_KUBE', None) == 'true':
     HOST = 'redis.redis'
@@ -25,6 +27,7 @@ class RedisHelper:
             redis_pw = environ['REDIS_PASSWORD']
 
         self.red = redis.StrictRedis(host=HOST, port=6379, db=0, password=redis_pw)
+        self.logger = logging.getLogger(LoggerNames.redis_logger)
 
     def increment_command(self, command : str):
         """

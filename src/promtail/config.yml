@@ -18,6 +18,16 @@ scrape_configs:
       job: backend
       env: ${ENV}
       __path__: '/home/app/logs/backend.log'
+  pipeline_stages:
+  - match:
+      selector: '{app="backend"}'
+      stages:
+      - regex:
+          expression: '\| (?P<level>[A-z]*) \|.*\[(?P<command>[A-z]*)]'
+      - labels:
+          level:
+          command:
+          
 - job_name: frontend
   static_configs:
   - targets:
