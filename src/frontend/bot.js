@@ -174,6 +174,11 @@ client.on('interactionCreate', async interaction => {
             guilds = await client.shard.fetchClientValues('guilds.cache.size')
             guildtotal = guilds.reduce((acc, guildsizes) => acc + guildsizes, 0)
 
+            logger.log({
+                level: 'warn',
+                message: `Processing stats interaction. User Count: ${usercount}, Guild Count: ${guildtotal}, Shard Count ${client.shard.count}`
+            });
+
             await command.execute_interaction(interaction, guildtotal, usercount, client.shard.count, logger);
         }
         else {
