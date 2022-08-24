@@ -31,7 +31,7 @@ module.exports = {
                 .setRequired(false),
         ),
 
-    async execute_roll(expression, user, guild = 0, debug = false)
+    async execute_roll(expression, user, guild = 0, debug = false, logger)
     {
         try
         {
@@ -41,6 +41,11 @@ module.exports = {
             // Creates the URL to call the backend
             url = await backend.create_url({path: string_url});
 
+            logger.log({
+                level: 'info',
+                message: `[ROLL] Sending request to backend. Uri: ${url}`
+            });
+
             // Make the request
             let request = await get(url);
             let response = await request.json()
@@ -48,6 +53,11 @@ module.exports = {
             // Backend should respond with a 200 OK if the dice expression is valid
             if (request.statusCode == 200)
             {
+                logger.log({
+                    level: 'info',
+                    message: `[ROLL] Backend returned 200 OK. Constructing response embed.`
+                });
+
                 // Todo (IAN)
                 // Need to put this in a loop for multiple dice counts.
                 // Or display it differently, probably just the totals.
@@ -75,12 +85,22 @@ module.exports = {
                     )
                 }
                 
+                logger.log({
+                    level: 'info',
+                    message: `[ROLL] Finished constructing response embed.`
+                });
+
                 return responseEmbed;
             }
             // If the backend could not parse the expression, we should get a 400 BAD REQUEST
             // For now we get a 500
             else if (request.statusCode == 500)
             {
+                logger.log({
+                    level: 'warn',
+                    message: `[ROLL] Backend returned 500 INTERNAL SERVER ERROR. Expression: ${expression}, Message: ${response.exception_message}`
+                });
+
                 error_string = response.expression + "\n" + response.exception_message
                 responseEmbed = new MessageEmbed().setColor(embedColors.errorEmbedColor)
                 .setTitle("Invalid Dice Expression")
@@ -91,6 +111,11 @@ module.exports = {
             // If the status code is something else, we are outside of expected behaviour
             else
             {
+                logger.log({
+                    level: 'warn',
+                    message: `[ROLL] Backend returned an unexpected response. Expression: ${expression}, StatusCode: ${request.statusCode}`
+                });
+
                 responseEmbed = new MessageEmbed().setColor(embedColors.errorEmbedColor)
                 .addFields(
                     { name: "Unexpected Response", value: request.statusCode }
@@ -101,13 +126,23 @@ module.exports = {
         }
         catch (error)
         {
-            console.log("Caught Unhandled Exception in ROLL")
-            console.log(error)
-            if (debug)
-            {
+            logger.log({
+                level: 'error',
+                message: `[ROLL] Encountered an exception in Roll with Expression: ${expression}. Stack Trace: ${error.stack}`
+            });
+
+            if (debug) {
                 responseEmbed = new MessageEmbed().setColor(embedColors.errorEmbedColor)
                 .addFields(
                     { name: "Unhandled Exception", value: error.toString() }
+                )
+
+                return responseEmbed;
+            }
+            else {
+                responseEmbed = new MessageEmbed().setColor(embedColors.errorEmbedColor)
+                .addFields(
+                    { name: "Oops!", value: "Something went wrong." }
                 )
 
                 return responseEmbed;
@@ -116,16 +151,26 @@ module.exports = {
     },
 
     // Executes the command from message context
-    async execute_message(content, user, guild)
+    async execute_message(content, user, guild, logger)
     {
+        logger.log({
+            level: 'info',
+            message: '[ROLL] Received roll message'
+        });
+
         var expression = content
         var debug = false
     
-        return await this.execute_roll(expression, user, guild, debug);
+        return await this.execute_roll(expression, user, guild, debug, logger);
     },
 
     // Executes the command from an interaction (slash command) context
-    async execute_interaction(interaction) {
+    async execute_interaction(interaction, logger) {
+        logger.log({
+            level: 'info',
+            message: '[ROLL] Received roll interaction'
+        });
+
         expression = interaction.options.getString('expression')
         debug = interaction.options.getString('debug')
         user = interaction.user.id
@@ -136,7 +181,12 @@ module.exports = {
             guild = interaction.guild.id
         }
 
-        var response = await this.execute_roll(expression, user, guild, debug)
+        logger.log({
+            level: 'info',
+            message: `[ROLL] Executing roll. Expression: ${expression}, User: ${user}, Guild: ${guild}, Debug: ${debug}`
+        });
+
+        var response = await this.execute_roll(expression, user, guild, debug, logger)
         return await interaction.reply({ embeds: [response]})
     }
 };

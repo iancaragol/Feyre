@@ -1,0 +1,69 @@
+server:
+  http_listen_port: 9080
+  grpc_listen_port: 0
+        
+positions:
+  filename: /tmp/positions.yaml
+        
+client:
+  url: https://168447:${GRAFANA_API_KEY}@logs-prod3.grafana.net/api/prom/push
+        
+scrape_configs:
+- job_name: backend
+  static_configs:
+  - targets:
+      - localhost
+    labels:
+      app: backend
+      job: backend
+      env: ${ENV}
+      __path__: '/home/app/logs/backend.log'
+  pipeline_stages:
+  - match:
+      selector: '{app="backend"}'
+      stages:
+      - regex:
+          expression: '\| (?P<level>[A-z]*) \|.*\[(?P<command>[A-z]*)]'
+      - labels:
+          level:
+          command:
+          
+- job_name: frontend
+  static_configs:
+  - targets:
+      - localhost
+    labels:
+      app: frontend
+      job: frontend
+      env: ${ENV}
+      __path__: '/home/app/logs/frontend.log'
+  pipeline_stages:
+    - match:
+        selector: '{app="frontend"}'
+        stages:
+        - json:
+            expressions:
+              level: level
+              message: message
+              service: service
+              timestamp: timestamp
+
+- job_name: shardingmanager
+  static_configs:
+  - targets:
+      - localhost
+    labels:
+      app: shardingmanager
+      job: shardingmanager
+      env: ${ENV}
+      __path__: '/home/app/logs/shardingmanager.log'
+  pipeline_stages:
+    - match:
+        selector: '{app="shardingmanager"}'
+        stages:
+        - json:
+            expressions:
+              level: level
+              message: message
+              service: service
+              timestamp: timestamp

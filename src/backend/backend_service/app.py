@@ -1,6 +1,8 @@
 from time import sleep
-import sentry_sdk
 
+import time
+import logging
+from logging.handlers import RotatingFileHandler
 import uvicorn
 import requests
 from fastapi import FastAPI
@@ -18,6 +20,8 @@ from backend_service.api.router.initiative_router import initiative_router
 from backend_service.api.router.character_router import character_router
 
 from backend_service.collectors.collectors import StatsMetricsCollector
+
+from common.logger import logger_setup, LoggerNames
 
 # Register any custom collectors here
 REGISTRY.register(StatsMetricsCollector())
@@ -81,6 +85,7 @@ def check_sync_state():
         i+=1
         
 def main():
+    logger_setup(LoggerNames.backend_logger, "backend.log")
     check_sync_state()
     app = create_app()
     print("[#] Starting app...", flush = True)

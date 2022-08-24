@@ -39,6 +39,8 @@ const put = bent('PUT', status_codes);
 const patch = bent('PATCH', status_codes);
 const del = bent('DELETE', status_codes);
 
+// API Endpoint for initiative
+
 // Export the module which handles the slash command
 module.exports = {
     data: new SlashCommandBuilder()
@@ -69,130 +71,193 @@ module.exports = {
                 .setDescription('Creates a brand new tracker')
         ),
 
-    async execute_init(type, user, guild, channel, character = null, roll = null, count = null, debug = false)
+    async execute_init_get(user, guild, channel, logger) {
+        string_url = `/api/backendservice/initiative?user=${user}&guild=${guild}&channel=${channel}`
+        url = await backend.create_url({path: string_url});
+
+        logger.log({
+            level: 'info',
+            message: `[INIT] Executing init join. Uri: ${url}`
+        });
+
+        request = await get(url);
+        response = await request.json();
+
+        return response
+    },
+
+    async execute_init_join(user, guild, channel, character, roll, logger)
     {
-        try
+        string_url = `/api/backendservice/initiative?user=${user}&guild=${guild}&channel=${channel}`
+
+        // If character is provided, but not roll, then default to 1d20
+        if (character != null && roll == null)
         {
-            // Ex: /initiative?user=12345&guild=4&channel=4&character_name=Carol&initiative_expression=1d20
-            string_url = `/api/backendservice/initiative?user=${user}&guild=${guild}&channel=${channel}`
+            roll = "1d20"
+        }
 
-            // If we are joining, and character and roll are provided then those
-            // Values need to be included in the PUT Query
-            if (type === 'join' && character && roll)
-            {
-                string_url += `&character_name=${encodeURIComponent(character)}&initiative_expression=${encodeURIComponent(roll)}`
-            }
-            if (type === 'remove' && character)
-            {
-                string_url += `&character_name=${encodeURIComponent(character)}`
-            }
+        // Initiative API expects no character name or expression if it is going to fetch from the database.
+        if (character != null && roll != null)
+        {
+            string_url += `&character_name=${encodeURIComponent(character)}&initiative_expression=${encodeURIComponent(roll)}`
+        }
 
-            // Creates the URL to call the backend
-            url = await backend.create_url({path: string_url});
+        url = await backend.create_url({path: string_url});
 
-            let request;
-            let response;
+        logger.log({
+            level: 'info',
+            message: `[INIT] Executing init join. Uri: ${url}`
+        });
 
-            // Get maes a GET request to return the initiative tracker without modification
-            if (type === 'get')
-            {
-                request = await get(url);
-                response = await request.json();
-            }
-            // Join makes a PUT request to add a character to the initiative tracker
-            else if (type === 'join')
-            {
-                request = await put(url);
-                response = await request.json();
-            }
-            // Next makes a PATCH request to increment the turn by one
-            else if (type === 'next')
-            {
-                request = await patch(url);
-                response = await request.json();
-            }
-            // Remove makes a DELETE request to delete the character
-            else if (type === 'remove')
-            {
-                request = await del(url);
-                response = await request.json();
-            }
-            else if (type === 'reset')
-            {
-                request = await del(url);
-                request = await get(url);
-                response = await request.json();
-            }
+        request = await put(url);
+        response = await request.json();
 
-            // console.log(response)
+        return response
+    },
+
+    async execute_init_remove(user, guild, channel, character, logger)
+    {
+        string_url = `/api/backendservice/initiative?user=${user}&guild=${guild}&channel=${channel}`
+        string_url += `&character_name=${encodeURIComponent(character)}`
+        url = await backend.create_url({path: string_url});
+
+        logger.log({
+            level: 'info',
+            message: `[INIT] Executing init remove. Uri: ${url}`
+        });
+
+        request = await del(url);
+        response = await request.json();
+
+        return response
+    },
+
+    async execute_init_next(user, guild, channel, logger)
+    {
+        string_url = `/api/backendservice/initiative?user=${user}&guild=${guild}&channel=${channel}`
+        url = await backend.create_url({path: string_url});
+
+        logger.log({
+            level: 'info',
+            message: `[INIT] Executing init next. Uri: ${url}`
+        });
+
+        request = await patch(url);
+        response = await request.json();
+
+        return response
+    },
+
+    async execute_init_reset(user, guild, channel, logger)
+    {
+        string_url = `/api/backendservice/initiative?user=${user}&guild=${guild}&channel=${channel}`
+        url = await backend.create_url({path: string_url});
+
+        logger.log({
+            level: 'info',
+            message: `[INIT] Executing init reset. Uri: ${url}`
+        });
+
+        request = await del(url);
+        request = await get(url);
+        response = await request.json();
+
+        return response
+    },
+
+    async execute_init_message_update(guild, channel, messageId) {
+        string_url = `/api/backendservice/initiative/update?guild=${guild}&channel=${channel}&messageId=${messageId}`
+        url = await backend.create_url({path: string_url});
+
+        request = await patch(url);
+        response = await request.json();
+
+        console.log("TEMP")
+        console.log(response)
+
+        return response
+    },
+
+    async create_init_embed(response, logger)
+    {
+        logger.log({
+            level: 'info',
+            message: `[INIT] Creating response embed.`
+        });
+
+        // Backend should respond with a 200 OK
+        if (request.statusCode == 200)
+        {
+            logger.log({
+                level: 'info',
+                message: `[INIT] Response had status code 200 OK`
+            });
+
+            responseEmbed = new MessageEmbed().setColor(embedColors.successEmbedColor)
+            responseEmbed.setTitle("[              Initiative              ]")
+            turnOrderString = ""
             
-            // Backend should respond with a 200 OK
-            if (request.statusCode == 200)
+            for (let i = 0; i < response.characters.length; i++)
             {
-                responseEmbed = new MessageEmbed().setColor(embedColors.successEmbedColor)
-                responseEmbed.setTitle("[              Initiative              ]")
-                turnOrderString = ""
-                
-                for (let i = 0; i < response.characters.length; i++)
+                if (response.turn % response.characters.length == i)
                 {
-                    if (response.turn % response.characters.length == i)
-                    {
-                        turnOrderString += `**➤ ${response.characters[i].name} (${response.characters[i].initiative_value})**\n`
-                    }
-                    else
-                    {
-                        turnOrderString += `${response.characters[i].name} (${response.characters[i].initiative_value})\n`
-                    }
+                    turnOrderString += `**➤ ${response.characters[i].name} (${response.characters[i].initiative_value})**\n`
                 }
-
-                responseEmbed.setDescription(
-                    turnOrderString.trim()
-                )
-
-                responseEmbed.addField(
-                    "Round: ", String(response.turn)
-                )
-
-                return responseEmbed;
+                else
+                {
+                    turnOrderString += `${response.characters[i].name} (${response.characters[i].initiative_value})\n`
+                }
             }
-            // Oops! Internal server error
-            else if (request.statusCode == 500)
-            {
-                error_string = "Something went wrong. See /help init for examples."
-                responseEmbed = new MessageEmbed().setColor(embedColors.errorEmbedColor)
-                .setTitle("Oops!")
-                .setDescription(error_string)
 
-                return responseEmbed;
-            }
-            // If the status code is something else, we are outside of expected behaviour
-            else
-            {
-                responseEmbed = new MessageEmbed().setColor(embedColors.errorEmbedColor)
-                .addFields(
-                    { name: "Unexpected Response", value: request.statusCode }
-                )
+            responseEmbed.setDescription(
+                turnOrderString.trim()
+            )
 
-                return responseEmbed;
-            }            
+            responseEmbed.addField(
+                "Round: ", String(response.turn)
+            )
+
+            logger.log({
+                level: 'info',
+                message: `[INIT] Constructed response embed.`
+            });
+
+            return responseEmbed;
         }
-        catch (error)
+        // Oops! Internal server error
+        else if (request.statusCode == 500)
         {
-            console.log("Caught Unhandled Exception in INIT")
-            console.log(error)
-            if (debug)
-            {
-                responseEmbed = new MessageEmbed().setColor(embedColors.errorEmbedColor)
-                .setTitle("Unhandled Exception")
-                .setDescription(error.toString())
+            logger.log({
+                level: 'warn',
+                message: `[INIT] Response status code was 500 INTERNAL SERVER ERROR.`
+            });
 
-                return responseEmbed;
-            }
+            error_string = "Something went wrong. See /help init for examples."
+            responseEmbed = new MessageEmbed().setColor(embedColors.errorEmbedColor)
+            .setTitle("Oops!")
+            .setDescription(error_string)
+
+            return responseEmbed;
         }
+        // If the status code is something else, we are outside of expected behaviour
+        else
+        {
+            logger.log({
+                level: 'warn',
+                message: `[INIT] Response status code was unexpected. StatusCode: ${request.statusCode}`
+            });
+
+            responseEmbed = new MessageEmbed().setColor(embedColors.errorEmbedColor)
+            .addFields(
+                { name: "Unexpected Response", value: request.statusCode }
+            )
+
+            return responseEmbed;
+        }            
     },
 
     // Executes the command from message context
-    async execute_message(content, user, guild)
+    async execute_message(content, user, guild, logger)
     {
         responseEmbed = new MessageEmbed().setColor(embedColors.errorEmbedColor)
         .setTitle("DMs are not supported")
@@ -202,12 +267,16 @@ module.exports = {
     },
 
     // Executes the command from an interaction (slash command) context
-    async execute_interaction(interaction) {
+    async execute_interaction(interaction, logger) {
+        logger.log({
+            level: 'info',
+            message: '[INIT] Received initiative interaction'
+        });
+
         user = interaction.user.id
 
         // If command was executed in DM context
-        if (interaction.guild == null)
-        {   
+        if (interaction.guild == null) {   
             response = new MessageEmbed().setColor(embedColors.errorEmbedColor)
             .setTitle("DMs are not supported")
             .setDescription("Sorry, the initiative tracker can not be used in Direct Messages. See /help init for details!")
@@ -220,42 +289,136 @@ module.exports = {
 
         roll = interaction.options.getString('roll')
         character = interaction.options.getString('character')
-        count = interaction.options.getString('count')
+        count = interaction.options.getInteger('count')
+
+        // TODO(IAN) Implement the count argument
+        // Count is not supported right now...
+        if (count != null) {
+            logger.log({
+                level: 'warn',
+                message: '[INIT] Count is not supported yet'
+            });
+
+            response = new MessageEmbed().setColor(embedColors.errorEmbedColor)
+            .setTitle("Count is not supported")
+            .setDescription("Sorry, the count argument is not supported yet!")
+
+            return await interaction.reply({ embeds: [response]})
+        }
 
         // JOIN and GET both return the INIT Tracker so they need buttons
         if (interaction.options.getSubcommand() === 'join') {
-            var response = await this.execute_init('join', user, guild, channel, character, roll, count)
-            return await interaction.reply({ embeds: [response],  components: [initButtons] })
+            logger.log({
+                level: 'info',
+                message: '[INIT] Subcommand is join'
+            });
+
+            // Make the request to the backend to get the tracker
+            var response = await this.execute_init_join(user, guild, channel, character, roll, logger)
+
+            // Delete the old messsage
+            if (response.message_id) {
+                logger.log({
+                    level: 'info',
+                    message: `[INIT] Deleting old message. Message Id: ${response.message_id}`
+                });
+                
+                await interaction.webhook.deleteMessage(response.message_id)
+            }
+
+            responseEmbed = await this.create_init_embed(response, logger)
+
+            logger.log({
+                level: 'info',
+                message: '[INIT] Replying.'
+            });
+
+            // Respond and update the initiative tracker with the message's id
+            return await interaction.reply({ embeds: [responseEmbed],  components: [initButtons], fetchReply: true  })
+                                    .then((reply) => this.execute_init_message_update(reply.guild.id, reply.channel.id, reply.id))
         }
         else if (interaction.options.getSubcommand() === 'get') {
-            var response = await this.execute_init('get', user, guild, channel, character, roll, count)
-            return await interaction.reply({ embeds: [response], components: [initButtons] })
+            logger.log({
+                level: 'info',
+                message: '[INIT] Subcommand is get'
+            });
+
+            var response = await this.execute_init_get(user, guild, channel, logger)
+            responseEmbed = await this.create_init_embed(response, logger)
+
+            logger.log({
+                level: 'info',
+                message: '[INIT] Replying.'
+            });
+
+            return await interaction.reply({ embeds: [responseEmbed], components: [initButtons] })
         }
         else if (interaction.options.getSubcommand() === 'remove') {
-            var response = await this.execute_init('remove', user, guild, channel, character, roll, count)
-            return await interaction.reply({ embeds: [response], components: [initButtons] })
+            logger.log({
+                level: 'info',
+                message: '[INIT] Subcommand is remove'
+            });
+
+            var response = await this.execute_init_remove(user, guild, channel, character, logger)
+            responseEmbed = await this.create_init_embed(response, logger)
+
+            return await interaction.reply({ embeds: [responseEmbed], components: [initButtons] })
         }
         else if (interaction.options.getSubcommand() === 'reset') {
-            var response = await this.execute_init('reset', user, guild, channel, character, roll, count)
-            return await interaction.reply({ embeds: [response], components: [initButtons] })
+            logger.log({
+                level: 'info',
+                message: '[INIT] Subcommand is reset'
+            });
+
+            var response = await this.execute_init_reset(user, guild, channel, logger)
+            responseEmbed = await this.create_init_embed(response, logger)
+
+            return await interaction.reply({ embeds: [responseEmbed], components: [initButtons] })
         }
     },
 
     // Handles interactions from button presses
-    async execute_button(interaction) {
+    async execute_button(interaction, logger) {
+        logger.log({
+            level: 'info',
+            message: '[INIT] Received init button interaction'
+        });
+
         user = interaction.user.id
         guild = interaction.guild.id
         channel = interaction.channel.id
 
         if (interaction.customId == 'init_next')
         {
-            var response = await this.execute_init('next', user, guild, channel)
-            return await interaction.update({ embeds: [response], components: [initButtons] })
+            logger.log({
+                level: 'info',
+                message: '[INIT] Button interaction is next'
+            });
+
+            var response = await this.execute_init_next(user, guild, channel, logger)
+            responseEmbed = await this.create_init_embed(response, logger)
+
+            logger.log({
+                level: 'info',
+                message: '[INIT] Updating embed message.'
+            });
+            return await interaction.update({ embeds: [responseEmbed], components: [initButtons] })
         }
         else if (interaction.customId == 'init_join')
         {
-            var response = await this.execute_init('join', user, guild, channel)
-            return await interaction.update({ embeds: [response], components: [initButtons] })
+            logger.log({
+                level: 'info',
+                message: '[INIT] Button interaction is join.'
+            });
+
+            var response = await this.execute_init_join(user, guild, channel, null, null, logger)
+            responseEmbed = await this.create_init_embed(response, logger)
+
+            logger.log({
+                level: 'info',
+                message: '[INIT] Updating embed message.'
+            });
+            return await interaction.update({ embeds: [responseEmbed], components: [initButtons] })
         }
     }
 };

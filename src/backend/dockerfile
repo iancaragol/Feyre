@@ -34,7 +34,12 @@ RUN apt install iputils-ping redis -y
 
 # create nonroot user
 RUN adduser nonroot
-RUN mkdir /home/app/ && chown -R nonroot:nonroot /home/app
+
+# Create and own directories
+RUN mkdir -p /home/app/
+RUN mkdir -p /home/app/logs/
+RUN chown -R nonroot:nonroot /home/app
+
 WORKDIR /home/app
 
 COPY --from=build /wheels /wheels

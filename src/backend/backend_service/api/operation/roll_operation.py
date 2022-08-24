@@ -363,12 +363,17 @@ class RollOperationException(Exception):
         self.exception = exception
         self.expression = expression
         self.message = str(exception)
+
+        # If we know that this is occuring because something is unsupported, set is_expected = True
+        self.is_expected = False
         
         # Additional handling for any specific errors
         # The messagae string will be returned to the user
         # So want to make sure it is somewhat descriptive
         if str(exception) == "pop from empty list":
             self.message = "Invalid expression string. Two operators (+, -, /, ...) in a row is not supported"
+            self.is_expected = True
 
         if str(exception).startswith("invalid literal") or str(exception).startswith("list index out of range"):
             self.message = "Invalid expressions string. Does it contain any extra characters? \nCheck /help roll for some examples."
+            self.is_expected = True

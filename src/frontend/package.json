@@ -4,6 +4,7 @@
     "bent": "^7.3.12",
     "discord-api-types": "^0.23.1",
     "discord.js": "^13.1.0",
-    "dotenv": "^10.0.0"
+    "dotenv": "^10.0.0",
+    "winston": "^3.8.1"
   }
 }
