@@ -26,7 +26,7 @@ module.exports = {
                 .setRequired(false)),
 
     // The function to execute when the slash command is called (calls our backend)
-    async execute_interaction(interaction, serverCount, userReach, logger) {
+    async execute_interaction(interaction, serverCount, userReach, shardCount, logger) {
         logger.log({
             level: 'info',
             message: '[STATS] Executing Stats interaction'
@@ -69,7 +69,8 @@ module.exports = {
 
             var serverBody = `**Unique Users** - ${response.user_count}
 **User Reach** - ${userReach}
-**Servers** - ${serverCount}`
+**Servers** - ${serverCount}
+**Shards** - ${shardCount}`
 
             responseEmbed.addField(
                 "Servers", serverBody
