@@ -170,8 +170,11 @@ client.on('interactionCreate', async interaction => {
 
     try {
         if (interaction.commandName == "stats") { // With the stats interaction, we need to pass in a few properties from the client
-            users = client.users.cache.filter(user => !user.bot)
-            await command.execute_interaction(interaction, client.guilds.cache.size, users.size, logger);
+            usercount = await client.shard.broadcastEval((c) => c.guilds.cache.map((guild) => guild.members.cache.size));
+            guilds = await client.shard.fetchClientValues('guilds.cache.size')
+            guildtotal = guilds.reduce((acc, guildsizes) => acc + guildsizes, 0)
+
+            await command.execute_interaction(interaction, guildtotal, usercount, client.shard.count, logger);
         }
         else {
             await command.execute_interaction(interaction, logger);
