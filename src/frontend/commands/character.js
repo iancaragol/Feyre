@@ -42,14 +42,16 @@ module.exports = {
                 .setDescription('Shows your character list')
         ),
 
-    async execute_character(type, user, guild, channel, characterName = null, characterId = null, characterInit = null, debug = false)
+    async execute_character(type, user, guild, channel, characterName = null, characterId = null, characterInit = null, debug = false, logger)
     {
         try
         {
             string_url = `/api/backendservice/character?user=${user}`
 
-            console.log(characterName)
-            console.log(characterInit)
+            logger.log({
+                level: 'info',
+                message: `[CHARACTER] Executing character operation. Type is ${type}`
+            });
 
             // If we are joining, and character and roll are provided then those
             // Values need to be included in the PUT Query
@@ -62,9 +64,13 @@ module.exports = {
                 string_url += `&character_id=${encodeURIComponent(characterId)}`
             }
 
-            console.log(string_url)
             // Creates the URL to call the backend
             url = await backend.create_url({path: string_url});
+
+            logger.log({
+                level: 'info',
+                message: `[CHARACTER] Sending request to backend. Uri: ${url}`
+            });
 
             let request;
             let response;
@@ -94,11 +100,14 @@ module.exports = {
                 response = await request.json();
             }
 
-            // console.log(response)
-            
             // Backend should respond with a 200 OK
             if (request.statusCode == 200)
             {
+                logger.log({
+                    level: 'info',
+                    message: `[CHARACTER] Backend returned 200 OK. Constructing response embed.`
+                });
+
                 responseEmbed = new MessageEmbed().setColor(embedColors.successEmbedColor)
                 responseEmbed.setTitle("[                            Your Characters                             ]")
                 characterList = ""
@@ -141,11 +150,21 @@ module.exports = {
                     characterList.trim()
                 )
 
+                logger.log({
+                    level: 'info',
+                    message: `[CHARACTER] Finished constructing response embed.`
+                });
+
                 return [responseEmbed, buttons];
             }
             // Oops! Internal server error
             else if (request.statusCode == 500)
             {
+                logger.log({
+                    level: 'warn',
+                    message: `[CHARACTER] Backend returned 500 INTERNAL SERVER ERROR.`
+                });
+
                 error_string = "There should be some error handling here...\nYou might have too many characters already created. The maximum is 9!"
                 responseEmbed = new MessageEmbed().setColor(embedColors.errorEmbedColor)
                 .addFields(
@@ -157,6 +176,11 @@ module.exports = {
             // If the status code is something else, we are outside of expected behaviour
             else
             {
+                logger.log({
+                    level: 'warn',
+                    message: `[CHARACTER] Backend returned an unexpected response. Expression: ${expression}, StatusCode: ${request.statusCode}`
+                });
+
                 responseEmbed = new MessageEmbed().setColor(embedColors.errorEmbedColor)
                 .addFields(
                     { name: "Unexpected Response", value: request.statusCode }
@@ -167,8 +191,11 @@ module.exports = {
         }
         catch (error)
         {
-            console.log("Caught Unhandled Exception in character")
-            console.log(error)
+            logger.log({
+                level: 'error',
+                message: `[CHARACTER] Encountered an exception in Character. Type: ${type}, User: ${user}, Stack Trace: ${error.stack}`
+            });
+
             if (debug)
             {
                 responseEmbed = new MessageEmbed().setColor(embedColors.errorEmbedColor)
@@ -177,6 +204,14 @@ module.exports = {
                 )
 
                 return [responseEmbed];
+            }
+            else {
+                responseEmbed = new MessageEmbed().setColor(embedColors.errorEmbedColor)
+                .addFields(
+                    { name: "Oops!", value: "Something went wrong." }
+                )
+
+                return responseEmbed;
             }
         }
     },
@@ -193,7 +228,7 @@ module.exports = {
     },
 
     // Executes the command from an interaction (slash command) context
-    async execute_interaction(interaction) {
+    async execute_interaction(interaction, logger) {
         user = interaction.user.id
         guild = interaction.guild.id
         channel = interaction.channel.id
@@ -202,14 +237,19 @@ module.exports = {
         characterId = interaction.options.getInteger('id')
         characterInit = interaction.options.getString('initiative')
 
+        logger.log({
+            level: 'info',
+            message: `[CHARACTER] Received character interaction`
+        });
+
         if (interaction.options.getSubcommand() === 'add') {
-            var response = await this.execute_character('add', user, guild, channel, characterName, characterId, characterInit)
+            var response = await this.execute_character('add', user, guild, channel, characterName, characterId, characterInit, false, logger)
         }
         else if (interaction.options.getSubcommand() === 'remove') {
-            var response = await this.execute_character('remove', user, guild, channel, characterName, characterId, characterInit)
+            var response = await this.execute_character('remove', user, guild, channel, characterName, characterId, characterInit, false, logger)
         }
         else if (interaction.options.getSubcommand() === 'list') {
-            var response = await this.execute_character('list', user, guild, channel, characterName, characterId, characterInit)
+            var response = await this.execute_character('list', user, guild, channel, characterName, characterId, characterInit, false, logger)
         }
 
         // I feel like this is really bad, but we rollin' with it
@@ -221,16 +261,19 @@ module.exports = {
     },
 
     // Handles interactions from button presses
-    async execute_button(interaction) {
+    async execute_button(interaction, logger) {
         user = interaction.user.id
         guild = interaction.guild.id
         channel = interaction.channel.id
 
         characterId = parseInt(interaction.customId.split('_')[1])
-        // console.log("ID")
-        // console.log(characterId)
 
-        var response = await this.execute_character('select', user, guild, channel, null, characterId, null)
+        logger.log({
+            level: 'info',
+            message: `[CHARACTER] Received character interaction via button`
+        });
+
+        var response = await this.execute_character('select', user, guild, channel, null, characterId, null, false, logger)
         return await interaction.update({ embeds: [response[0]], components: response[1] })
     }
 };

@@ -1,5 +1,4 @@
 // This is the main file for the frontend application
-
 // Required Dependencies
 const dotenv = require('dotenv');
 const fs = require('fs');
@@ -20,6 +19,29 @@ const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('
 // Regex to remove <@!id>
 const mentionRegex = RegExp('<@!.*>');
 
+// Setup logger
+// https://www.npmjs.com/package/winston
+const winston = require('winston');
+const logger = winston.createLogger({
+    level: 'info',
+    format: winston.format.combine(
+        winston.format.timestamp(),
+        winston.format.json()
+    ),
+    defaultMeta: { service: 'frontend' },
+    transports: [
+      new winston.transports.File({ filename: 'logs/frontend.log', level: 'warn' }),
+    ],
+    handleExceptions: true,
+    exitOnError: false,
+});
+
+if (process.env.ENVIRONMENT !== 'production') {
+    logger.add(new winston.transports.Console({
+        format: winston.format.simple(),
+    }));
+}
+
 // Creating a collection for commands in client
 const commands = [];
 client.commands = new Collection();
@@ -31,11 +53,40 @@ for (const file of commandFiles) {
 
 // When the client is ready, run this code (only once)
 client.once('ready', () => {
-	console.log('Ready!');
+	logger.log({
+        level: 'warn',
+        message: `Client is ready. Shard ID: ${client.shard.id}`
+    });
+});
+
+// Log any errors that the shard hits
+client.on('shardError', error => {
+    logger.log({
+        level: 'error',
+        message: `Client encountered a shard error. Shard ID: ${client.shard.id}, Error Stack: ${error.stack}`
+    });
+});
+
+// Log any unhandled promises, this can be encountered when there is an error talking to Discord API
+process.on('unhandledRejection', error => {
+	logger.log({
+        level: 'error',
+        message: `Process encountered an unhandled promise rejection. Error Stack: ${error.message}`
+    });
 });
 
 // Login to Discord
+logger.log({
+    level: 'warn',
+    message: `Client is logging into discord. Shard ID: ${client.shard.id}`
+});
+
 client.login(DISCORD_TOKEN);
+
+logger.log({
+    level: 'warn',
+    message: `Client logged into discord. Shard ID: ${client.shard.id}`
+});
 
 // Reply to @bot messages
 client.on('messageCreate', async message => {
@@ -45,11 +96,18 @@ client.on('messageCreate', async message => {
         return;
     }
 
-    console.log("Got an @ message");
-
+    logger.log({
+        level: 'info',
+        message: 'Got an @ message'
+    });
+    
     // Remove the @bot
     var content = message.content.replace(mentionRegex, '').trim()
-    // console.log("New content: ", content);
+
+    logger.log({
+        level: 'info',
+        message: '@ message content: ' + content
+    });
 
     // There is probably some cool way to reduce all of these if statements
     // But leave it like this for now
@@ -58,6 +116,11 @@ client.on('messageCreate', async message => {
     // Thinking just roll?
     if (content.startsWith("ping"))
     {
+        logger.log({
+            level: 'info',
+            message: 'Executing ping operation'
+        });
+
         const command = client.commands.get("ping")
         var response = await command.execute_message(content, message.author.id, message.guild.id)
 
@@ -65,14 +128,24 @@ client.on('messageCreate', async message => {
     }
     else if (content.startsWith("roll"))
     {
+        logger.log({
+            level: 'info',
+            message: 'Executing roll operation'
+        });
+
         content = content.slice(4).trim() // Remove the "roll"
         const command = client.commands.get("roll")
-        var response = await command.execute_message(content, message.author.id, message.guild.id)
+        var response = await command.execute_message(content, message.author.id, message.guild.id, logger)
 
         await message.channel.send({ embeds: [response]})
     }
     else if (content.startsWith("help"))
     {
+        logger.log({
+            level: 'info',
+            message: 'Executing help operation'
+        });
+
         const command = client.commands.get("help")
         content = content.slice(4).trim() // Remove the "help"
         var response = await command.execute_message(content, message.author.id, message.guild.id)
@@ -85,15 +158,36 @@ client.on('messageCreate', async message => {
 
 // Reply to Slash Commands
 client.on('interactionCreate', async interaction => {
-    console.log("Processing command:", interaction.commandName);
+
+    logger.log({
+        level: 'info',
+        message: 'Processing interaction: ' + interaction.commandName
+    });
+
     if (!interaction.isCommand()) return;
     const command = client.commands.get(interaction.commandName);
     if (!command) return;
 
     try {
-        await command.execute_interaction(interaction);
+        if (interaction.commandName == "stats") { // With the stats interaction, we need to pass in a few properties from the client
+            users = client.users.cache.filter(user => !user.bot)
+            await command.execute_interaction(interaction, client.guilds.cache.size, users.size, logger);
+        }
+        else {
+            await command.execute_interaction(interaction, logger);
+        }
+
+        logger.log({
+            level: 'info',
+            message: 'Interaction executed successfully!'
+        });
     } catch (error) {
-        if (error) console.error(error);
+        if (error) {
+            logger.log({
+                level: 'error',
+                message: error.stack
+            });
+        }
         await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
     }
 });
@@ -101,6 +195,12 @@ client.on('interactionCreate', async interaction => {
 // Reply to Buttons
 client.on('interactionCreate', async interaction => {
 	if (!interaction.isButton()) return;
+
+    logger.log({
+        level: 'info',
+        message: 'Processing button interaction: ' + interaction.customId
+    });
+
 	// console.log(interaction);
     // All buttons are labeled with command_button
     // Like this: init_join
@@ -109,6 +209,16 @@ client.on('interactionCreate', async interaction => {
     if(interaction.customId.startsWith('init') ||
        interaction.customId.startsWith('character'))
     {
-        await command.execute_button(interaction);
+        try {
+            await command.execute_button(interaction, logger);
+        }
+        catch (error) {
+            if (error) {
+                logger.log({
+                    level: 'error',
+                    message: error.stack
+                });
+            }
+        }
     }
 });

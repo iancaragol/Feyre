@@ -19,7 +19,7 @@ class InitiativeOperation():
     Operation that edits an initiative tracker resource
     """
 
-    def __init__(self, logger : logging.Logger, user : int = None, guild : int = None, channel : int = None, message_id :int = None, character_name : str = None, initiative_expression : str = None):
+    def __init__(self, user : int = None, guild : int = None, channel : int = None, message_id :int = None, character_name : str = None, initiative_expression : str = None):
         self.user = user
         self.guild = guild
         self.channel = channel
@@ -27,7 +27,7 @@ class InitiativeOperation():
         self.character_name = character_name
         self.initiative_expression = initiative_expression
         self.redis_helper = RedisHelper()
-        self.logger = logger
+        self.logger = logging.getLogger(LoggerNames.backend_logger)
 
     async def execute_get(self):
         """
@@ -54,26 +54,33 @@ class InitiativeOperation():
             The updated initiative tracker as a dictionary
         """
 
+        self.logger.info(f"[INIT OPERATION > PUT] Entered execute_put")
+
+        self.logger.info(f"[INIT OPERATION > PUT] Getting tracker resource")
         tracker = await self.get_tracker()
 
         # If tracker is not present in Redis then create a new one
         if not tracker:
+            self.logger.info(f"[INIT OPERATION > PUT] Tracker did not exist. Creating a new one.")
             tracker = await self.new_tracker(guild=self.guild, channel=self.channel)
 
         # If they provided the character and modifier then just use that!
-        if self.character_name and self.initiative_expression:
+        if self.character_name != None and self.initiative_expression != None:
+            self.logger.info(f"[INIT OPERATION > PUT] Adding character {self.character_name} with init {self.initiative_expression} to initiative")
             character = Character(user = self.user, name = self.character_name, initiative_expression = self.initiative_expression)
             await self.add_character(tracker=tracker, character=character)
         # Otherwise need to query the database
         else:
-            self.logger.info(f"[INIT > PUT] Getting selected character for user {self.user}")
+            self.logger.info(f"[INIT OPERATION > PUT] Getting selected character for user {self.user}")
             character = await self.get_selected_char(user=self.user)
-            self.logger.info(f"[INIT > PUT] Got character: {character.name} with initiative {character.initiative_expression}")
+            self.logger.info(f"[INIT OPERATION > PUT] Got character: {character.name} with initiative {character.initiative_expression}")
             await self.add_character(tracker=tracker, character=character)
 
         # Put the tracker back into Redis
+        self.logger.info(f"[INIT OPERATION > PUT] Put tracker back in Redis")
         await self.put_tracker(tracker)
 
+        self.logger.info(f"[INIT OPERATION > PUT] execute_put completed successfully. Returning tracker.")
         return dumps(tracker.to_dict())
         
     async def execute_patch(self):

@@ -69,7 +69,7 @@ module.exports = {
     },
 
     // The function to execute when the slash command is called (calls our backend)
-    async execute_interaction(interaction) {
+    async execute_interaction(interaction, logger) {
         command = interaction.options.getString('command')
         user = interaction.user.id
         guild = 0

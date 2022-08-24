@@ -21,7 +21,7 @@ module.exports = {
     },
 
     // Exucutes the command from an interaction (slash command) context
-    async execute_interaction(interaction) {
+    async execute_interaction(interaction, logger) {
         var responseEmbed = new MessageEmbed().setColor(embedColors.successEmbedColor)
         responseEmbed.setTitle("pong")
 

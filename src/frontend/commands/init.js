@@ -71,9 +71,14 @@ module.exports = {
                 .setDescription('Creates a brand new tracker')
         ),
 
-    async execute_init_get(user, guild, channel) {
+    async execute_init_get(user, guild, channel, logger) {
         string_url = `/api/backendservice/initiative?user=${user}&guild=${guild}&channel=${channel}`
         url = await backend.create_url({path: string_url});
+
+        logger.log({
+            level: 'info',
+            message: `[INIT] Executing init join. Uri: ${url}`
+        });
 
         request = await get(url);
         response = await request.json();
@@ -81,11 +86,28 @@ module.exports = {
         return response
     },
 
-    async execute_init_join(user, guild, channel, character, roll)
+    async execute_init_join(user, guild, channel, character, roll, logger)
     {
         string_url = `/api/backendservice/initiative?user=${user}&guild=${guild}&channel=${channel}`
-        string_url += `&character_name=${encodeURIComponent(character)}&initiative_expression=${encodeURIComponent(roll)}`
+
+        // If character is provided, but not roll, then default to 1d20
+        if (character != null && roll == null)
+        {
+            roll = "1d20"
+        }
+
+        // Initiative API expects no character name or expression if it is going to fetch from the database.
+        if (character != null && roll != null)
+        {
+            string_url += `&character_name=${encodeURIComponent(character)}&initiative_expression=${encodeURIComponent(roll)}`
+        }
+
         url = await backend.create_url({path: string_url});
+
+        logger.log({
+            level: 'info',
+            message: `[INIT] Executing init join. Uri: ${url}`
+        });
 
         request = await put(url);
         response = await request.json();
@@ -93,11 +115,16 @@ module.exports = {
         return response
     },
 
-    async execute_init_remove(user, guild, channel, character)
+    async execute_init_remove(user, guild, channel, character, logger)
     {
         string_url = `/api/backendservice/initiative?user=${user}&guild=${guild}&channel=${channel}`
         string_url += `&character_name=${encodeURIComponent(character)}`
         url = await backend.create_url({path: string_url});
+
+        logger.log({
+            level: 'info',
+            message: `[INIT] Executing init remove. Uri: ${url}`
+        });
 
         request = await del(url);
         response = await request.json();
@@ -105,10 +132,15 @@ module.exports = {
         return response
     },
 
-    async execute_init_next(user, guild, channel)
+    async execute_init_next(user, guild, channel, logger)
     {
         string_url = `/api/backendservice/initiative?user=${user}&guild=${guild}&channel=${channel}`
         url = await backend.create_url({path: string_url});
+
+        logger.log({
+            level: 'info',
+            message: `[INIT] Executing init next. Uri: ${url}`
+        });
 
         request = await patch(url);
         response = await request.json();
@@ -116,10 +148,15 @@ module.exports = {
         return response
     },
 
-    async execute_init_reset(user, guild, channel)
+    async execute_init_reset(user, guild, channel, logger)
     {
         string_url = `/api/backendservice/initiative?user=${user}&guild=${guild}&channel=${channel}`
         url = await backend.create_url({path: string_url});
+
+        logger.log({
+            level: 'info',
+            message: `[INIT] Executing init reset. Uri: ${url}`
+        });
 
         request = await del(url);
         request = await get(url);
@@ -141,12 +178,20 @@ module.exports = {
         return response
     },
 
-    async create_init_embed(response)
+    async create_init_embed(response, logger)
     {
+        logger.log({
+            level: 'info',
+            message: `[INIT] Creating response embed.`
+        });
+
         // Backend should respond with a 200 OK
         if (request.statusCode == 200)
         {
-            console.log(response)
+            logger.log({
+                level: 'info',
+                message: `[INIT] Response had status code 200 OK`
+            });
 
             responseEmbed = new MessageEmbed().setColor(embedColors.successEmbedColor)
             responseEmbed.setTitle("[              Initiative              ]")
@@ -172,11 +217,21 @@ module.exports = {
                 "Round: ", String(response.turn)
             )
 
+            logger.log({
+                level: 'info',
+                message: `[INIT] Constructed response embed.`
+            });
+
             return responseEmbed;
         }
         // Oops! Internal server error
         else if (request.statusCode == 500)
         {
+            logger.log({
+                level: 'warn',
+                message: `[INIT] Response status code was 500 INTERNAL SERVER ERROR.`
+            });
+
             error_string = "Something went wrong. See /help init for examples."
             responseEmbed = new MessageEmbed().setColor(embedColors.errorEmbedColor)
             .setTitle("Oops!")
@@ -187,6 +242,11 @@ module.exports = {
         // If the status code is something else, we are outside of expected behaviour
         else
         {
+            logger.log({
+                level: 'warn',
+                message: `[INIT] Response status code was unexpected. StatusCode: ${request.statusCode}`
+            });
+
             responseEmbed = new MessageEmbed().setColor(embedColors.errorEmbedColor)
             .addFields(
                 { name: "Unexpected Response", value: request.statusCode }
@@ -197,7 +257,7 @@ module.exports = {
     },
 
     // Executes the command from message context
-    async execute_message(content, user, guild)
+    async execute_message(content, user, guild, logger)
     {
         responseEmbed = new MessageEmbed().setColor(embedColors.errorEmbedColor)
         .setTitle("DMs are not supported")
@@ -207,7 +267,12 @@ module.exports = {
     },
 
     // Executes the command from an interaction (slash command) context
-    async execute_interaction(interaction) {
+    async execute_interaction(interaction, logger) {
+        logger.log({
+            level: 'info',
+            message: '[INIT] Received initiative interaction'
+        });
+
         user = interaction.user.id
 
         // If command was executed in DM context
@@ -224,65 +289,135 @@ module.exports = {
 
         roll = interaction.options.getString('roll')
         character = interaction.options.getString('character')
-        count = interaction.options.getString('count')
+        count = interaction.options.getInteger('count')
+
+        // TODO(IAN) Implement the count argument
+        // Count is not supported right now...
+        if (count != null) {
+            logger.log({
+                level: 'warn',
+                message: '[INIT] Count is not supported yet'
+            });
+
+            response = new MessageEmbed().setColor(embedColors.errorEmbedColor)
+            .setTitle("Count is not supported")
+            .setDescription("Sorry, the count argument is not supported yet!")
+
+            return await interaction.reply({ embeds: [response]})
+        }
 
         // JOIN and GET both return the INIT Tracker so they need buttons
         if (interaction.options.getSubcommand() === 'join') {
+            logger.log({
+                level: 'info',
+                message: '[INIT] Subcommand is join'
+            });
+
             // Make the request to the backend to get the tracker
-            var response = await this.execute_init_join(user, guild, channel, character, roll, count)
+            var response = await this.execute_init_join(user, guild, channel, character, roll, logger)
 
             // Delete the old messsage
             if (response.message_id) {
-                console.log("Delete reply ")
-                console.log(response.message_id)
-                //await interaction,channel.fetchMessage(response.message_id)
-                //                         .then(msg => msg.delete());
+                logger.log({
+                    level: 'info',
+                    message: `[INIT] Deleting old message. Message Id: ${response.message_id}`
+                });
                 
                 await interaction.webhook.deleteMessage(response.message_id)
             }
 
-            responseEmbed = await this.create_init_embed(response)
+            responseEmbed = await this.create_init_embed(response, logger)
+
+            logger.log({
+                level: 'info',
+                message: '[INIT] Replying.'
+            });
 
             // Respond and update the initiative tracker with the message's id
             return await interaction.reply({ embeds: [responseEmbed],  components: [initButtons], fetchReply: true  })
                                     .then((reply) => this.execute_init_message_update(reply.guild.id, reply.channel.id, reply.id))
         }
         else if (interaction.options.getSubcommand() === 'get') {
-            var response = await this.execute_init_get(user, guild, channel)
-            responseEmbed = await this.create_init_embed(response)
+            logger.log({
+                level: 'info',
+                message: '[INIT] Subcommand is get'
+            });
+
+            var response = await this.execute_init_get(user, guild, channel, logger)
+            responseEmbed = await this.create_init_embed(response, logger)
+
+            logger.log({
+                level: 'info',
+                message: '[INIT] Replying.'
+            });
 
             return await interaction.reply({ embeds: [responseEmbed], components: [initButtons] })
         }
         else if (interaction.options.getSubcommand() === 'remove') {
-            var response = await this.execute_init_remove(user, guild, channel, character)
-            responseEmbed = await this.create_init_embed(response)
+            logger.log({
+                level: 'info',
+                message: '[INIT] Subcommand is remove'
+            });
+
+            var response = await this.execute_init_remove(user, guild, channel, character, logger)
+            responseEmbed = await this.create_init_embed(response, logger)
 
             return await interaction.reply({ embeds: [responseEmbed], components: [initButtons] })
         }
         else if (interaction.options.getSubcommand() === 'reset') {
-            var response = await this.execute_init_reset(user, guild, channel)
-            responseEmbed = await this.create_init_embed(response)
+            logger.log({
+                level: 'info',
+                message: '[INIT] Subcommand is reset'
+            });
+
+            var response = await this.execute_init_reset(user, guild, channel, logger)
+            responseEmbed = await this.create_init_embed(response, logger)
 
             return await interaction.reply({ embeds: [responseEmbed], components: [initButtons] })
         }
     },
 
     // Handles interactions from button presses
-    async execute_button(interaction) {
+    async execute_button(interaction, logger) {
+        logger.log({
+            level: 'info',
+            message: '[INIT] Received init button interaction'
+        });
+
         user = interaction.user.id
         guild = interaction.guild.id
         channel = interaction.channel.id
 
         if (interaction.customId == 'init_next')
         {
-            var response = await this.execute_init_next(user, guild, channel)
-            responseEmbed = await this.create_init_embed(response)
+            logger.log({
+                level: 'info',
+                message: '[INIT] Button interaction is next'
+            });
+
+            var response = await this.execute_init_next(user, guild, channel, logger)
+            responseEmbed = await this.create_init_embed(response, logger)
+
+            logger.log({
+                level: 'info',
+                message: '[INIT] Updating embed message.'
+            });
             return await interaction.update({ embeds: [responseEmbed], components: [initButtons] })
         }
         else if (interaction.customId == 'init_join')
         {
-            var response = await this.execute_init_join(user, guild, channel, null, null)
-            responseEmbed = await this.create_init_embed(response)
+            logger.log({
+                level: 'info',
+                message: '[INIT] Button interaction is join.'
+            });
+
+            var response = await this.execute_init_join(user, guild, channel, null, null, logger)
+            responseEmbed = await this.create_init_embed(response, logger)
+
+            logger.log({
+                level: 'info',
+                message: '[INIT] Updating embed message.'
+            });
             return await interaction.update({ embeds: [responseEmbed], components: [initButtons] })
         }
     }

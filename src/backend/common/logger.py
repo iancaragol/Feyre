@@ -1,4 +1,5 @@
 import logging
+import sys
 from logging.handlers import RotatingFileHandler
 from os import environ
 
@@ -26,10 +27,15 @@ def logger_setup(logger_name : str, logger_file : str):
         logger.setLevel(logging.WARNING)
     
     # add a rotating handler
-    handler = RotatingFileHandler(f"./logs/{logger_file}",
+    rotate = RotatingFileHandler(f"./logs/{logger_file}",
                                   maxBytes=20000)
 
-    formatter = logging.Formatter('%(asctime)s | %(levelname)s | %(message)s')
-    handler.setFormatter(formatter)
+    # add a handler to log to stdout
+    stdout = logging.StreamHandler(sys.stdout)
 
-    logger.addHandler(handler)
+    formatter = logging.Formatter('%(asctime)s | %(levelname)s | %(message)s')
+    rotate.setFormatter(formatter)
+    stdout.setFormatter(formatter)
+
+    logger.addHandler(rotate)
+    logger.addHandler(stdout)

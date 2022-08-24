@@ -51,7 +51,7 @@ async def initiative_put(user : int, guild : int, channel : int, character_name 
 
     try:
         logger.info(f"[INIT > PUT] Executing InitiativeOperation. user: {user}, guild: {guild}, channel: {channel}, character_name: {character_name}, initiative_expression: {initiative_expression}")
-        result = await InitiativeOperation(logger = logger, user = user, guild = guild, channel = channel, character_name = character_name, initiative_expression = initiative_expression).execute_put()
+        result = await InitiativeOperation(user = user, guild = guild, channel = channel, character_name = character_name, initiative_expression = initiative_expression).execute_put()
         logger.info(f"[INIT > PUT] InitiativeOperation was successful.")
         return Response(content = result, status_code = HTTPStatus.OK)
 
@@ -89,7 +89,7 @@ async def initiative_get(user : int, guild : int, channel):
 
     try:
         logger.info(f"[INIT > GET] Executing InitiativeOperation. user: {user}, guild: {guild}, channel: {channel}")
-        result = await InitiativeOperation(logger = logger, user = user, guild = guild, channel = channel).execute_get()
+        result = await InitiativeOperation(user = user, guild = guild, channel = channel).execute_get()
         if result == None:
             logger.info(f"[INIT > GET] InitiativeTracker does not exist in guild {guild}, channel {channel}")
             return Response(status_code = HTTPStatus.NO_CONTENT)
@@ -129,7 +129,7 @@ async def initiative_patch_messageid(guild : int, channel : int, message_id : in
 
     try:
         logger.info(f"[INIT > PATCH] Executing InitiativeOperation. guild: {guild}, channel: {channel}, message_id: {message_id}")
-        result = await InitiativeOperation(logger = logger, guild = guild, channel = channel, message_id = message_id).execute_patch_message_id()
+        result = await InitiativeOperation(guild = guild, channel = channel, message_id = message_id).execute_patch_message_id()
         logger.info(f"[INIT > PATCH] InitiativeOperation was successful.")
 
         if result == None:
@@ -171,7 +171,7 @@ async def initiative_patch(user : int, guild : int, channel):
 
     try:
         logger.info(f"[INIT > PATCH] Executing InitiativeOperation. user: {user}, guild: {guild}, channel: {channel}")
-        result = await InitiativeOperation(logger = logger, user = user, guild = guild, channel = channel).execute_patch()
+        result = await InitiativeOperation(user = user, guild = guild, channel = channel).execute_patch()
 
         if result == None:
             logger.info(f"[INIT > PATCH] InitiativeTracker does not exist in guild {guild}, channel {channel}")
@@ -213,7 +213,7 @@ async def initiative_delete(user : int, guild : int, channel, character_name : O
 
     try:
         logger.info(f"[INIT > DELETE] Executing InitiativeOperation. user: {user}, guild: {guild}, channel: {channel}, character_name: {character_name}")
-        result = await InitiativeOperation(logger = logger, user = user, guild = guild, channel = channel).execute_delete(character_name = character_name)
+        result = await InitiativeOperation(user = user, guild = guild, channel = channel).execute_delete(character_name = character_name)
         logger.info(f"[INIT > DELETE] InitiativeOperation was successful")
         return Response(content = result, status_code = HTTPStatus.OK)
 

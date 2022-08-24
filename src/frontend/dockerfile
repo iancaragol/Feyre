@@ -3,7 +3,6 @@ FROM node:stretch-slim
 # create nonroot user
 RUN adduser nonroot
 
-
 # Create and own directories
 RUN mkdir -p /home/app/
 RUN mkdir -p /home/app/logs/
@@ -17,7 +16,9 @@ COPY --chown=nonroot:nonroot . /home/app/
 
 RUN npm install
 
-USER nonroot
+# TODO(IAN)
+# Fix the permission issues for log writing, so dont need to run as root
+# USER nonroot
 
 ENTRYPOINT [ "node" ]
 CMD [ "index.js" ]

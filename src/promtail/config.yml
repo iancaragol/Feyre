@@ -37,3 +37,33 @@ scrape_configs:
       job: frontend
       env: ${ENV}
       __path__: '/home/app/logs/frontend.log'
+  pipeline_stages:
+    - match:
+        selector: '{app="frontend"}'
+        stages:
+        - json:
+            expressions:
+              level: level
+              message: message
+              service: service
+              timestamp: timestamp
+
+- job_name: shardingmanager
+  static_configs:
+  - targets:
+      - localhost
+    labels:
+      app: shardingmanager
+      job: shardingmanager
+      env: ${ENV}
+      __path__: '/home/app/logs/shardingmanager.log'
+  pipeline_stages:
+    - match:
+        selector: '{app="shardingmanager"}'
+        stages:
+        - json:
+            expressions:
+              level: level
+              message: message
+              service: service
+              timestamp: timestamp

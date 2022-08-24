@@ -10,8 +10,9 @@ class Commands:
     # It is a SUBSET of all_commands
     default_commands_list = [
         "roll",
-        "init"
+        "init",
         "stats",
+        "char",
         "help"
     ]
 
@@ -20,5 +21,6 @@ class Commands:
         "roll",
         "init",
         "stats",
+        "char",
         "help"
     ]
