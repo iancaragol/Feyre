@@ -494,6 +494,16 @@ async def on_ready():
             save_data.start()
 
 
+@bot.command()
+async def update(ctx, *, args = None):
+    embed = discord.Embed()
+    embed.title = "Updating Feyre to use Slash Commands"
+    embed.description = """
+Update Feyre's permissions or invite Feyre back to the server with this [LINK](http://invite.feyre.io/)
+
+You should now be able to use slash commands. Checkout all of the new initiative tracker and dice roller here"""
+    await ctx.send(embed=embed)
+
 #region upper/lowercase
 @bot.command()
 async def Hello(ctx, *, args = None):
@@ -543,6 +553,7 @@ try:
     token = os.environ['FEYRE_TOKEN']
     bucket_key = os.environ['BUCKET_KEY']
     access_key = os.environ['ACCESS_KEY']
+
     bot.run(token)
 
 except KeyError:

@@ -151,24 +151,47 @@ Totals: [{t1}] & [{t2}]
                 outMsg = f'''```diff
 I interpreted your input as {rES}.
 Rolls: {uES}
-- Ability/Skill Check: Succeeded -```'''
+- Ability/Skill Check: Succeeded -
+
+IMPORTANT: Feyre is moving to Slash Commands on August 31st. See https://docs.feyre.io/updating-feyre/ for more information.
+           You can now roll dice with /roll
+           
+           See !update for instructions on how to update Feyre's permissions```'''
             else:
                 outMsg = f'''```diff
 I interpreted your input as {rES}.
 Rolls: {uES}
-- Ability/Skill Check: Failed -```'''
+- Ability/Skill Check: Failed -
+
+- IMPORTANT -
+Feyre is moving to Slash Commands on August 31st. See https://docs.feyre.io/updating-feyre/ for more information.
+You can now roll dice with /roll
+           
+See !update for instructions on how to update Feyre's permissions```'''
 
         elif float(t).is_integer():
             outMsg = f'''```diff
 I interpreted your input as {rES}.
 Rolls: {uES}
-- Total: {t} -```'''
+- Total: {t} -
+
+- IMPORTANT -
+Feyre is moving to Slash Commands on August 31st. See https://docs.feyre.io/updating-feyre/ for more information.
+You can now roll dice with /roll
+           
+See !update for instructions on how to update Feyre's permissions```'''
 
         else:
             outMsg = f'''```diff
 I interpreted your input as {rES}.
 Rolls: {uES}
-- Total: {"%.2f" % t} -```'''
+- Total: {"%.2f" % t} -
+
+- IMPORTANT -
+Feyre is moving to Slash Commands on August 31st. See https://docs.feyre.io/updating-feyre/ for more information.
+You can now roll dice with /roll
+           
+See !update for instructions on how to update Feyre's permissions```'''
 
         return outMsg
 

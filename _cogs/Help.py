@@ -12,6 +12,12 @@ class Helper(commands.Cog):
         self.help_str_base = textwrap.dedent(
             '''
             ```asciidoc
+            [IMPORTANT]
+            Feyre is moving to Slash Commands on August 31st. See https://docs.feyre.io/updating-feyre/ for more information.
+            You can use the slash command version of Feyre by doing /help
+
+            See !update for instructions on how to update Feyre's permissions
+
             Hello! My name is Feyre. You can use chat or DM's to summon me. 
             ===============================================================
 
