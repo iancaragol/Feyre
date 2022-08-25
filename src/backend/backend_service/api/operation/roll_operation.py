@@ -39,25 +39,25 @@ class RollOperation():
             "equal":"="
         }
 
-    def execute(self):
+    async def execute(self):
         """
         Executes the RollOperation
         """
 
         try:
-            return self.shunt(self.expression)
+            return await self.shunt(self.expression)
         except Exception as e:
             if self.verbose:
                 print(traceback.format_exc())
             raise RollOperationException(e, self.expression)
 
-    def shunt(self, expression):
+    async def shunt(self, expression):
         """
         Entry point for dice rolling
 
         Returns: A Json list of ParentRollModels
         """
-        tokens = self.tokenize(expression)
+        tokens = await self.tokenize(expression)
         count = 1
         roll_results = [] # List of RollResults objects
         
@@ -70,13 +70,13 @@ class RollOperation():
         # Repeat entire roll for # of count
         # If count was only one, then the list will have length 1
         for i in range(count):
-            evaluated = self.evaluate(tokens, expression)
+            evaluated = await self.evaluate(tokens, expression)
             roll_results.append(evaluated.to_dict())
 
         roll_results_json = dumps({"parent_result" : roll_results})
         return roll_results_json 
 
-    def tokenize(self, expression):
+    async def tokenize(self, expression):
         """
         Token mappings:
         d = dice
@@ -164,7 +164,7 @@ class RollOperation():
         elif op == 't': return self.applyThen(a, b)
 
     # Function that returns value of expression after evaluation.
-    def evaluate(self, tokens, expression):
+    async def evaluate(self, tokens, expression):
         roll_results = [] # List of roll results to check for criticals, dropped
         dropped = []
         critical = False
@@ -181,7 +181,7 @@ class RollOperation():
                 ops.append(tokens[i])
 
             elif ('d' in tokens[i]): # Token is a dice, evaluate and push it to values
-                roll = self.roll(tokens[i])
+                roll = await self.roll(tokens[i])
                 roll_results.append(roll.to_dict()) # This is super wacky, need to find a better way to express dropped/critical dice
                 dropped.extend(roll.dropped)
                 if roll.critical: 
@@ -226,7 +226,7 @@ class RollOperation():
         # Create final roll result, and return it
         return ParentRollModel(expression, tokens, values[-1], critical, roll_results)
 
-    def roll(self, expression):
+    async def roll(self, expression):
         number = 0
         size = 0
         keep = -1 # If  keep is -1, then keep all

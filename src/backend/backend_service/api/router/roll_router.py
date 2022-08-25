@@ -42,7 +42,7 @@ async def roll(user : int, expression : str, verbose : bool = False):
     if expression:
         try:
             logger.info(f"[ROLL] Executing RollOperation. expression: {expression}")
-            result = RollOperation(expression = expression, verbose = verbose).execute()
+            result = await RollOperation(expression = expression, verbose = verbose).execute()
             logger.info(f"[ROLL] RollOperation was successful. expression: {expression}")
             return Response(content = result, status_code = HTTPStatus.OK)
 

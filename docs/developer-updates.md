@@ -3,6 +3,11 @@
 **Have any questions? Reach out on the Feyre discord channel!**
 
 ---
+## 8/25/2022 - Preparing for the final move to slash commands
+
+Slash commands will be required starting on August 31st! The slash command version of the bot is finally "complete". It now has better logging and metrics which will help me diagnose any issues.
+
+
 ## 4/21/22 - Message Content deadline moved to August 31st 2022
 
 Good news! Message Content was delayed until August 31st, Discord was probably nervous about losing hundreds of un-updated bots.

@@ -1,8 +1,6 @@
 # Updating Feyre
 
-**As outlined in [developer updates](developer-updates.md), Feyre will be moving to Slash commands.**
-
-**In order to update Feyre on your server follow the steps below:**
+**In order to update Feyre on your server follow the steps below**
 
 ----
 
