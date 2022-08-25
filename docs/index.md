@@ -10,10 +10,6 @@
 ⭐ Check how to use the commands [here](commands.md) ⭐
 
 ---
-## Looking for the old docs?
-This area is a work in progress. Old docs are [here](https://feyre.readthedocs.io/en/latest/)
-
----
 
 ## Add Feyre to your server
 
@@ -46,3 +42,5 @@ Have any questions or ideas for Feyre? Join the community server [here](https://
 * Its simple so you can focus on the game
 
 ---
+## Looking for the old docs?
+This area is a work in progress. Old docs are [here](https://feyre.readthedocs.io/en/latest/)
