@@ -3,9 +3,17 @@
 </br>
 </h2>
 
+# FEYRE HAS MOVED TO SLASH COMMANDS
+
+# YOU WILL NEED TO UPDATE IT'S PERMISSIONS
+
+# UOPDATE INSTRUCTIONS ARE [HERE](updating-feyre.md)
+
+---
+
 # Feyre
 
-**A discord bot for playing D&D, Pathfinder, and more!**
+**A discord bot for rolling dice and keeping track of initiative. Great for Dungeons and Dragons, Pathfinder, and more!**
 
 ⭐ Check how to use the commands [here](commands.md) ⭐
 
