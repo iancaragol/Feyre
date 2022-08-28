@@ -75,10 +75,11 @@ class InitiativeOperation():
             character = await self.get_selected_char(user=self.user)
 
             # If the user does not have a selected character
-            if (not character):
+            if (character == None):
                 raise InitOperationException("no valid characters")
-            self.logger.info(f"[INIT OPERATION > PUT] Got character: {character.name} with initiative {character.initiative_expression}")
-            await self.add_character(tracker=tracker, character=character)
+            else:
+                self.logger.info(f"[INIT OPERATION > PUT] Got character: {character.name} with initiative {character.initiative_expression}")
+                await self.add_character(tracker=tracker, character=character)
 
         # Put the tracker back into Redis
         self.logger.info(f"[INIT OPERATION > PUT] Put tracker back in Redis")
