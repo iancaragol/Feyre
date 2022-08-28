@@ -7,7 +7,7 @@ from fastapi.responses import Response
 from json import dumps
 
 from http import HTTPStatus
-
+from backend_service.api.operation.initiative_operation import InitOperationException
 from backend_service.api.operation.initiative_operation import InitiativeOperation
 from common.redis_helper import RedisHelper
 from urllib.parse import unquote_plus
@@ -54,6 +54,21 @@ async def initiative_put(user : int, guild : int, channel : int, character_name 
         result = await InitiativeOperation(user = user, guild = guild, channel = channel, character_name = character_name, initiative_expression = initiative_expression).execute_put()
         logger.info(f"[INIT > PUT] InitiativeOperation was successful.")
         return Response(content = result, status_code = HTTPStatus.OK)
+
+    except InitOperationException as e:
+        result = {
+                "message": f"An exception occurred when attempting the initiative operations.",
+                "stack_trace": traceback.format_exc(),
+                "exception_message": e.message,
+                "is_expected" : e.is_expected
+            }
+        
+        if not e.is_expected:
+            logger.error(f"[INIT > PUT] Unexpected Exception occurred in InitiativeOpeartion with user: {user}, guild: {guild}, channel: {channel}, character_name: {character_name}, initiative_expression: {initiative_expression}. Exception Message: {str(e)}. Traceback: {traceback.format_exc()}")
+        else:
+            logger.info(f"[INIT > PUT] Expected Exception occurred in InitiativeOpeartion with user: {user}, guild: {guild}, channel: {channel}, character_name: {character_name}, initiative_expression: {initiative_expression}. Exception Message: {str(e)}. Traceback: {traceback.format_exc()}")
+
+        return Response(content = dumps(result), status_code = HTTPStatus.INTERNAL_SERVER_ERROR)
 
     except Exception as e:
         result = {
