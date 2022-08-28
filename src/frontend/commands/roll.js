@@ -172,7 +172,7 @@ module.exports = {
         });
 
         expression = interaction.options.getString('expression')
-        debug = interaction.options.getString('debug')
+        debug = interaction.options.getBoolean('debug')
         user = interaction.user.id
         guild = 0
         

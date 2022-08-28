@@ -7,13 +7,15 @@ global:
 rule_files:
 
 scrape_configs:
-  - job_name: 'prometheus'
+  # Right now there is no reason to scrape prometheus's own metrics.
+  # It just produces a lot of extra data
+  # - job_name: 'prometheus'
 
-    static_configs:
-      - targets: ['localhost:9090']
-        labels:
-          instance: "prometheus"
-          env: ${ENV}
+  #   static_configs:
+  #     - targets: ['localhost:9090']
+  #       labels:
+  #         instance: "prometheus"
+  #         env: ${ENV}
 
   - job_name: 'backend'
     metrics_path: /metrics

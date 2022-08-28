@@ -9,7 +9,7 @@ const backend = require("./../common/backend");
 const embedColors = require('./../common/embed_colors')
 
 // Status codes that can be returned by the backend
-let status_codes = [200, 500, 504]
+let status_codes = [200, 202, 500, 504]
 
 // Button row for all initiative messages
 const initButtons = new MessageActionRow()
@@ -81,9 +81,7 @@ module.exports = {
         });
 
         request = await get(url);
-        response = await request.json();
-
-        return response
+        return request
     },
 
     async execute_init_join(user, guild, channel, character, roll, logger)
@@ -110,9 +108,7 @@ module.exports = {
         });
 
         request = await put(url);
-        response = await request.json();
-
-        return response
+        return request
     },
 
     async execute_init_remove(user, guild, channel, character, logger)
@@ -127,9 +123,7 @@ module.exports = {
         });
 
         request = await del(url);
-        response = await request.json();
-
-        return response
+        return request
     },
 
     async execute_init_next(user, guild, channel, logger)
@@ -143,9 +137,7 @@ module.exports = {
         });
 
         request = await patch(url);
-        response = await request.json();
-
-        return response
+        return request
     },
 
     async execute_init_reset(user, guild, channel, logger)
@@ -158,11 +150,10 @@ module.exports = {
             message: `[INIT] Executing init reset. Uri: ${url}`
         });
 
-        request = await del(url);
-        request = await get(url);
-        response = await request.json();
+        delrequest = await del(url);
+        getrequest = await get(url);
 
-        return response
+        return getrequest
     },
 
     async execute_init_message_update(guild, channel, messageId) {
@@ -170,20 +161,21 @@ module.exports = {
         url = await backend.create_url({path: string_url});
 
         request = await patch(url);
-        response = await request.json();
-
-        console.log("TEMP")
-        console.log(response)
-
-        return response
+        return request
     },
 
-    async create_init_embed(response, logger)
+    // Response = null is a special case for the init join method where we need to use response.json()
+    // Before calling this method.
+    async create_init_embed(request, logger, response = null)
     {
         logger.log({
             level: 'info',
             message: `[INIT] Creating response embed.`
         });
+
+        if (!response) {
+            response = await request.json()
+        }
 
         // Backend should respond with a 200 OK
         if (request.statusCode == 200)
@@ -191,6 +183,11 @@ module.exports = {
             logger.log({
                 level: 'info',
                 message: `[INIT] Response had status code 200 OK`
+            });
+
+            logger.log({
+                level: 'info',
+                message: `[INIT] Response body: ${String(response)}`
             });
 
             responseEmbed = new MessageEmbed().setColor(embedColors.successEmbedColor)
@@ -232,7 +229,12 @@ module.exports = {
                 message: `[INIT] Response status code was 500 INTERNAL SERVER ERROR.`
             });
 
-            error_string = "Something went wrong. See /help init for examples."
+            error_string = "Something went wrong. See /help init for examples.\n\n**You can refresh the tracker with /init get or reset it with /init reset**"
+
+            if (response.is_expected) {
+                error_string = response.exception_message + "\n\n**You can refresh the tracker with /init get or reset it with /init reset**"
+            }
+
             responseEmbed = new MessageEmbed().setColor(embedColors.errorEmbedColor)
             .setTitle("Oops!")
             .setDescription(error_string)
@@ -314,19 +316,22 @@ module.exports = {
             });
 
             // Make the request to the backend to get the tracker
-            var response = await this.execute_init_join(user, guild, channel, character, roll, logger)
+            var request = await this.execute_init_join(user, guild, channel, character, roll, logger)
+            var responseJson = await request.json()
 
             // Delete the old messsage
-            if (response.message_id) {
-                logger.log({
-                    level: 'info',
-                    message: `[INIT] Deleting old message. Message Id: ${response.message_id}`
-                });
-                
-                await interaction.webhook.deleteMessage(response.message_id)
+            if (request.statusCode == 200) {
+                if (responseJson.message_id) {
+                    logger.log({
+                        level: 'info',
+                        message: `[INIT] Deleting old message. Message Id: ${response.message_id}`
+                    });
+                    
+                    await interaction.webhook.deleteMessage(response.message_id)
+                }
             }
 
-            responseEmbed = await this.create_init_embed(response, logger)
+            responseEmbed = await this.create_init_embed(request, logger, response = responseJson)
 
             logger.log({
                 level: 'info',
@@ -343,8 +348,8 @@ module.exports = {
                 message: '[INIT] Subcommand is get'
             });
 
-            var response = await this.execute_init_get(user, guild, channel, logger)
-            responseEmbed = await this.create_init_embed(response, logger)
+            var request = await this.execute_init_get(user, guild, channel, logger)
+            responseEmbed = await this.create_init_embed(request, logger)
 
             logger.log({
                 level: 'info',
@@ -359,8 +364,8 @@ module.exports = {
                 message: '[INIT] Subcommand is remove'
             });
 
-            var response = await this.execute_init_remove(user, guild, channel, character, logger)
-            responseEmbed = await this.create_init_embed(response, logger)
+            var request = await this.execute_init_remove(user, guild, channel, character, logger)
+            responseEmbed = await this.create_init_embed(request, logger)
 
             return await interaction.reply({ embeds: [responseEmbed], components: [initButtons] })
         }
@@ -370,8 +375,8 @@ module.exports = {
                 message: '[INIT] Subcommand is reset'
             });
 
-            var response = await this.execute_init_reset(user, guild, channel, logger)
-            responseEmbed = await this.create_init_embed(response, logger)
+            var request = await this.execute_init_reset(user, guild, channel, logger)
+            responseEmbed = await this.create_init_embed(request, logger)
 
             return await interaction.reply({ embeds: [responseEmbed], components: [initButtons] })
         }
@@ -395,8 +400,8 @@ module.exports = {
                 message: '[INIT] Button interaction is next'
             });
 
-            var response = await this.execute_init_next(user, guild, channel, logger)
-            responseEmbed = await this.create_init_embed(response, logger)
+            var request = await this.execute_init_next(user, guild, channel, logger)
+            responseEmbed = await this.create_init_embed(request, logger)
 
             logger.log({
                 level: 'info',

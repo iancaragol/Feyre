@@ -22,6 +22,7 @@ const mentionRegex = RegExp('<@!.*>');
 // Setup logger
 // https://www.npmjs.com/package/winston
 const winston = require('winston');
+const { getSystemErrorMap } = require('util');
 const logger = winston.createLogger({
     level: 'info',
     format: winston.format.combine(
@@ -53,6 +54,8 @@ for (const file of commandFiles) {
 
 // When the client is ready, run this code (only once)
 client.once('ready', () => {
+    client.user.setStatus('docs.feyre.io | /help');
+
 	logger.log({
         level: 'warn',
         message: `Client is ready. Shard ID: ${client.shard.id}`
@@ -69,9 +72,17 @@ client.on('shardError', error => {
 
 // Log any unhandled promises, this can be encountered when there is an error talking to Discord API
 process.on('unhandledRejection', error => {
+
+    // This is a very common exception hit when interacting with the discord API
+    // We just supress it
+    if (String(error.message).includes("The reply to this interaction has already been sent"))
+    {
+        return;
+    }
+
 	logger.log({
         level: 'error',
-        message: `Process encountered an unhandled promise rejection. Error Stack: ${error.message}`
+        message: `Process encountered an unhandled promise rejection. Error Message: ${error.message}`
     });
 });
 
@@ -176,7 +187,7 @@ client.on('interactionCreate', async interaction => {
             guildtotal = guilds.reduce((acc, guildsizes) => acc + guildsizes, 0)
 
             logger.log({
-                level: 'warn',
+                level: 'info',
                 message: `Processing stats interaction. User Count: ${usercount}, Guild Count: ${guildtotal}, Shard Count ${client.shard.count}`
             });
 

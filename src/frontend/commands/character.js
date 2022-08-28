@@ -110,44 +110,49 @@ module.exports = {
 
                 responseEmbed = new MessageEmbed().setColor(embedColors.successEmbedColor)
                 responseEmbed.setTitle("[                            Your Characters                             ]")
-                characterList = ""
+                characterListString = "" // String that will be shown to users
                 buttons = []
 
                 buttonRow = new MessageActionRow()
 
-                for (let i = 0; i < response.characters.length; i++)
-                {
-                    var character = response.characters[i]
+                if (response.characters.length > 0) { // User has characters
+                    for (let i = 0; i < response.characters.length; i++) {
+                        var character = response.characters[i]
 
-                    if (character.is_active)
-                    {
-                        characterList += `**➤ ${character.id}. ${character.name} (${character.initiative_expression})**\n`
-                    }
-                    else
-                    {
-                        characterList += `${character.id}. ${character.name} (${character.initiative_expression})\n`
+                        if (character.is_active)
+                        {
+                            characterListString += `**➤ ${character.id}. ${character.name} (${character.initiative_expression})**\n`
+                        }
+                        else
+                        {
+                            characterListString += `${character.id}. ${character.name} (${character.initiative_expression})\n`
+                        }
+
+                        buttonRow.addComponents(
+                            new MessageButton()
+                                .setCustomId(`character_${character.id}`)
+                                .setLabel(`${character.id}`)
+                                .setStyle('SECONDARY')
+                        )
+
+                        // On the 5th iteration we need to create a new button row!
+                        // Unless its the last iteration, in which case we do not want to add an empty button
+                        if (i == 4 && i + 1 != response.characters.length) 
+                        {
+                            buttons.push(buttonRow)
+                            buttonRow = new MessageActionRow()
+                        }
                     }
 
-                    buttonRow.addComponents(
-                        new MessageButton()
-                            .setCustomId(`character_${character.id}`)
-                            .setLabel(`${character.id}`)
-                            .setStyle('SECONDARY')
-                    )
+                    buttons.push(buttonRow)
 
-                    // On the 5th iteration we need to create a new button row!
-                    // Unless its the last iteration, in which case we do not want to add an empty button
-                    if (i == 4 && i + 1 != response.characters.length) 
-                    {
-                        buttons.push(buttonRow)
-                        buttonRow = new MessageActionRow()
-                    }
+                }
+                else { // User has no created characters
+                    characterListString = "**You don't have any characters!**\n\nSee /help character or https://docs.feyre.io/commands/#character for instructions on creating characters."
                 }
 
-                buttons.push(buttonRow)
-
                 responseEmbed.setDescription(
-                    characterList.trim()
+                    characterListString.trim()
                 )
 
                 logger.log({
@@ -230,8 +235,19 @@ module.exports = {
     // Executes the command from an interaction (slash command) context
     async execute_interaction(interaction, logger) {
         user = interaction.user.id
-        guild = interaction.guild.id
-        channel = interaction.channel.id
+        guild = 0
+        
+        if (interaction.guild)
+        {
+            guild = interaction.guild.id
+        }
+
+        channel = 0
+        
+        if (interaction.channel)
+        {
+            channel = interaction.channel.id
+        }
 
         characterName = interaction.options.getString('name')
         characterId = interaction.options.getInteger('id')

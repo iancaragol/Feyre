@@ -73,6 +73,10 @@ class InitiativeOperation():
         else:
             self.logger.info(f"[INIT OPERATION > PUT] Getting selected character for user {self.user}")
             character = await self.get_selected_char(user=self.user)
+
+            # If the user does not have a selected character
+            if (not character):
+                raise InitOperationException("no valid characters")
             self.logger.info(f"[INIT OPERATION > PUT] Got character: {character.name} with initiative {character.initiative_expression}")
             await self.add_character(tracker=tracker, character=character)
 
@@ -147,7 +151,7 @@ class InitiativeOperation():
         """
         Adds the character to the tracker's list and sorts the list by initiative roll
         """
-        character.initiative_value = loads(RollOperation(character.initiative_expression).execute())['parent_result'][0]['total']
+        character.initiative_value = loads(await RollOperation(expression = character.initiative_expression).execute())['parent_result'][0]['total']
 
         # Don't allow duplicate characters
         # If a duplicate character is added, we re-roll its initiative
@@ -205,3 +209,26 @@ class InitiativeOperation():
         tracker = InitiativeTracker(guild=guild, channel=channel)
         await self.put_tracker(tracker = tracker)
         return tracker
+
+class InitOperationException(Exception):
+    """
+    Exception raised for errors in the InitOperation
+
+    Attributes:
+        exception: The original exception that was thrown
+        message: Error message to be returned to the user
+    """
+
+    def __init__(self, exception):
+        self.exception = exception
+        self.message = str(exception)
+
+        # If we know that this is occuring because something is unsupported, set is_expected = True
+        self.is_expected = False
+        
+        # Additional handling for any specific errors
+        # The message string will be returned to the user
+        # So want to make sure it is somewhat descriptive
+        if str(exception) == "no valid characters":
+            self.message = "You do not have any characters selected. See /help characters or https://docs.feyre.io/commands/#character for help."
+            self.is_expected = True
