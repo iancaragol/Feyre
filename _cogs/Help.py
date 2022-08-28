@@ -74,6 +74,15 @@ class Helper(commands.Cog):
             ''' 
         )
 
+        self.help_str_base = textwrap.dedent(
+            f'''
+            **FEYRE HAS MOVED TO SLASH COMMANDS**
+
+            **!help** is no longer supported, you can use **/help** instead
+
+            See **https://docs.feyre.io** for more information or **!update.**
+            ''')
+
         self.help_str_init = textwrap.dedent(
             '''
             ```

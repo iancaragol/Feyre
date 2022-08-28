@@ -148,50 +148,32 @@ Totals: [{t1}] & [{t2}]
 
         if(type(t) is bool):
             if(t):
-                outMsg = f'''```diff
-I interpreted your input as {rES}.
-Rolls: {uES}
-- Ability/Skill Check: Succeeded -
+                outMsg = f'''**FEYRE HAS MOVED TO SLASH COMMANDS**
 
-IMPORTANT: Feyre is moving to Slash Commands on August 31st. See https://docs.feyre.io/updating-feyre/ for more information.
-           You can now roll dice with /roll
-           
-           See !update for instructions on how to update Feyre's permissions```'''
+**!roll** is no longer supported, you can use **/roll** instead
+
+See **https://docs.feyre.io** for more information or **!update.**'''
             else:
-                outMsg = f'''```diff
-I interpreted your input as {rES}.
-Rolls: {uES}
-- Ability/Skill Check: Failed -
+                outMsg = f'''***FEYRE HAS MOVED TO SLASH COMMANDS**
 
-- IMPORTANT -
-Feyre is moving to Slash Commands on August 31st. See https://docs.feyre.io/updating-feyre/ for more information.
-You can now roll dice with /roll
-           
-See !update for instructions on how to update Feyre's permissions```'''
+**!roll** is no longer supported, you can use **/roll** instead
+
+See **https://docs.feyre.io** for more information or **!update.**
+'''
 
         elif float(t).is_integer():
-            outMsg = f'''```diff
-I interpreted your input as {rES}.
-Rolls: {uES}
-- Total: {t} -
+            outMsg = f'''**FEYRE HAS MOVED TO SLASH COMMANDS**
 
-- IMPORTANT -
-Feyre is moving to Slash Commands on August 31st. See https://docs.feyre.io/updating-feyre/ for more information.
-You can now roll dice with /roll
-           
-See !update for instructions on how to update Feyre's permissions```'''
+**!roll** is no longer supported, you can use **/roll** instead
+
+See **https://docs.feyre.io** for more information or **!update.**'''
 
         else:
-            outMsg = f'''```diff
-I interpreted your input as {rES}.
-Rolls: {uES}
-- Total: {"%.2f" % t} -
+            outMsg = f'''**FEYRE HAS MOVED TO SLASH COMMANDS**
 
-- IMPORTANT -
-Feyre is moving to Slash Commands on August 31st. See https://docs.feyre.io/updating-feyre/ for more information.
-You can now roll dice with /roll
-           
-See !update for instructions on how to update Feyre's permissions```'''
+**!roll** is no longer supported, you can use **/roll** instead
+
+See **https://docs.feyre.io** for more information or **!update.**'''
 
         return outMsg
 
