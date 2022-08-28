@@ -54,7 +54,7 @@ for (const file of commandFiles) {
 
 // When the client is ready, run this code (only once)
 client.once('ready', () => {
-    client.user.setStatus('docs.feyre.io | /help');
+    client.user.setActivity('docs.feyre.io | /help');
 
 	logger.log({
         level: 'warn',
