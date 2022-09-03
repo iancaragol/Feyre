@@ -9,6 +9,8 @@ services:
     image: traefik:v2.8
     env_file: 
       - ./src/traefik/traefik.env
+    networks:
+      - traefik-public
     command: 
       - --api=true
       - --providers.docker
