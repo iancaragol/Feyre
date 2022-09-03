@@ -129,8 +129,11 @@ services:
   #    - 3000:3000
 
   caddy:
+    container_name: caddy
     image: caddy:2.5.2
     restart: unless-stopped
+    env_file: 
+      - ./src/caddy/caddy.env
     ports:
       - "80:80"
       - "443:443"
