@@ -13,6 +13,8 @@ class LoggerNames:
 
     redis_logger = "REDIS_LOGGER"
 
+    public_logger = "PUBLIC_LOGGER"
+
 def logger_setup(logger_name : str, logger_file : str):
     """
     Creates a rotating logger with logger_name that writes to logger_file

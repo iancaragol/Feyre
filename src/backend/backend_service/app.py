@@ -1,7 +1,5 @@
 from time import sleep
 
-import time
-import logging
 from logging.handlers import RotatingFileHandler
 import uvicorn
 import requests

@@ -2,6 +2,7 @@
 # Doing it this way allows us to have the common folder for shared classes
 import backend_service.app
 import sync_service.app
+import public_service.app
 
 if __name__ == '__main__':
     from argparse import ArgumentParser
@@ -18,3 +19,6 @@ if __name__ == '__main__':
     elif service == "sync":
         print("[#] Starting Sync Service on this container")
         sync_service.app.main()
+    elif service == "public":
+        print("[#] Starting Public Stats on this container")
+        public_service.app.main()

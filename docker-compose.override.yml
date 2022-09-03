@@ -1,0 +1,8 @@
+services:
+  public:
+    ports:
+      - "5002:5002"
+      
+networks:
+  traefik-public:
+    external: false

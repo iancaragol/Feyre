@@ -1,6 +1,26 @@
 version: '3.9'
 
 services:
+  reverse-proxy:
+    container_name: traefik-reverse-proxy
+    image: traefik:v2.8
+    command: 
+      - --api.insecure=true
+      - --providers.docker
+      - --providers.docker.exposedbydefault=false
+      - --entrypoints.http.address=:80
+      - --entrypoints.websecure.address=:443
+      - --accesslog
+      - --log
+    ports:
+      # The HTTP port
+      - "80:80"
+      # The Web UI (enabled by --api.insecure=true)
+      - "8080:8080"
+    volumes:
+      # So that Traefik can listen to the Docker events
+      - /var/run/docker.sock:/var/run/docker.sock
+
   # Frontend service
   frontend:
     container_name: frontend
@@ -45,6 +65,29 @@ services:
     depends_on:
       - redis-primary
       - redis-secondary
+
+  # Public Stats Service
+  public:
+    container_name: public
+    env_file: 
+      - ./src/backend/backend.env
+    restart: unless-stopped
+    build: ./src/backend
+    volumes:
+      - log-volume:/home/app/logs
+    command: setup.py -s public
+    depends_on:
+      - redis-primary
+      - redis-secondary
+      - datasync
+      - frontend
+    labels:
+      - traefik.enable=true
+      - traefik.http.services.app.loadbalancer.server.port=5002
+      - traefik.http.routers.app-http.entrypoints=http
+      - traefik.http.routers.app-http.rule=Host(`public.feyre.io`)
+    networks:
+      - traefik-public
 
   # Primary redis
   redis-primary:
@@ -112,3 +155,7 @@ volumes:
   redis_data:
     driver: local
   log-volume:
+
+networks:
+  traefik-public:
+    external: true
