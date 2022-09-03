@@ -4,12 +4,17 @@ services:
   reverse-proxy:
     container_name: traefik-reverse-proxy
     image: traefik:v2.8
+    env_file: 
+      - ./src/traefik/traefik.env
     command: 
-      - --api.insecure=true
+      - --api=true
       - --providers.docker
       - --providers.docker.exposedbydefault=false
       - --entrypoints.http.address=:80
       - --entrypoints.websecure.address=:443
+      - --certificatesresolvers.le.acme.email=${LE_EMAIL}
+      - --certificatesresolvers.le.acme.storage=/certificates/acme.json
+      - --certificatesresolvers.le.acme.tlschallenge=true
       - --accesslog
       - --log
     ports:
@@ -17,9 +22,27 @@ services:
       - "80:80"
       # The Web UI (enabled by --api.insecure=true)
       - "8080:8080"
+      - "443:443"
+    restart: always
     volumes:
       # So that Traefik can listen to the Docker events
       - /var/run/docker.sock:/var/run/docker.sock
+      - traefik-public-certificates:/certificates
+    labels:
+      - traefik.enable=true
+      - traefik.http.services.app.loadbalancer.server.port=8080
+      - traefik.http.routers.traefik-dashboard.entrypoints=http
+      - traefik.http.routers.traefik-dashboard.rule=Host(`traefik.feyre.io`)
+      - traefik.http.routers.traefik-dashboard.entrypoints=https
+      - traefik.http.routers.traefik-dashboard.rule=Host(`traefik.feyre.io`)
+      - traefik.http.routers.traefik-dashboard.tls=true
+      - traefik.http.routers.traefik-dashboard.tls.certresolver=le
+      - traefik.http.middlewares.https-redirect.redirectsheme.scheme=https
+      - traefik.http.middlewares.https-redirect.redirectsheme.permanent=true
+      - traefik.http.routers.traefik-dashboard.middlewares=https-redirect
+      - traefik.http.middlewares.admin-auth.basicauth.users=${USERNAME?Variable not set}:${HASHED_PASSWORD?Variable not set}
+      - traefik.http.routers.traefik-dashboard.middlewares=admin-auth
+
 
   # Frontend service
   frontend:
@@ -82,10 +105,18 @@ services:
       - datasync
       - frontend
     labels:
+      # https://www.youtube.com/watch?v=7N5O62FjGDc
       - traefik.enable=true
       - traefik.http.services.app.loadbalancer.server.port=5002
       - traefik.http.routers.app-http.entrypoints=http
       - traefik.http.routers.app-http.rule=Host(`public.feyre.io`)
+      - traefik.http.routers.app-https.entrypoints=https
+      - traefik.http.routers.app-https.rule=Host(`public.feyre.io`)
+      - traefik.http.routers.app-https.tls=true
+      - traefik.http.routers.app-https.tls.certresolver=le
+      - traefik.http.middlewares.https-redirect.redirectsheme.scheme=https
+      - traefik.http.middlewares.https-redirect.redirectsheme.permanent=true
+      - traefik.http.routers.app-http.middlewares=https-redirect
     networks:
       - traefik-public
 
