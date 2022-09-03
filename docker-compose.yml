@@ -36,8 +36,8 @@ services:
       - traefik.http.routers.traefik-dashboard.entrypoints=https
       - traefik.http.routers.traefik-dashboard.tls=true
       - traefik.http.routers.traefik-dashboard.tls.certresolver=le
-      - traefik.http.middlewares.https-redirect.redirectsheme.scheme=https
-      - traefik.http.middlewares.https-redirect.redirectsheme.permanent=true
+      - traefik.http.middlewares.https-redirect.redirectscheme.scheme=https
+      - traefik.http.middlewares.https-redirect.redirectscheme.permanent=true
       - traefik.http.routers.traefik-dashboard.middlewares=https-redirect
       - traefik.http.middlewares.admin-auth.basicauth.users=${USERNAME}:${HASHED_PASSWORD}
       - traefik.http.routers.traefik-dashboard.middlewares=admin-auth
@@ -111,8 +111,8 @@ services:
       - traefik.http.routers.app-https.rule=Host(`public.feyre.io`)
       - traefik.http.routers.app-https.tls=true
       - traefik.http.routers.app-https.tls.certresolver=le
-      - traefik.http.middlewares.https-redirect.redirectsheme.scheme=https
-      - traefik.http.middlewares.https-redirect.redirectsheme.permanent=true
+      - traefik.http.middlewares.https-redirect.redirectscheme.scheme=https
+      - traefik.http.middlewares.https-redirect.redirectscheme.permanent=true
       - traefik.http.routers.app-http.middlewares=https-redirect
     networks:
       - traefik-public
