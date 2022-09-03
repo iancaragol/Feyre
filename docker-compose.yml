@@ -73,8 +73,6 @@ services:
       # Make Traefik use this domain in HTTP
       - traefik.http.routers.app-http.entrypoints=http
       - traefik.http.routers.app-http.rule=Host(`api.feyre.io`)
-      # Use the traefik-public network (declared below)
-      - traefik.docker.network=traefik-public
       # Make Traefik use this domain in HTTPS
       - traefik.http.routers.app-https.entrypoints=https
       - traefik.http.routers.app-https.rule=Host(`api.feyre.io`)

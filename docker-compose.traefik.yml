@@ -33,8 +33,6 @@ services:
       # Make Traefik use this domain in HTTP
       - traefik.http.routers.traefik-dashboard-http.entrypoints=http
       - traefik.http.routers.traefik-dashboard-http.rule=Host(`traefik.feyre.io`)
-      # Use the traefik-public network (declared below)
-      - traefik.docker.network=traefik-public
       # traefik-https the actual router using HTTPS
       - traefik.http.routers.traefik-dashboard-https.entrypoints=https
       - traefik.http.routers.traefik-dashboard-https.rule=Host(`traefik.feyre.io`)
