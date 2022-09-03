@@ -106,9 +106,9 @@ services:
       - traefik.enable=true
       - traefik.http.services.app.loadbalancer.server.port=5002
       - traefik.http.routers.app-http.entrypoints=http
-      - traefik.http.routers.app-http.rule=Host(`public.feyre.io`)
+      - traefik.http.routers.app-http.rule=Host(`api.feyre.io`)
       - traefik.http.routers.app-https.entrypoints=https
-      - traefik.http.routers.app-https.rule=Host(`public.feyre.io`)
+      - traefik.http.routers.app-https.rule=Host(`api.feyre.io`)
       - traefik.http.routers.app-https.tls=true
       - traefik.http.routers.app-https.tls.certresolver=le
       - traefik.http.middlewares.https-redirect.redirectscheme.scheme=https
