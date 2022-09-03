@@ -1,6 +1,8 @@
 version: '3.9'
 
 services:
+  # How to setup Traefik
+  # https://www.youtube.com/watch?v=7N5O62FjGDc
   reverse-proxy:
     container_name: traefik-reverse-proxy
     image: traefik:v2.8
@@ -20,7 +22,6 @@ services:
     ports:
       # The HTTP port
       - "80:80"
-      # The Web UI (enabled by --api.insecure=true)
       - "8080:8080"
       - "443:443"
     restart: always
@@ -29,20 +30,17 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
       - traefik-public-certificates:/certificates
     labels:
-      - traefik.enable=true
       - traefik.http.services.app.loadbalancer.server.port=8080
       - traefik.http.routers.traefik-dashboard.entrypoints=http
       - traefik.http.routers.traefik-dashboard.rule=Host(`traefik.feyre.io`)
       - traefik.http.routers.traefik-dashboard.entrypoints=https
-      - traefik.http.routers.traefik-dashboard.rule=Host(`traefik.feyre.io`)
       - traefik.http.routers.traefik-dashboard.tls=true
       - traefik.http.routers.traefik-dashboard.tls.certresolver=le
       - traefik.http.middlewares.https-redirect.redirectsheme.scheme=https
       - traefik.http.middlewares.https-redirect.redirectsheme.permanent=true
       - traefik.http.routers.traefik-dashboard.middlewares=https-redirect
-      - traefik.http.middlewares.admin-auth.basicauth.users=${USERNAME?Variable not set}:${HASHED_PASSWORD?Variable not set}
+      - traefik.http.middlewares.admin-auth.basicauth.users=${USERNAME}:${HASHED_PASSWORD}
       - traefik.http.routers.traefik-dashboard.middlewares=admin-auth
-
 
   # Frontend service
   frontend:
@@ -105,7 +103,6 @@ services:
       - datasync
       - frontend
     labels:
-      # https://www.youtube.com/watch?v=7N5O62FjGDc
       - traefik.enable=true
       - traefik.http.services.app.loadbalancer.server.port=5002
       - traefik.http.routers.app-http.entrypoints=http
@@ -185,8 +182,10 @@ services:
 volumes:
   redis_data:
     driver: local
+  traefik-public-certificates:
+    driver: local
   log-volume:
-
+  
 networks:
   traefik-public:
     external: true
