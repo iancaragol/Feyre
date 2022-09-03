@@ -96,6 +96,8 @@ services:
     build: ./src/backend
     ports:
       - "5002:5002"
+    expose:
+      - 5002
     volumes:
       - log-volume:/home/app/logs
     command: setup.py -s public
