@@ -146,7 +146,6 @@ services:
     environment:
       PROXY_BACKEND: public
       PROXY_PORT: 5002
-      DOMAIN: ${DOMAIN}
 
 volumes:
   redis_data:
