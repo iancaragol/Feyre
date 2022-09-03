@@ -41,6 +41,7 @@ services:
       - traefik.http.routers.traefik-dashboard.middlewares=https-redirect
       - traefik.http.middlewares.admin-auth.basicauth.users=${USERNAME}:${HASHED_PASSWORD}
       - traefik.http.routers.traefik-dashboard.middlewares=admin-auth
+      - traefik.docker.network=traefik-public
 
   # Frontend service
   frontend:
@@ -118,6 +119,7 @@ services:
       - traefik.http.middlewares.https-redirect.redirectscheme.scheme=https
       - traefik.http.middlewares.https-redirect.redirectscheme.permanent=true
       - traefik.http.routers.app-http.middlewares=https-redirect
+      - traefik.docker.network=traefik-public
     networks:
       - traefik-public
 
