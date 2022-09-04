@@ -1,7 +1,6 @@
 <h2 align="center"><img src="docs/assets/images/feyre-icon.png" alt="feyre" align="center" width="200px" /></h2>
-<h1 align="center" style="font-size:50px; font-family:'Times New Roman'"><i>feyre</i></h1>
+<h1 align="center" style="font-size:70px; font-family:'Times New Roman'"><i>feyre</i></h1>
 
-<br>
 <h5 align="center"><a href="https://invite.feyre.io"><img src="docs/assets/badges/invite.svg" alt="invite" align="center" width="200px" /></a></h5>
 <br>
 
