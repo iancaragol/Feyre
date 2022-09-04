@@ -31,7 +31,7 @@ async def stats(request: Request):
         logger.info(f"[STATS] Executing Public Metrics Stats Operation")
         logger.info(f"[STATS] StatsOperation was successful")
         if last_stats != None:
-            return JSONResponse(content = dumps(last_stats.dict()), status_code = HTTPStatus.OK)
+            return JSONResponse(content = last_stats.dict(), status_code = HTTPStatus.OK)
         else:
             return Response(status_code=HTTPStatus.OK)
     except Exception as e:
@@ -53,7 +53,7 @@ async def stats(request: Request):
                 "message": str(last_stats.guild_total),
                 "color": "success"
             }
-            return JSONResponse(content = dumps(badge), status_code = HTTPStatus.OK)
+            return JSONResponse(content = badge, status_code = HTTPStatus.OK)
         else:
             return Response(status_code=HTTPStatus.OK)
     except Exception as e:
@@ -75,7 +75,7 @@ async def stats(request: Request):
                 "message": str(last_stats.command_total),
                 "color": "informational"
             }
-            return JSONResponse(content = dumps(badge), status_code = HTTPStatus.OK)
+            return JSONResponse(content = badge, status_code = HTTPStatus.OK)
         else:
             return Response(status_code=HTTPStatus.OK)
     except Exception as e:
@@ -97,7 +97,7 @@ async def stats(request: Request):
                 "message": str(last_stats.user_total),
                 "color": "success"
             }
-            return JSONResponse(content = dumps(badge), status_code = HTTPStatus.OK)
+            return JSONResponse(content = badge, status_code = HTTPStatus.OK)
         else:
             return Response(status_code=HTTPStatus.OK)
     except Exception as e:
@@ -119,7 +119,7 @@ async def stats(request: Request):
                 "message": str(last_stats.user_reach),
                 "color": "informational"
             }
-            return JSONResponse(content = dumps(badge), status_code = HTTPStatus.OK)
+            return JSONResponse(content = badge, status_code = HTTPStatus.OK)
         else:
             return Response(status_code=HTTPStatus.OK)
     except Exception as e:
