@@ -62,6 +62,7 @@ notfoundEmbed.setDescription(notfoundEmbedDescription)
 var rollEmbed = new MessageEmbed()
 rollEmbed.setColor(embedColor)
 rollEmbed.setTitle("roll")
+rollEmbed.setImage("https://raw.githubusercontent.com/iancaragol/Feyre/main/docs/assets/images/dice-expressions.png")
 
 var rollDescription = 
 `/roll can be used to roll dice of any size with complicated expressions.
@@ -125,6 +126,7 @@ rollEmbed.addField("Count Operator", countOperatorField)
 rollEmbed.addField("Keep / Drop Operator", keepOperatorField)
 rollEmbed.addField("Advantage / Disadvantage", advantageOperatorField)
 rollEmbed.addField("Explode Operator", explodeOperatorField)
+
 
 // Documentation button
 var rollRow = new MessageActionRow()
