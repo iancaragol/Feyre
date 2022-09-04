@@ -19,7 +19,7 @@
 
 ## 🚧🚧🚧 
 ## Feyre is currently being re-written and re-deployed. Some of this info may be out of date!
-## See [developer updates](http://docs.feyre.io/developer-updates/) for more info on the changes!
+## See [developer updates](https://feyre.io/developer-updates/) for more info on the changes!
 ## 🚧🚧🚧
 
 ---

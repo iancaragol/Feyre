@@ -231,5 +231,5 @@ class InitOperationException(Exception):
         # The message string will be returned to the user
         # So want to make sure it is somewhat descriptive
         if str(exception) == "no valid characters":
-            self.message = "You do not have any characters selected. See /help characters or https://docs.feyre.io/commands/#character for help."
+            self.message = "You do not have any characters selected. See /help characters or https://feyre.io/commands/#character for help."
             self.is_expected = True

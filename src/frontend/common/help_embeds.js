@@ -2,8 +2,8 @@ const { MessageEmbed, MessageActionRow, MessageButton } = require('discord.js');
 const embedColors = require('./embed_colors')
 
 var embedColor = embedColors.helpEmbedColor
-var documentationUrl = "http://docs.feyre.io/commands/"
-var inviteLink = "http://docs.feyre.io/#add-feyre-to-your-server"
+var documentationUrl = "https://feyre.io/commands/"
+var inviteLink = "https://invite.feyre.io"
 
 // ================================================
 //                      HELP

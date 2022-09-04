@@ -7,7 +7,7 @@
 
 # YOU WILL NEED TO UPDATE IT'S PERMISSIONS
 
-# UOPDATE INSTRUCTIONS ARE [HERE](updating-feyre.md)
+# UPDATE INSTRUCTIONS ARE [HERE](updating-feyre.md)
 
 ---
 
@@ -21,7 +21,7 @@
 
 ## Add Feyre to your server
 
-Invite Feyre to your server with this [link](http://invite.feyre.io)
+Invite Feyre to your server with this [link](https://invite.feyre.io)
 
 ---
 
