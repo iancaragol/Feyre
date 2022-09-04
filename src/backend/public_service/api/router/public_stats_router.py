@@ -50,7 +50,7 @@ async def stats(request: Request):
             badge = {
                 "schemaVersion": 1,
                 "label": "Servers",
-                "message": last_stats.guild_total,
+                "message": str(last_stats.guild_total),
                 "color": "success"
             }
             return JSONResponse(content = dumps(badge), status_code = HTTPStatus.OK)
@@ -72,7 +72,7 @@ async def stats(request: Request):
             badge = {
                 "schemaVersion": 1,
                 "label": "Commands Proccessed",
-                "message": last_stats.command_total,
+                "message": str(last_stats.command_total),
                 "color": "informational"
             }
             return JSONResponse(content = dumps(badge), status_code = HTTPStatus.OK)
@@ -94,7 +94,7 @@ async def stats(request: Request):
             badge = {
                 "schemaVersion": 1,
                 "label": "Users",
-                "message": last_stats.user_total,
+                "message": str(last_stats.user_total),
                 "color": "success"
             }
             return JSONResponse(content = dumps(badge), status_code = HTTPStatus.OK)
@@ -116,7 +116,7 @@ async def stats(request: Request):
             badge = {
                 "schemaVersion": 1,
                 "label": "Users",
-                "message": last_stats.user_reach,
+                "message": str(last_stats.user_reach),
                 "color": "informational"
             }
             return JSONResponse(content = dumps(badge), status_code = HTTPStatus.OK)
