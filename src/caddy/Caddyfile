@@ -1,5 +1,5 @@
 {$DOMAIN} {
-	redir https://docs.feyre.io
+	redir https://iancaragol.github.io/Feyre
 }
 
 invite.{$DOMAIN} {
