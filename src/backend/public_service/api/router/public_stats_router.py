@@ -38,6 +38,94 @@ async def stats(request: Request):
         logger.error(f"[STATS] Exception occurred in StatsOperation. Traceback: {traceback.format_exc()}")
         return Response(content = f"An exception occurred when getting stats.\n{e}\n{traceback.format_exc()}", status_code = HTTPStatus.INTERNAL_SERVER_ERROR)
 
+@public_stats_router.get('/public/stats/badge/guilds')
+async def stats(request: Request):
+    """
+    Returns the user badge for Shields
+    """
+    try:
+        logger.info(f"[STATS] Executing Public Metrics Stats Operation")
+        logger.info(f"[STATS] StatsOperation was successful")
+        if last_stats != None:
+            badge = {
+                "schemaVersion": 1,
+                "label": "Servers",
+                "message": last_stats.guild_total,
+                "color": "success"
+            }
+            return JSONResponse(content = dumps(badge), status_code = HTTPStatus.OK)
+        else:
+            return Response(status_code=HTTPStatus.OK)
+    except Exception as e:
+        logger.error(f"[STATS] Exception occurred in StatsOperation. Traceback: {traceback.format_exc()}")
+        return Response(content = f"An exception occurred when getting stats.\n{e}\n{traceback.format_exc()}", status_code = HTTPStatus.INTERNAL_SERVER_ERROR)
+
+@public_stats_router.get('/public/stats/badge/commands')
+async def stats(request: Request):
+    """
+    Returns the user badge for Shields
+    """
+    try:
+        logger.info(f"[STATS] Executing Public Metrics Stats Operation")
+        logger.info(f"[STATS] StatsOperation was successful")
+        if last_stats != None:
+            badge = {
+                "schemaVersion": 1,
+                "label": "Commands Proccessed",
+                "message": last_stats.command_total,
+                "color": "informational"
+            }
+            return JSONResponse(content = dumps(badge), status_code = HTTPStatus.OK)
+        else:
+            return Response(status_code=HTTPStatus.OK)
+    except Exception as e:
+        logger.error(f"[STATS] Exception occurred in StatsOperation. Traceback: {traceback.format_exc()}")
+        return Response(content = f"An exception occurred when getting stats.\n{e}\n{traceback.format_exc()}", status_code = HTTPStatus.INTERNAL_SERVER_ERROR)
+
+@public_stats_router.get('/public/stats/badge/users')
+async def stats(request: Request):
+    """
+    Returns the user badge for Shields
+    """
+    try:
+        logger.info(f"[STATS] Executing Public Metrics Stats Operation")
+        logger.info(f"[STATS] StatsOperation was successful")
+        if last_stats != None:
+            badge = {
+                "schemaVersion": 1,
+                "label": "Users",
+                "message": last_stats.user_total,
+                "color": "success"
+            }
+            return JSONResponse(content = dumps(badge), status_code = HTTPStatus.OK)
+        else:
+            return Response(status_code=HTTPStatus.OK)
+    except Exception as e:
+        logger.error(f"[STATS] Exception occurred in StatsOperation. Traceback: {traceback.format_exc()}")
+        return Response(content = f"An exception occurred when getting stats.\n{e}\n{traceback.format_exc()}", status_code = HTTPStatus.INTERNAL_SERVER_ERROR)
+
+@public_stats_router.get('/public/stats/badge/reach')
+async def stats(request: Request):
+    """
+    Returns the user badge for Shields
+    """
+    try:
+        logger.info(f"[STATS] Executing Public Metrics Stats Operation")
+        logger.info(f"[STATS] StatsOperation was successful")
+        if last_stats != None:
+            badge = {
+                "schemaVersion": 1,
+                "label": "Users",
+                "message": last_stats.user_reach,
+                "color": "informational"
+            }
+            return JSONResponse(content = dumps(badge), status_code = HTTPStatus.OK)
+        else:
+            return Response(status_code=HTTPStatus.OK)
+    except Exception as e:
+        logger.error(f"[STATS] Exception occurred in StatsOperation. Traceback: {traceback.format_exc()}")
+        return
+
 @public_stats_router.post('/internal/stats')
 async def stats(stats: Stats):
     """
