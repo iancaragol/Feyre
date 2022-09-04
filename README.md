@@ -51,6 +51,8 @@ For extended documentation on using this bot see [feyre.io](https://feyre.io/com
 
 <p align="center">
   <br>
+  <img src="docs/assets/images/dice-expressions.png" alt="dice roll demo" width="400px"/>
+  <br>
   <img src="docs/assets/gifs/roll-demo.gif" alt="dice roll demo"/>
 </p>
 
