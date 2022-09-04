@@ -56,7 +56,9 @@ module.exports = {
             responseEmbed = new MessageEmbed().setColor(embedColors.successEmbedColor)
             responseEmbed.setTitle("Feyre - Statistics")
             
-            var commandsBody = `**roll** - ${response.roll}
+            var commandsBody = `**total** - ${resposne.total}
+            
+**roll** - ${response.roll}
 **init** - ${response.init}
 **character** - ${response.char}
 

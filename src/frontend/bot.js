@@ -19,10 +19,20 @@ const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('
 // Regex to remove <@!id>
 const mentionRegex = RegExp('<@!.*>');
 
+const backend = require("./common/backend");
+
+let status_codes = [200, 500, 504]
+
+// Setup our HTTP library
+const bent = require('bent');
+const post = bent('POST', 'json', status_codes)
+const get = bent(status_codes);
+
 // Setup logger
 // https://www.npmjs.com/package/winston
 const winston = require('winston');
 const { getSystemErrorMap } = require('util');
+const stats = require('./commands/stats');
 const logger = winston.createLogger({
     level: 'info',
     format: winston.format.combine(
@@ -54,7 +64,7 @@ for (const file of commandFiles) {
 
 // When the client is ready, run this code (only once)
 client.once('ready', () => {
-    client.user.setActivity('docs.feyre.io | /help');
+    client.user.setActivity('feyre.io | /help');
 
 	logger.log({
         level: 'warn',
@@ -242,3 +252,49 @@ client.on('interactionCreate', async interaction => {
         }
     }
 });
+
+// Send stats public API every hour
+// Public Service exposes two APIs
+// Internal (which this uses to send stats to)
+// and Public which is available at api.feyre.io/public/
+setInterval(async function () {
+    if (client.shard.ids.includes(0)) {
+        users = await client.shard.broadcastEval(c => c.guilds.cache.reduce((acc, guild) => acc + guild.memberCount, 0));
+        usercount = users.reduce((acc, userSize) => acc + userSize, 0)
+        guilds = await client.shard.fetchClientValues('guilds.cache.size')
+        guildtotal = guilds.reduce((acc, guildsizes) => acc + guildsizes, 0)
+
+        string_url = "/api/backendservice/stats?user=1&all=true" // Hardcode to true
+        
+        url = await backend.create_url({path: string_url});
+
+        logger.log({
+            level: 'info',
+            message: '[STATS] Making request to backend using uri: ' + url
+        });
+
+        get_stats = await get(url);
+        stats_json = await get_stats.json()
+
+        logger.log({
+            level: 'info',
+            message: `Sending info to backend. User Count: ${usercount}, Guild Count: ${guildtotal}, Shard Count ${client.shard.count}`
+        });
+
+        body = {"user_reach": usercount, "guild_total": guildtotal, "command_total": stats_json.total, "user_total": stats_json.user_count}
+
+        url = "http://public:5002/internal/stats";
+        let request = await post(url, body);
+
+        logger.log({
+            level: 'info',
+            message: `Sent info to backend. Status Code: ${request.statusCode}`
+        });
+    }
+    else {
+        logger.log({
+            level: 'info',
+            message: `This client is not on shard 0`
+        });
+    }
+ }, 1 * 60 * 1000)

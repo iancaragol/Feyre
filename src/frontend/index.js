@@ -25,8 +25,11 @@ if (process.env.ENVIRONMENT !== 'production') {
 // Load env vars
 dotenv.config();
 const DISCORD_TOKEN = process.env.DISCORD_TOKEN;
+const TOP_GG_TOKEN = process.env.TOP_GG_TOKEN;
 
 const manager = new ShardingManager('./bot.js', { token: DISCORD_TOKEN });
+const { AutoPoster } = require('topgg-autoposter')
+const poster = AutoPoster(TOP_GG_TOKEN, manager)
 
 manager.on('shardCreate', shard => logger.log({
         level: 'info',
@@ -44,4 +47,12 @@ manager.spawn();
 logger.log({
     level: 'info',
     message: `Shard mamanger was spawned.`
+})
+
+// Send info t// optional
+poster.on('posted', (stats) => { // ran when succesfully posted
+    logger.log({
+        level: 'warn',
+        message: `Posted stats to Top.gg | ${stats.serverCount} servers`
+    })
 })

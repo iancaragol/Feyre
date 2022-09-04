@@ -148,7 +148,7 @@ module.exports = {
 
                 }
                 else { // User has no created characters
-                    characterListString = "**You don't have any characters!**\n\nSee /help character or https://docs.feyre.io/commands/#character for instructions on creating characters."
+                    characterListString = "**You don't have any characters!**\n\nSee /help character or https://feyre.io/commands/#character for instructions on creating characters."
                 }
 
                 responseEmbed.setDescription(
