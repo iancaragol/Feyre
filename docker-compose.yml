@@ -1,6 +1,8 @@
 version: '3.9'
 
 services:
+  
+
   # Frontend service
   frontend:
     container_name: frontend
@@ -45,6 +47,24 @@ services:
     depends_on:
       - redis-primary
       - redis-secondary
+
+  # Public Stats Service
+  public:
+    container_name: public
+    env_file: 
+      - ./src/backend/backend.env
+    restart: unless-stopped
+    build: ./src/backend
+    volumes:
+      - log-volume:/home/app/logs
+    command: setup.py -s public
+    ports:
+      - "5002:5002"
+    depends_on:
+      - redis-primary
+      - redis-secondary
+      - datasync
+      - frontend
 
   # Primary redis
   redis-primary:
@@ -108,7 +128,28 @@ services:
   #  ports:
   #    - 3000:3000
 
+  caddy:
+    container_name: caddy
+    image: caddy:2.5.2
+    restart: unless-stopped
+    env_file: 
+      - ./src/caddy/caddy.env
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./src/caddy/Caddyfile:/etc/caddy/Caddyfile
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - public
+    environment:
+      PROXY_BACKEND: public
+      PROXY_PORT: 5002
+
 volumes:
   redis_data:
     driver: local
+  caddy_data:
+  caddy_config:
   log-volume:
