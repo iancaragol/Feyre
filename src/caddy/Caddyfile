@@ -1,5 +1,6 @@
 {$DOMAIN} {
 	redir https://docs.feyre.io
+}
 
 invite.{$DOMAIN} {
 	redir https://discord.com/oauth2/authorize?client_id=500733845856059402&permissions=2147493952&scope=applications.commands%20bot
