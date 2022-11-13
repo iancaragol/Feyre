@@ -2,24 +2,31 @@ from decimal import InvalidOperation
 import traceback
 import textwrap
 import aioodbc
+import logging
 
 from os import environ
 from urllib import response
 from itertools import count, filterfalse
 from json import dumps, loads
 from backend_service.api.model.character_model import Character
+from common.table_helper import TableHelper
+from common.logger import LoggerNames
+
+# TODO(IAN)
+# Not sure where to put this
+logger = logging.getLogger(LoggerNames.backend_logger)
+table_helper = TableHelper(logger=logger)
 
 class CharacterOperation():
     """
     """
 
-    def __init__(self, user : int, character_id : int = None, character_name : str = None, init_mod : str = None):
+    def __init__(self, user : int, character_id : int = None, character_name : str = None, init_mod : str = None, logger = None):
         self.user = user
         self.character_id = character_id
         self.character_name = character_name
         self.init_mod = init_mod
-        self.uid = environ.get("SQL_DB_UID").strip()
-        self.pw = environ.get("SQL_DB_PW").strip()
+        self.logger = logger
 
     async def execute_get(self):
         """
@@ -73,146 +80,156 @@ class CharacterOperation():
 
         return cnxn
 
-    ################################################################
-    #   Everything below here is old code, consider reworking it!  #
-    ################################################################
+    # TODO(Ian):
+    # This could be in a helper class rather than being part of the operation?
+    # This breaks the backend contract, we talk directly to azure storage instead of redis
+    #
+    # Example Table Storage JSON:
+    # {
+    # "characters": [
+    #         {
+    #             "user": 112041042894655488,
+    #             "name": "Frodo",
+    #             "initiative_expression": "1d20",
+    #             "initiative_value": null,
+    #             "is_active": true,
+    #             "id": 0
+    #         },
+    #         {
+    #             "user": 112041042894655488,
+    #             "name": "Sam",
+    #             "initiative_expression": "1d20+5",
+    #             "initiative_value": null,
+    #             "is_active": false,
+    #             "id": 1
+    #         }
+    #     ]
+    # }
+
     async def select_character(self):
         """
         Updates the character to be the selected character
         """
-        cnxn = await self.connect()
-        cursor = await cnxn.cursor()
+        self.logger.info(f"[CHAR > DELETE] Removing character for {self.user} with ID {self.character_id}")
 
-        characters = await self.get_characters()
-        currently_selected = 0
+        characters_json = await self.get_characters_json()
 
-        for c in characters:
-            if c.is_active == 1:
-                currently_selected = c.id
-        
+        if characters_json:
+            characters = characters_json["characters"]
 
-        # Disable the currently selected character
-        if currently_selected:
-            update_string = textwrap.dedent("""
-            UPDATE characters SET selected = ? WHERE userId = ? AND characterId = ?""")
-            await cursor.execute(update_string,
-                            False,
-                            self.user, 
-                            currently_selected)
+            for character in characters:
+                # Unselect any selected characters
+                if (character["is_active"] and character["id"] != self.character_id):
+                    character["is_active"] = False
+                elif (character["id"] == self.character_id):
+                    character["is_active"] = True
 
-            await cnxn.commit()
+            self.logger.info(f"[CHAR > DELETE] New character list: {character}")
 
-        # Then select new character
-        update_string = textwrap.dedent("""
-        UPDATE characters SET selected = ? WHERE userId = ? AND characterId = ?""")
-        await cursor.execute(update_string,
-                        True,
-                        self.user, 
-                        self.character_id)
+            characters_as_entity = {"RowKey": str(self.user), "character_json": dumps({"characters":characters})}
+            table_helper.insert_entity(table_name = "characters", entity_json = characters_as_entity)
 
-        await cnxn.commit()
-        await cursor.close()
-        await cnxn.close()
+            self.logger.info(f"[CHAR > DELETE] Removed character for {self.user} with ID {self.character_id}")
+
+    async def get_characters_json(self):
+        entry = table_helper.get_entity("characters", self.user)
+        self.logger.info(f"[CHAR > GET] Got {entry} from table storage. User ID: {self.user}")
+
+        character_json = None
+        if entry:
+            character_json = loads(entry["character_json"])
+        return character_json
 
     async def get_characters(self):
-        cnxn = await self.connect()
-        cursor = await cnxn.cursor()
+        entry = table_helper.get_entity("characters", self.user)
+        character_list = []
 
-        selection_string = textwrap.dedent(""" 
-            SELECT * From characters WHERE userId = ?""")
+        self.logger.info(f"[CHAR > GET] Got {entry} from table storage. User ID: {self.user}")
 
-        await cursor.execute(selection_string, self.user)
-        results = await cursor.fetchall()
+        characters_json = await self.get_characters_json()
+        if characters_json:
+            for character in characters_json["characters"]:
+                character = Character(user = self.user, id=int(character["id"]), is_active=character["is_active"], name = character["name"], initiative_expression = str(character["initiative_expression"]))
+                character_list.append(character)
 
-        characters = []
+        self.logger.info(f"[CHAR > GET] Character list for {self.user}: {character_list}")
 
-        if results:
-            for result in results:
-                character = Character(user = self.user, id=int(result.characterId), is_active=bool(result.selected), name = result.characterName, initiative_expression = str(result.initMod))
-                characters.append(character)
-
-        await cursor.close()
-        await cnxn.close()
-
-        return characters
+        return character_list
 
     async def get_active_character(self):
-        cnxn = await self.connect()
-        cursor = await cnxn.cursor()
-
-        selection_string = textwrap.dedent(""" 
-            SELECT * From characters WHERE userId = ? AND selected = 1""")
-
-        await cursor.execute(selection_string, self.user)
-        results = await cursor.fetchall()
-
-        characters = []
-
-        if results:
-            for result in results:
-                character = Character(user = self.user, is_active=bool(result.selected), name = result.characterName, initiative_expression = str(result.initMod))
-                characters.append(character)
-
-        await cursor.close()
-        await cnxn.close()
-
-        if len(characters) == 1:
-            return characters[0]
-        else:
-            return None
-
-    async def add_character(self):
-        cnxn = await self.connect()
-        cursor = await cnxn.cursor()
+        self.logger.info(f"[CHAR > GET] Getting active characters for {self.user}")
 
         characters = await self.get_characters()
 
-        insert_string = textwrap.dedent("""
-            INSERT INTO characters(userId,
-            characterName,
-            characterId, 
-            initMod,
-            selected,
-            pp, gp, ep, sp, cp) VALUES(?,?,?,?,?,?,?,?,?,?)""")
+        active_character = None
+        for character in characters:
+            if character.is_active:
+                active_character = character
+                return active_character
+        
+        self.logger.info(f"[CHAR > GET] Found active character for {self.user}: {active_character}")
+        return active_character
+
+    async def add_character(self):
+        self.logger.info(f"[CHAR > ADD] Adding new character for {self.user}")
+
+        # Get our character json
+        characters_json = await self.get_characters_json()
+
+        # If there is no character_json then we need to create one
+        if (characters_json == None):
+            characters_json = {"characters": []}
+
+        # This is a bit messy, but characters is a list []
+        characters = characters_json["characters"]
 
         # Wizardry to get the smallest id not already taken
         character_id = 1
         ids = []
         if characters:
-            ids = [c.id for c in characters]
+            ids = [c["id"] for c in characters]
             character_id = int(next(filterfalse(set(ids).__contains__, count(1))))
-
-        selected = 0 # If there are no characters select the new one by default
-        if len(ids) == 0:
-            selected = 1
-
+        
         if character_id > 9:
-            await cursor.close()
-            await cnxn.close()
-
             raise InvalidOperation(message="Maximum # of characters reached")
 
-        try:
-            await cursor.execute(insert_string, self.user, self.character_name, character_id, self.init_mod, selected, 0, 0, 0, 0, 0)
-            await cnxn.commit()
+        is_active = 0 # If there are no characters select the new one by default
+        if len(ids) == 0:
+            is_active = 1
 
-            await cursor.close()
-            await cnxn.close()
+        # Construct new character json
+        new_character = {}
+        new_character["name"] = self.character_name
+        new_character["initiative_expression"] = self.init_mod
+        new_character["user"] = self.user
+        new_character["id"] = character_id
+        new_character["is_active"] = is_active
 
-        except Exception as e:
-            await cursor.close()
-            await cnxn.close()
+        # Add the new character json to the list
+        characters.append(new_character)
 
-            raise e
+        self.logger.info(f"[CHAR > ADD] New character json: {characters}")
+
+        # This is funky, but basically an entity is a representation of columns
+        characters_as_entity = {"RowKey": str(self.user), "character_json": dumps({"characters":characters})}
+        table_helper.insert_entity(table_name = "characters", entity_json = characters_as_entity)
+
+        self.logger.info(f"[CHAR > ADD] Inserted new json.")
 
     async def remove_character(self):
-        cnxn = await self.connect()
-        cursor = await cnxn.cursor()
+        self.logger.info(f"[CHAR > DELETE] Removing character for {self.user} with ID {self.character_id}")
 
-        delete_string = textwrap.dedent("""
-        DELETE FROM characters WHERE userId = ? and characterId = ?""")
-        await cursor.execute(delete_string, self.user, self.character_id)
-        await cnxn.commit()
+        characters_json = await self.get_characters_json()
 
-        await cursor.close()
-        await cnxn.close()
+        if characters_json:
+            characters = characters_json["characters"]
+            new_characters = [x for x in characters if not (x["id"] == self.character_id)]
+        
+            self.logger.info(f"[CHAR > DELETE] New character list: {new_characters}")
+
+            characters_as_entity = {"RowKey": str(self.user), "character_json": dumps({"characters":new_characters})}
+            table_helper.insert_entity(table_name = "characters", entity_json = characters_as_entity)
+
+            self.logger.info(f"[CHAR > DELETE] Removed character for {self.user} with ID {self.character_id}")
+
+

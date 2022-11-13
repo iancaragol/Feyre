@@ -39,7 +39,7 @@ async def character_get(user : int):
 
     try:
         logger.info(f"[CHAR > GET] Executing CharacterOperation. user: {user}")
-        result = await CharacterOperation(user = user).execute_get()
+        result = await CharacterOperation(user = user, logger = logger).execute_get()
 
         if result == None:
             logger.info(f"[CHAR > GET] User {user} does not have any characters.")
@@ -79,7 +79,7 @@ async def character_patch(user : int, character_id : int):
 
     try:
         logger.info(f"[CHAR > PATCH] Executing CharacterOperation. user: {user}, character_id: {character_id}")
-        result = await CharacterOperation(user = user, character_id = character_id).execute_patch()
+        result = await CharacterOperation(user = user, character_id = character_id, logger=logger).execute_patch()
 
         if result == None:
             logger.info(f"[CHAR > PATCH] User {user} does not have any characters.")
@@ -120,7 +120,7 @@ async def character_put(user : int, character_name : str, initiative_expression 
 
     try:
         logger.info(f"[CHAR > PATCH] Executing PatchOperation. user: {user}, character_name: {character_name}, initiative_expression: {initiative_expression}")
-        result = await CharacterOperation(user = user, character_name = character_name, init_mod = initiative_expression).execute_put()
+        result = await CharacterOperation(user = user, character_name = character_name, init_mod = initiative_expression, logger=logger).execute_put()
 
         if result == None:
             logger.info(f"[CHAR > PATCH] User {user} does not have any characters.")
@@ -163,7 +163,7 @@ async def character_delete(user : int, character_id : int):
 
     try:
         logger.info(f"[CHAR > DELETE] Executing CharacterOperation. user: {user}, character_id: {character_id}")
-        result = await CharacterOperation(user = user, character_id = character_id).execute_delete()
+        result = await CharacterOperation(user = user, character_id = character_id, logger=logger).execute_delete()
 
         if result == None:
             logger.info(f"[CHAR > DELETE] User {user} does not have any characters.")

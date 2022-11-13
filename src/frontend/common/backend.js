@@ -10,15 +10,15 @@ async function create_url({protocol = 'http', host = null, path = null, port = 5
     if (host !== null) {
         host = host;
     }
-    else if (process.env.ENVIRONMENT == "prod" && host === null) {
+    else if (process.env.ENVIRONMENT.toLowerCase() == "prod" && host === null) {
         // If the environment is prod, use the "name" set via docker-compose
         host = "backend";
     }
-    else if (process.env.ENVIRONMENT == "staging" && host === null) {
+    else if (process.env.ENVIRONMENT.toLocaleLowerCase() == "staging" && host === null) {
         // If the environment is staging, use the "name" set via docker-compose
         host = 'backend';
     }
-    else if (process.env.ENVIRONMENT == "dev" && host === null) {
+    else if (process.env.ENVIRONMENT.toLocaleLowerCase() == "dev" && host === null) {
         // If the environment is dev, use the "name" set via docker-compose
         host = 'backend';
     }

@@ -145,7 +145,7 @@ class InitiativeOperation():
         """
         Gets the user's selected character and its initiative modifer from the SQL data base.
         """
-        character = await CharacterOperation(user = user).get_active_character()
+        character = await CharacterOperation(user = user, logger = self.logger).get_active_character()
         return character
 
     async def add_character(self, tracker : InitiativeTracker, character : Character):
@@ -185,8 +185,10 @@ class InitiativeOperation():
         """
         tracker_json = self.redis_helper.get_initiative_tracker(self.guild, self.channel)
         if tracker_json:
+            self.logger.info(f"[INIT OPERATION > PUT] Tracker: {tracker_json}")
             return InitiativeTracker(it_dict=tracker_json)
         else:
+            self.logger.info(f"[INIT OPERATION > PUT] Tracker is null.")
             return None
 
     async def put_tracker(self, tracker : InitiativeTracker):
