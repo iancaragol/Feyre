@@ -8,7 +8,7 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from prometheus_client.core import REGISTRY
 from starlette_exporter import PrometheusMiddleware, handle_metrics
 from sync_service.api.routers.sync_stats import stats_router, sync_stats
-from sync_service.api.routers.sync_user import users_router, sync_users
+from sync_service.api.routers.sync_user_set import user_set_router, sync_users
 from sync_service.collectors.collectors import TimeSinceSyncMetricsCollector, CompletedSuccesfullyMetricsCollector
 
 sync_interval_seconds = 7200 # 2 Hours
@@ -27,12 +27,10 @@ if (not environ.get('DB_BYPASS', None)):
     # Shut down the scheduler when exiting the app
     atexit.register(lambda: scheduler.shutdown())
 
-
-
 def create_app():
     app = FastAPI()
     app.include_router(stats_router)
-    app.include_router(users_router)
+    app.include_router(user_set_router)
 
     app.add_middleware(PrometheusMiddleware)
     app.add_route("/metrics", handle_metrics)

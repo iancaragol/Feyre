@@ -10,12 +10,12 @@ from common.redis_helper import RedisHelper
 from datetime import datetime
 from sync_service.api.models.last_sync import LastSync
 
-users_router = APIRouter()
+user_set_router = APIRouter()
 redis_helper = RedisHelper()
 blob_helper = BlobHelper()
 last_sync = LastSync()
 
-@users_router.put('/api/syncservice/users')
+@user_set_router.put('/api/syncservice/users')
 def put_users_set():
     """
     Puts the current user set stored in Redis into the Mongo DB.
@@ -30,7 +30,7 @@ def put_users_set():
     except Exception as e:
         return f"An exception occurred when updating the Users Table.\n{e}\n{traceback.format_exc()}", HTTPStatus.INTERNAL_SERVER_ERROR
 
-@users_router.get('/api/syncservice/users')
+@user_set_router.get('/api/syncservice/users')
 def get_users():
     """
     Returns user_set as a json
@@ -39,7 +39,7 @@ def get_users():
     
     return Response(content = dumps(users), status_code = HTTPStatus.OK)
 
-@users_router.put('/api/syncservice/users/sync')
+@user_set_router.put('/api/syncservice/users/sync')
 def sync_users_set(sync : bool = False):
     """
     Syncs Redis and Blob Storage
@@ -63,7 +63,7 @@ def sync_users_set(sync : bool = False):
     except Exception as e:
         return Response(content = f"An exception occurred when syncing.\n{e}\n{traceback.format_exc()}", status_code = HTTPStatus.INTERNAL_SERVER_ERROR)
 
-@users_router.get('/api/syncservice/users/sync')
+@user_set_router.get('/api/syncservice/users/sync')
 def get_last_sync_as_json():
     """
     Returns information on the last sync as a json

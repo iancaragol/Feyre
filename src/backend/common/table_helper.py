@@ -1,16 +1,21 @@
 from datetime import datetime
 from os import environ
-from azure.data.tables import TableClient, TableServiceClient
+from azure.data.tables import TableClient, TableServiceClient, UpdateMode
 from azure.core.exceptions import ResourceExistsError, HttpResponseError
 
 # https://github.com/Azure/azure-sdk-for-python/blob/main/sdk/tables/azure-data-tables/samples/sample_create_client.py
 # https://github.com/Azure/azure-sdk-for-python/blob/main/sdk/tables/azure-data-tables/samples/sample_insert_delete_entities.py
 
 class TableHelper:
-    def __init__(self):
+    def __init__(self, logger = None):
         self.partition_key = environ.get("ENV")
         self.endpoint = environ.get("TABLE_ENDPOINT")
         self.connection_string = environ.get("STORAGE_ACCOUNT_CONNECTION_STRING")
+
+        # TODO(IAN)
+        # Instrument sync service with logger
+        # Right now we can just check with if (self.logger)
+        self.logger = logger
 
     def create_table_client(self, table_name : str):
         """
@@ -21,6 +26,9 @@ class TableHelper:
             table_name = table_name
         )
 
+        if (self.logger):
+            self.logger.info(f"[TABLE HELPER] Created table client for {table_name}")
+
         return table_client
 
     def create_table_service(self):
@@ -30,6 +38,10 @@ class TableHelper:
         table_service = TableServiceClient.from_connection_string(
             conn_str = self.connection_string
         )
+
+        if (self.logger):
+            self.logger.info(f"[TABLE HELPER] Created table service")
+
         return table_service
 
     def insert_entity(self, table_name : str, entity_json : dict):
@@ -42,7 +54,9 @@ class TableHelper:
         table_client = self.create_table_client(table_name = table_name)
         try:
             entity_json_formatted = self.format_entity(table_name = table_name, entity_json = entity_json)
-            resp = table_client.create_entity(entity = entity_json_formatted)
+            if (self.logger):
+                self.logger.info(f"[TABLE HELPER] Inserting entity {entity_json_formatted}")
+            resp = table_client.upsert_entity(mode=UpdateMode.MERGE, entity=entity_json_formatted)
             return entity_json_formatted["RowKey"]
         except Exception as e:
             print("An exception occurred. Retrying!")
@@ -56,6 +70,10 @@ class TableHelper:
 
         https://docs.microsoft.com/en-us/rest/api/storageservices/Querying-Tables-and-Entities?redirectedfrom=MSDN
         """
+
+        if (self.logger):
+            self.logger.info(f"[TABLE HELPER] Getting entity from {table_name} with row key {row_key}")
+
         table_client = self.create_table_client(table_name)
 
         if table_name == "stats":
@@ -74,6 +92,21 @@ class TableHelper:
 
         elif table_name == "characters":
             # For characters, should get the character list based on user_id
+
+            filter = f"PartitionKey eq '{self.partition_key}' and RowKey eq '{row_key}'"
+
+            if (self.logger):
+                self.logger.info(f"[TABLE HELPER] Using filter {filter} on table {table_name}")
+
+            entities = table_client.query_entities(query_filter = filter)
+
+            for entity in entities:
+                if (self.logger):
+                    self.logger.info(f"[TABLE HELPER] Got entity {entity}")
+
+                return dict(entity)
+            if (self.logger):
+                self.logger.info(f"[TABLE HELPER] No entries exist for filter.")
             return None
 
         elif table_name == "prefixes":
@@ -142,7 +175,9 @@ class TableHelper:
 
         elif table_name == "characters":
             # For characters, our row key should probably be the user id
-            return None
+            entity_json[u"PartitionKey"] = self.partition_key # Partition Key is the ENV, so Development/Production
+
+            return entity_json
 
         elif table_name == "prefixes":
             # For prefixes, our row key should be the guild id
