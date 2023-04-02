@@ -8,10 +8,12 @@ dotenv.config();
 const DISCORD_TOKEN = process.env.DISCORD_TOKEN;
 
 // Require the necessary discord.js classes
-const { Client, Intents, Collection } = require('discord.js');
+const { Client, IntentsBitField , Collection } = require('discord.js');
 
 // Create a new client instance
-const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.DIRECT_MESSAGES, Intents.FLAGS.GUILD_MESSAGES] });
+const feyreIntents = new IntentsBitField();
+feyreIntents.add(IntentsBitField.Flags.GuildMessages, IntentsBitField.Flags.Guilds, IntentsBitField.Flags.DirectMessages);
+const client = new Client({ intents: feyreIntents });
 
 // Load all commands from the commands folder
 const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
