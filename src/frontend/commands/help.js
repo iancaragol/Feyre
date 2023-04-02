@@ -1,6 +1,6 @@
 // Import SlashCommandBuild to handle slash commands
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const { MessageEmbed } = require('discord.js');
+const { EmbedBuilder } = require('discord.js');
 
 // Import our common backend functions
 const backend = require("./../common/backend");

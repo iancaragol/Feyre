@@ -1,6 +1,6 @@
 // Import SlashCommandBuild to handle slash commands
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const { MessageEmbed, MessageActionRow, MessageButton, IntegrationApplication } = require('discord.js');
+const { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
 
 // Import our common backend functions
 const backend = require("./../common/backend");
@@ -12,21 +12,21 @@ const embedColors = require('./../common/embed_colors')
 let status_codes = [200, 202, 500, 504]
 
 // Button row for all initiative messages
-const initButtons = new MessageActionRow()
+const initButtons = new ActionRowBuilder()
     .addComponents(
-        new MessageButton()
+        new ButtonBuilder()
             .setCustomId('init_join')
             .setLabel('➕ Join')
-            .setStyle('PRIMARY'),
-        new MessageButton()
+            .setStyle(ButtonStyle.Primary),
+        new ButtonBuilder()
             .setCustomId('init_next')
             .setLabel('⚔️ Next')
-            .setStyle('SUCCESS'),
-        // new MessageButton()
+            .setStyle(ButtonStyle.Success),
+        // new ButtonBuilder()
         //     .setCustomId('init_refresh')
         //     .setLabel('Refresh')
         //     .setStyle('SECONDARY'),
-        // new MessageButton()
+        // new ButtonBuilder()
         //     .setCustomId('init_leave')
         //     .setLabel('Leave')
         //     .setStyle('DANGER'),
@@ -190,7 +190,7 @@ module.exports = {
                 message: `[INIT] Response body: ${String(response)}`
             });
 
-            responseEmbed = new MessageEmbed().setColor(embedColors.successEmbedColor)
+            responseEmbed = new EmbedBuilder().setColor(embedColors.successEmbedColor)
             responseEmbed.setTitle("[              Initiative              ]")
             turnOrderString = ""
             
@@ -210,8 +210,8 @@ module.exports = {
                 turnOrderString.trim()
             )
 
-            responseEmbed.addField(
-                "Round: ", String(response.turn)
+            responseEmbed.addFields(
+                { name: "Round: ", value: String(response.turn) }
             )
 
             logger.log({
@@ -235,7 +235,7 @@ module.exports = {
                 error_string = response.exception_message + "\n\n**You can refresh the tracker with /init get or reset it with /init reset**"
             }
 
-            responseEmbed = new MessageEmbed().setColor(embedColors.errorEmbedColor)
+            responseEmbed = new EmbedBuilder().setColor(embedColors.errorEmbedColor)
             .setTitle("Oops!")
             .setDescription(error_string)
 
@@ -249,7 +249,7 @@ module.exports = {
                 message: `[INIT] Response status code was unexpected. StatusCode: ${request.statusCode}`
             });
 
-            responseEmbed = new MessageEmbed().setColor(embedColors.errorEmbedColor)
+            responseEmbed = new EmbedBuilder().setColor(embedColors.errorEmbedColor)
             .addFields(
                 { name: "Unexpected Response", value: request.statusCode }
             )
@@ -261,7 +261,7 @@ module.exports = {
     // Executes the command from message context
     async execute_message(content, user, guild, logger)
     {
-        responseEmbed = new MessageEmbed().setColor(embedColors.errorEmbedColor)
+        responseEmbed = new EmbedBuilder().setColor(embedColors.errorEmbedColor)
         .setTitle("DMs are not supported")
         .setDescription("Sorry, initiative tracking requires using slash (/) commands. See /help init for details!")
         
@@ -279,7 +279,7 @@ module.exports = {
 
         // If command was executed in DM context
         if (interaction.guild == null) {   
-            response = new MessageEmbed().setColor(embedColors.errorEmbedColor)
+            response = new EmbedBuilder().setColor(embedColors.errorEmbedColor)
             .setTitle("DMs are not supported")
             .setDescription("Sorry, the initiative tracker can not be used in Direct Messages. See /help init for details!")
 
@@ -301,7 +301,7 @@ module.exports = {
                 message: '[INIT] Count is not supported yet'
             });
 
-            response = new MessageEmbed().setColor(embedColors.errorEmbedColor)
+            response = new EmbedBuilder().setColor(embedColors.errorEmbedColor)
             .setTitle("Count is not supported")
             .setDescription("Sorry, the count argument is not supported yet!")
 

@@ -1,6 +1,6 @@
 // Import SlashCommandBuild to handle slash commands
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const { MessageEmbed, MessageActionRow, MessageButton, IntegrationApplication } = require('discord.js');
+const { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
 
 // Import our common backend functions
 const backend = require("./../common/backend");
@@ -52,6 +52,18 @@ module.exports = {
                 level: 'info',
                 message: `[CHARACTER] Executing character operation. Type is ${type}`
             });
+
+            // If no initiative is provided, then we fail
+            if (type === 'add' && characterName && !characterInit)
+            {
+                error_string = "You need to specify the initiative roll for your character."
+                responseEmbed = new EmbedBuilder().setColor(embedColors.errorEmbedColor)
+                .addFields(
+                    { name: "Oops! Something broke.", value: error_string }
+                )
+
+                return [responseEmbed, []];
+            }
 
             // If we are joining, and character and roll are provided then those
             // Values need to be included in the PUT Query
@@ -108,12 +120,12 @@ module.exports = {
                     message: `[CHARACTER] Backend returned 200 OK. Constructing response embed.`
                 });
 
-                responseEmbed = new MessageEmbed().setColor(embedColors.successEmbedColor)
+                responseEmbed = new EmbedBuilder().setColor(embedColors.successEmbedColor)
                 responseEmbed.setTitle("[                            Your Characters                             ]")
                 characterListString = "" // String that will be shown to users
                 buttons = []
 
-                buttonRow = new MessageActionRow()
+                buttonRow = new ActionRowBuilder()
 
                 if (response.characters.length > 0) { // User has characters
                     for (let i = 0; i < response.characters.length; i++) {
@@ -129,10 +141,10 @@ module.exports = {
                         }
 
                         buttonRow.addComponents(
-                            new MessageButton()
+                            new ButtonBuilder()
                                 .setCustomId(`character_${character.id}`)
                                 .setLabel(`${character.id}`)
-                                .setStyle('SECONDARY')
+                                .setStyle(ButtonStyle.Secondary)
                         )
 
                         // On the 5th iteration we need to create a new button row!
@@ -140,7 +152,7 @@ module.exports = {
                         if (i == 4 && i + 1 != response.characters.length) 
                         {
                             buttons.push(buttonRow)
-                            buttonRow = new MessageActionRow()
+                            buttonRow = new ActionRowBuilder()
                         }
                     }
 
@@ -171,7 +183,7 @@ module.exports = {
                 });
 
                 error_string = "There should be some error handling here...\nYou might have too many characters already created. The maximum is 9!"
-                responseEmbed = new MessageEmbed().setColor(embedColors.errorEmbedColor)
+                responseEmbed = new EmbedBuilder().setColor(embedColors.errorEmbedColor)
                 .addFields(
                     { name: "Oops! Something broke.", value: error_string }
                 )
@@ -186,7 +198,7 @@ module.exports = {
                     message: `[CHARACTER] Backend returned an unexpected response. Expression: ${expression}, StatusCode: ${request.statusCode}`
                 });
 
-                responseEmbed = new MessageEmbed().setColor(embedColors.errorEmbedColor)
+                responseEmbed = new EmbedBuilder().setColor(embedColors.errorEmbedColor)
                 .addFields(
                     { name: "Unexpected Response", value: request.statusCode }
                 )
@@ -203,7 +215,7 @@ module.exports = {
 
             if (debug)
             {
-                responseEmbed = new MessageEmbed().setColor(embedColors.errorEmbedColor)
+                responseEmbed = new EmbedBuilder().setColor(embedColors.errorEmbedColor)
                 .addFields(
                     { name: "Unhandled Exception", value: error.toString() }
                 )
@@ -211,7 +223,7 @@ module.exports = {
                 return [responseEmbed];
             }
             else {
-                responseEmbed = new MessageEmbed().setColor(embedColors.errorEmbedColor)
+                responseEmbed = new EmbedBuilder().setColor(embedColors.errorEmbedColor)
                 .addFields(
                     { name: "Oops!", value: "Something went wrong." }
                 )
@@ -224,7 +236,7 @@ module.exports = {
     // Executes the command from message context
     async execute_message(content, user, guild)
     {
-        responseEmbed = new MessageEmbed().setColor(embedColors.errorEmbedColor)
+        responseEmbed = new EmbedBuilder().setColor(embedColors.errorEmbedColor)
         .addFields(
             { name: "Not supported.", value: "Sorry, characters requires using slash (/) commands. See /help character for details!" }
         )

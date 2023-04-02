@@ -1,6 +1,6 @@
 // Import SlashCommandBuild to handle slash commands
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const { MessageEmbed } = require('discord.js');
+const { EmbedBuilder } = require('discord.js');
 
 // Import our common backend functions
 const backend = require("../common/backend");
@@ -53,7 +53,7 @@ module.exports = {
                 message: '[STATS] Backend returned 200 OK'
             });
 
-            responseEmbed = new MessageEmbed().setColor(embedColors.successEmbedColor)
+            responseEmbed = new EmbedBuilder().setColor(embedColors.successEmbedColor)
             responseEmbed.setTitle("Feyre - Statistics")
             
             var commandsBody = `**total** - ${response.total}
@@ -65,8 +65,8 @@ module.exports = {
 **stats** - ${response.stats}
 **help** - ${response.help}`
 
-            responseEmbed.addField(
-                "Commands", commandsBody
+            responseEmbed.addFields(
+                { name: "Commands", value: commandsBody }
             )
 
             var serverBody = `**Unique Users** - ${response.user_count}
@@ -74,8 +74,8 @@ module.exports = {
 **Servers** - ${serverCount}
 **Shards** - ${shardCount}`
 
-            responseEmbed.addField(
-                "Servers", serverBody
+            responseEmbed.addFields(
+                { name: "Servers", value: serverBody}
             )
 
             interaction.reply({ embeds: [responseEmbed]})
@@ -87,7 +87,7 @@ module.exports = {
                 message: '[STATS] Backend returned 500 INTERNAL SERVER ERROR'
             });
 
-            responseEmbed = new MessageEmbed().setColor(embedColors.errorEmbedColor)
+            responseEmbed = new EmbedBuilder().setColor(embedColors.errorEmbedColor)
                 .addFields(
                     { name: "Error", value: "Oops! Something went wrong." }
                 )

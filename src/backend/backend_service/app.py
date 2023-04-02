@@ -64,7 +64,7 @@ def check_sync_state():
         print("[#] This is a dev environment. Skipping!", flush = True)
         return
 
-    has_synced = False
+    has_synced = True
     i = 0
     while (not has_synced):
         try:

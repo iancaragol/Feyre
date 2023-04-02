@@ -1,6 +1,6 @@
 // Import SlashCommandBuild to handle slash commands
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const { MessageEmbed } = require('discord.js');
+const { EmbedBuilder } = require('discord.js');
 
 // Import our common backend functions
 const backend = require("./../common/backend");
@@ -62,7 +62,7 @@ module.exports = {
                 // Need to put this in a loop for multiple dice counts.
                 // Or display it differently, probably just the totals.
                 // Otherwise it will hit the max size of an embed and be hard to read
-                responseEmbed = new MessageEmbed().setColor(embedColors.successEmbedColor)
+                responseEmbed = new EmbedBuilder().setColor(embedColors.successEmbedColor)
 
                 if (response.parent_result.length > 1)
                 {
@@ -102,7 +102,7 @@ module.exports = {
                 });
 
                 error_string = response.expression + "\n" + response.exception_message
-                responseEmbed = new MessageEmbed().setColor(embedColors.errorEmbedColor)
+                responseEmbed = new EmbedBuilder().setColor(embedColors.errorEmbedColor)
                 .setTitle("Invalid Dice Expression")
                 .setDescription(error_string)
 
@@ -116,7 +116,7 @@ module.exports = {
                     message: `[ROLL] Backend returned an unexpected response. Expression: ${expression}, StatusCode: ${request.statusCode}`
                 });
 
-                responseEmbed = new MessageEmbed().setColor(embedColors.errorEmbedColor)
+                responseEmbed = new EmbedBuilder().setColor(embedColors.errorEmbedColor)
                 .addFields(
                     { name: "Unexpected Response", value: request.statusCode }
                 )
@@ -132,7 +132,7 @@ module.exports = {
             });
 
             if (debug) {
-                responseEmbed = new MessageEmbed().setColor(embedColors.errorEmbedColor)
+                responseEmbed = new EmbedBuilder().setColor(embedColors.errorEmbedColor)
                 .addFields(
                     { name: "Unhandled Exception", value: error.toString() }
                 )
@@ -140,7 +140,7 @@ module.exports = {
                 return responseEmbed;
             }
             else {
-                responseEmbed = new MessageEmbed().setColor(embedColors.errorEmbedColor)
+                responseEmbed = new EmbedBuilder().setColor(embedColors.errorEmbedColor)
                 .addFields(
                     { name: "Oops!", value: "Something went wrong." }
                 )

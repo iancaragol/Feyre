@@ -3,6 +3,11 @@
 **Have any questions? Reach out on the Feyre discord channel!**
 
 ---
+
+## 4/02/2023 - Bug Fixes and Discord Js Update
+
+Updated discord js to v14 which uses Discord's new v10 API. Fixed a bug where /character add "Name" would fail without an error message.
+
 ## 8/25/2022 - Preparing for the final move to slash commands
 
 Slash commands will be required starting on August 31st! The slash command version of the bot is finally "complete". It now has better logging and metrics which will help me diagnose any issues.

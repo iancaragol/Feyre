@@ -1,7 +1,7 @@
 // This function is useful for checking the frontend container health
 // Import SlashCommandBuild to handle slash commands
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const { MessageEmbed } = require('discord.js');
+const { EmbedBuilder } = require('discord.js');
 
 // Import our embed color constants
 const embedColors = require('./../common/embed_colors')
@@ -14,7 +14,7 @@ module.exports = {
 
     // Executes the command from message context
     async execute_message(content, user, guild) {
-        var responseEmbed = new MessageEmbed().setColor(embedColors.successEmbedColor)
+        var responseEmbed = new EmbedBuilder().setColor(embedColors.successEmbedColor)
         responseEmbed.setTitle("pong")
 
         return responseEmbed
@@ -22,7 +22,7 @@ module.exports = {
 
     // Exucutes the command from an interaction (slash command) context
     async execute_interaction(interaction, logger) {
-        var responseEmbed = new MessageEmbed().setColor(embedColors.successEmbedColor)
+        var responseEmbed = new EmbedBuilder().setColor(embedColors.successEmbedColor)
         responseEmbed.setTitle("pong")
 
         interaction.reply({ embeds: [responseEmbed] });
