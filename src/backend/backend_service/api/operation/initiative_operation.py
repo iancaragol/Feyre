@@ -185,10 +185,10 @@ class InitiativeOperation():
         """
         tracker_json = self.redis_helper.get_initiative_tracker(self.guild, self.channel)
         if tracker_json:
-            self.logger.info(f"[INIT OPERATION > PUT] Tracker: {tracker_json}")
+            self.logger.info(f"[INIT OPERATION] Tracker: {tracker_json}")
             return InitiativeTracker(it_dict=tracker_json)
         else:
-            self.logger.info(f"[INIT OPERATION > PUT] Tracker is null.")
+            self.logger.info(f"[INIT OPERATION] Tracker is null.")
             return None
 
     async def put_tracker(self, tracker : InitiativeTracker):
@@ -208,7 +208,7 @@ class InitiativeOperation():
         Returns:
             An empty tracker
         """
-       
+        self.logger.info("[INIT OPERATION] Creating new tracker")
         tracker = InitiativeTracker(guild=guild, channel=channel)
         await self.put_tracker(tracker = tracker)
         return tracker

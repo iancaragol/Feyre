@@ -192,7 +192,12 @@ module.exports = {
 
             responseEmbed = new EmbedBuilder().setColor(embedColors.successEmbedColor)
             responseEmbed.setTitle("[              Initiative              ]")
+
             turnOrderString = ""
+            if (response.characters.length == 0)
+            {
+                turnOrderString = "No characters in initiative."
+            }
             
             for (let i = 0; i < response.characters.length; i++)
             {
